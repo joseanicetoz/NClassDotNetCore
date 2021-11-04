@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon />
+    <StartupObject />
+    <AssemblyName>NClass.DiagramEditor</AssemblyName>
+    <RootNamespace>NClass.DiagramEditor</RootNamespace>
+    <Authors>Balazs Tihanyi</Authors>
+    <Version>2.4</Version>
+    <Copyright>Copyright © Georgi Baychev 2016-2018, Balazs Tihanyi 2006-2009</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeGenerator\CodeGenerator.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\CSharp\CSharp.csproj" />
+    <ProjectReference Include="..\Java\Java.csproj" />
+  </ItemGroup>
+
+</Project>

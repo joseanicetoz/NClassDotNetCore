@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>NClass</AssemblyName>
+    <RootNamespace>NClass.GUI</RootNamespace>
+    <Version>2.4</Version>
+    <Copyright>Copyright (C) 2006-2009 Balazs Tihanyi</Copyright>
+    <Authors>Balazs Tihanyi</Authors>
+    <Description>NClass is a free tool to easily create UML class diagrams.</Description>
+    <NeutralLanguage>en-AU</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\DiagramEditor\DiagramEditor.csproj" />
+    <ProjectReference Include="..\Translations\Translations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NReflect">
+      <HintPath>..\AssemblyImport\libs\NReflect.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp">
+      <HintPath>..\PDFExport\libs\PdfSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
