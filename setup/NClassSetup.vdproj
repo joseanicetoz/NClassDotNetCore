@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F5B15C2E04B24242ABDFFB49C017A31C"
+        "MsmKey" = "8:_E2A01F15DE554853B7CE3F595047A7B2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -90,9 +106,9 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F5B15C2E04B24242ABDFFB49C017A31C"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E2A01F15DE554853B7CE3F595047A7B2"
             {
-            "SourcePath" = "8:..\\..\\src\\icons\\nclass.ico"
+            "SourcePath" = "8:..\\src\\GUI\\icons\\nclass.ico"
             "TargetName" = "8:nclass.ico"
             "Tag" = "8:"
             "Folder" = "8:_7CEEB833BFDF415F847F2DBEE4635D60"
@@ -184,7 +200,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:This is an attempt to port NClass v2.4 by Balazs Tihanyi to .NET Core."
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_F5B15C2E04B24242ABDFFB49C017A31C"
+        "ARPPRODUCTICON" = "8:_E2A01F15DE554853B7CE3F595047A7B2"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -688,7 +704,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E1D7EEBBEA3B4D87891BA808CC9BDCF6"
             {
-            "SourcePath" = "8:..\\..\\src\\GUI\\obj\\Debug\\net5.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\src\\GUI\\obj\\Debug\\net5.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7CEEB833BFDF415F847F2DBEE4635D60"

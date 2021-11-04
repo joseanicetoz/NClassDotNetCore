@@ -23,17 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiagramEditor", "DiagramEdi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeGenerator", "CodeGenerator\CodeGenerator.csproj", "{A00AE1AA-EA4F-42E5-8C0F-7664DDF9EBEA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icons", "icons", "{4A7559D8-A0DE-49A4-815A-833B6D0E0295}"
-	ProjectSection(SolutionItems) = preProject
-		icons\diagram.ico = icons\diagram.ico
-		icons\nclass.ico = icons\nclass.ico
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{42C556D7-33A6-427E-90ED-11231B50AD90}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDFExport", "PDFExport\PDFExport.csproj", "{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NClassSetup", "..\setup\NClassSetup\NClassSetup.vdproj", "{56F2965F-6F87-44D9-8D41-144E6E4769C9}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\setup\NClassSetup.vdproj", "{CE6ECD25-8AB2-4BB9-A508-CD34EE1691C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,8 +71,10 @@ Global
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56F2965F-6F87-44D9-8D41-144E6E4769C9}.Debug|Any CPU.ActiveCfg = Debug
-		{56F2965F-6F87-44D9-8D41-144E6E4769C9}.Release|Any CPU.ActiveCfg = Release
+		{CE6ECD25-8AB2-4BB9-A508-CD34EE1691C4}.Debug|Any CPU.ActiveCfg = Debug
+		{CE6ECD25-8AB2-4BB9-A508-CD34EE1691C4}.Debug|Any CPU.Build.0 = Debug
+		{CE6ECD25-8AB2-4BB9-A508-CD34EE1691C4}.Release|Any CPU.ActiveCfg = Release
+		{CE6ECD25-8AB2-4BB9-A508-CD34EE1691C4}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

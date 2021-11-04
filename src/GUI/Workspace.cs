@@ -337,8 +337,10 @@ namespace NClass.GUI
 			foreach (Project project in projects)
 			{
 				if (project.IsDirty)
-					allSaved &= SaveProject(project);
-			}
+                {
+                    allSaved &= SaveProject(project);
+                }
+            }
 			return allSaved;
 		}
 
@@ -377,31 +379,29 @@ namespace NClass.GUI
 		{
 			Project project = (Project) sender;
 			if (project == ActiveProject)
-				OnActiveProjectStateChanged(EventArgs.Empty);
-		}
+            {
+                OnActiveProjectStateChanged(EventArgs.Empty);
+            }
+        }
 
 		protected virtual void OnActiveProjectChanged(EventArgs e)
 		{
-			if (ActiveProjectChanged != null)
-				ActiveProjectChanged(this, EventArgs.Empty);
-		}
+            ActiveProjectChanged?.Invoke(this, EventArgs.Empty);
+        }
 
 		protected virtual void OnActiveProjectStateChanged(EventArgs e)
 		{
-			if (ActiveProjectStateChanged != null)
-				ActiveProjectStateChanged(this, EventArgs.Empty);
-		}
+            ActiveProjectStateChanged?.Invoke(this, EventArgs.Empty);
+        }
 
 		protected virtual void OnProjectAdded(ProjectEventArgs e)
 		{
-			if (ProjectAdded != null)
-				ProjectAdded(this, e);
-		}
+            ProjectAdded?.Invoke(this, e);
+        }
 
 		protected virtual void OnProjectRemoved(ProjectEventArgs e)
 		{
-			if (ProjectRemoved != null)
-				ProjectRemoved(this, e);
-		}
+            ProjectRemoved?.Invoke(this, e);
+        }
 	}
 }
