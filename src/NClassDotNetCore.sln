@@ -7,21 +7,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PlugIns", "PlugIns", "{A83F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Languages", "Languages", "{21627654-4FFB-4AEE-B1CE-E1AE514D9FD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyImport", "AssemblyImport\AssemblyImport.csproj", "{DBE5912F-CC01-43C9-B3ED-123C21B79406}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyImport", "AssemblyImport\AssemblyImport.csproj", "{DBE5912F-CC01-43C9-B3ED-123C21B79406}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{AE4C8491-7930-41AE-A110-20A802E20388}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Translations", "Translations\Translations.csproj", "{00561ADB-177D-4356-A48F-FA4E12B44704}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Translations", "Translations\Translations.csproj", "{00561ADB-177D-4356-A48F-FA4E12B44704}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{8863BE3E-73A8-4AF5-95F8-912F5EA2D680}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{8863BE3E-73A8-4AF5-95F8-912F5EA2D680}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharp", "CSharp\CSharp.csproj", "{AD50905F-ECDB-478B-974C-FAF94279383A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharp", "CSharp\CSharp.csproj", "{AD50905F-ECDB-478B-974C-FAF94279383A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java", "Java\Java.csproj", "{8EF17258-43D9-47EA-BD2E-93121E6CAAEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Java", "Java\Java.csproj", "{8EF17258-43D9-47EA-BD2E-93121E6CAAEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiagramEditor", "DiagramEditor\DiagramEditor.csproj", "{DEB5BA2B-8A7A-4FD4-9630-03E439692897}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiagramEditor", "DiagramEditor\DiagramEditor.csproj", "{DEB5BA2B-8A7A-4FD4-9630-03E439692897}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerator", "CodeGenerator\CodeGenerator.csproj", "{A00AE1AA-EA4F-42E5-8C0F-7664DDF9EBEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeGenerator", "CodeGenerator\CodeGenerator.csproj", "{A00AE1AA-EA4F-42E5-8C0F-7664DDF9EBEA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icons", "icons", "{4A7559D8-A0DE-49A4-815A-833B6D0E0295}"
 	ProjectSection(SolutionItems) = preProject
@@ -29,9 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "icons", "icons", "{4A7559D8
 		icons\nclass.ico = icons\nclass.ico
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{42C556D7-33A6-427E-90ED-11231B50AD90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{42C556D7-33A6-427E-90ED-11231B50AD90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFExport", "PDFExport\PDFExport.csproj", "{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDFExport", "PDFExport\PDFExport.csproj", "{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NClassSetup", "..\setup\NClassSetup\NClassSetup.vdproj", "{56F2965F-6F87-44D9-8D41-144E6E4769C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,8 @@ Global
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F52E931-4B89-490D-B2D9-EDD0C3B6CFF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F2965F-6F87-44D9-8D41-144E6E4769C9}.Debug|Any CPU.ActiveCfg = Debug
+		{56F2965F-6F87-44D9-8D41-144E6E4769C9}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
