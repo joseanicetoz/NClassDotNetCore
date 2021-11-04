@@ -2,8 +2,7 @@
 
 # NClassDotNetCore
 
-This is a .NET Core port of [NClass v2.4](http://nclass.sourceforge.net/index.html) by Balazs Tihanyi.
-
+This is an attempt to port [NClass v2.4](http://nclass.sourceforge.net/index.html) by Balazs Tihanyi to .NET Core.
 
 # Overview
 
