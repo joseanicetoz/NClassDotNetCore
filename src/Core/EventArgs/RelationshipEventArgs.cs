@@ -14,24 +14,23 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
-using System.Windows.Forms;
 
-namespace NClass.DiagramEditor
+namespace NClass.Core
 {
-	public delegate void PopupWindowEventHandler(object sender, PopupWindowEventArgs e);
+    public delegate void RelationshipEventHandler(object sender, RelationshipEventArgs e);
 
-	public class PopupWindowEventArgs
-	{
-		PopupWindow window;
+    public class RelationshipEventArgs : EventArgs
+    {
+        readonly Relationship relationship;
 
-		public PopupWindowEventArgs(PopupWindow window)
-		{
-			this.window = window;
-		}
+        public RelationshipEventArgs(Relationship relationship)
+        {
+            this.relationship = relationship;
+        }
 
-		public PopupWindow Window
-		{
-			get { return window; }
-		}
-	}
+        public Relationship Relationship
+        {
+            get { return relationship; }
+        }
+    }
 }

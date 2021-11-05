@@ -14,24 +14,23 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
-using NClass.Core;
 
-namespace NClass.GUI
+namespace NClass.Core
 {
-	public delegate void ProjectEventHandler(object sender, ProjectEventArgs e);
+    public delegate void EntityEventHandler(object sender, EntityEventArgs e);
 
-	public class ProjectEventArgs
-	{
-		Project project;
+    public class EntityEventArgs : EventArgs
+    {
+        readonly IEntity entity;
 
-		public ProjectEventArgs(Project project)
-		{
-			this.project = project;
-		}
+        public EntityEventArgs(IEntity entity)
+        {
+            this.entity = entity;
+        }
 
-		public Project Project
-		{
-			get { return project; }
-		}
-	}
+        public IEntity Entity
+        {
+            get { return entity; }
+        }
+    }
 }

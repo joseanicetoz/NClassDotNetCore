@@ -13,60 +13,59 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+using NClass.Core;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using NClass.Core;
 
 namespace NClass.DiagramEditor
 {
-	public interface IDocument : IProjectItem, IEditable, IPrintable
-	{
-		event EventHandler OffsetChanged;
-		event EventHandler SizeChanged;
-		event EventHandler ZoomChanged;
-		event EventHandler StatusChanged;
-		event EventHandler NeedsRedraw;
-		event PopupWindowEventHandler ShowingWindow;
-		event PopupWindowEventHandler HidingWindow;
+    public interface IDocument : IProjectItem, IEditable, IPrintable
+    {
+        event EventHandler OffsetChanged;
+        event EventHandler SizeChanged;
+        event EventHandler ZoomChanged;
+        event EventHandler StatusChanged;
+        event EventHandler NeedsRedraw;
+        event PopupWindowEventHandler ShowingWindow;
+        event PopupWindowEventHandler HidingWindow;
 
 
-		Point Offset { get; set; }
+        Point Offset { get; set; }
 
-		Size Size { get; }
+        Size Size { get; }
 
-		float Zoom { get; set; }
+        float Zoom { get; set; }
 
-		Color BackColor { get; }
+        Color BackColor { get; }
 
-		bool HasSelectedElement { get; }
+        bool HasSelectedElement { get; }
 
 
-		void Display(Graphics g);
+        void Display(Graphics g);
 
-		void Redraw();
+        void Redraw();
 
-		void CloseWindows();
+        void CloseWindows();
 
-		DynamicMenu GetDynamicMenu();
+        DynamicMenu GetDynamicMenu();
 
-		string GetStatus();
+        string GetStatus();
 
-		string GetShortDescription();
+        string GetShortDescription();
 
-		string GetSelectedElementName();
+        string GetSelectedElementName();
 
-		void MouseDown(AbsoluteMouseEventArgs e);
+        void MouseDown(AbsoluteMouseEventArgs e);
 
-		void MouseMove(AbsoluteMouseEventArgs e);
+        void MouseMove(AbsoluteMouseEventArgs e);
 
-		void MouseUp(AbsoluteMouseEventArgs e);
+        void MouseUp(AbsoluteMouseEventArgs e);
 
-		void DoubleClick(AbsoluteMouseEventArgs e);
+        void DoubleClick(AbsoluteMouseEventArgs e);
 
-		void KeyDown(KeyEventArgs e);
+        void KeyDown(KeyEventArgs e);
 
-		ContextMenuStrip GetContextMenu(AbsoluteMouseEventArgs e);
-	}
+        ContextMenuStrip GetContextMenu(AbsoluteMouseEventArgs e);
+    }
 }

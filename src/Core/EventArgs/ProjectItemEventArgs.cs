@@ -15,21 +15,22 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.Core
 {
-	public class EventArgs<T> : EventArgs
-	{
-		T value;
+    public delegate void ProjectItemEventHandler(object sender, ProjectItemEventArgs e);
 
-		public T Value
-		{
-			get { return this.value; }
-			set { this.value = value; }
-		}
+    public class ProjectItemEventArgs : EventArgs
+    {
+        readonly IProjectItem projectItem;
 
-		public EventArgs(T value)
-		{
-			this.value = value;
-		}
-	}
+        public ProjectItemEventArgs(IProjectItem projectItem)
+        {
+            this.projectItem = projectItem;
+        }
+
+        public IProjectItem ProjectItem
+        {
+            get { return projectItem; }
+        }
+    }
 }

@@ -13,30 +13,30 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+using NClass.Translations;
 using System;
 using System.Runtime.Serialization;
-using NClass.Translations;
 
 namespace NClass.Core
 {
-	public class RelationshipException : Exception
-	{
-		public RelationshipException() : base(Strings.ErrorCannotCreateRelationship)
-		{
-		}
+    public class RelationshipException : Exception
+    {
+        public RelationshipException() : base(Strings.ErrorCannotCreateRelationship)
+        {
+        }
 
-		public RelationshipException(string message) : base(message)
-		{
-		}
+        public RelationshipException(string message) : base(message)
+        {
+        }
 
-		public RelationshipException(string message, Exception innerException)
-			: base(message, innerException)
-		{
-		}
+        public RelationshipException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
 
-		protected RelationshipException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
-		{
-		}
-	}
+        protected RelationshipException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+    }
 }

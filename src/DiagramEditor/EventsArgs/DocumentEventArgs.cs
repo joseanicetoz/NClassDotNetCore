@@ -15,22 +15,22 @@
 
 using System;
 
-namespace NClass.Core
+namespace NClass.DiagramEditor
 {
-	public delegate void RelationshipEventHandler(object sender, RelationshipEventArgs e);
+    public delegate void DocumentEventHandler(object sender, DocumentEventArgs e);
 
-	public class RelationshipEventArgs : EventArgs
-	{
-		Relationship relationship;
+    public class DocumentEventArgs : EventArgs
+    {
+        readonly IDocument document;
 
-		public RelationshipEventArgs(Relationship relationship)
-		{
-			this.relationship = relationship;
-		}
+        public DocumentEventArgs(IDocument document)
+        {
+            this.document = document;
+        }
 
-		public Relationship Relationship
-		{
-			get { return relationship; }
-		}
-	}
+        public IDocument Document
+        {
+            get { return document; }
+        }
+    }
 }

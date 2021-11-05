@@ -17,28 +17,20 @@ using System;
 
 namespace NClass.DiagramEditor
 {
-	public delegate void DocumentMovedEventHandler(object sender, DocumentMovedEventArgs e);
+    [Obsolete("Already supported in .NET Core")]
+    public class EventArgs<T> : EventArgs
+    {
+        T value;
 
-	public class DocumentMovedEventArgs : DocumentEventArgs
-	{
-		int oldPostion;
-		int newPosition;
+        public T Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
 
-		public DocumentMovedEventArgs(IDocument document, int oldPostion, int newPosition)
-			: base(document)
-		{
-			this.oldPostion = oldPostion;
-			this.newPosition = newPosition;
-		}
-
-		public int OldPostion
-		{
-			get { return oldPostion; }
-		}
-
-		public int NewPosition
-		{
-			get { return newPosition; }
-		}
-	}
+        public EventArgs(T value)
+        {
+            this.value = value;
+        }
+    }
 }

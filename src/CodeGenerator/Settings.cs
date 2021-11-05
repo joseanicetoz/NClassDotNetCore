@@ -13,45 +13,45 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+using NClass.Core;
 using System;
-using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using NClass.Core;
+using System.Configuration;
 using System.IO;
 
 namespace NClass.CodeGenerator
 {
-	internal sealed partial class Settings
-	{
-		Dictionary<Language, StringCollection> importLists = new Dictionary<Language, StringCollection>();
+    internal sealed partial class Settings
+    {
+        readonly Dictionary<Language, StringCollection> importLists = new Dictionary<Language, StringCollection>();
 
-		public Settings()
-		{
-			this.SettingsLoaded += Settings_SettingsLoaded;
-		}
+        public Settings()
+        {
+            this.SettingsLoaded += Settings_SettingsLoaded;
+        }
 
-		public IDictionary<Language, StringCollection> ImportList
-		{
-			get { return importLists; }
-		}
+        public IDictionary<Language, StringCollection> ImportList
+        {
+            get { return importLists; }
+        }
 
-		private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
-		{
-			if (CSharpImportList == null)
-				CSharpImportList = new StringCollection();
-			if (JavaImportList == null)
-				JavaImportList = new StringCollection();
+        private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
+        {
+            if (CSharpImportList == null)
+                CSharpImportList = new StringCollection();
+            if (JavaImportList == null)
+                JavaImportList = new StringCollection();
 
-			ImportList.Clear();
-			ImportList.Add(CSharp.CSharpLanguage.Instance, CSharpImportList);
-			ImportList.Add(Java.JavaLanguage.Instance, JavaImportList);
+            ImportList.Clear();
+            ImportList.Add(CSharp.CSharpLanguage.Instance, CSharpImportList);
+            ImportList.Add(Java.JavaLanguage.Instance, JavaImportList);
 
-			if (string.IsNullOrEmpty(DestinationPath))
-			{
-				string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-				DestinationPath = Path.Combine(myDocuments, "NClass Generated Projects");
-			}
-		}
-	}
+            if (string.IsNullOrEmpty(DestinationPath))
+            {
+                string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                DestinationPath = Path.Combine(myDocuments, "NClass Generated Projects");
+            }
+        }
+    }
 }

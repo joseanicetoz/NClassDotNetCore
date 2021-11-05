@@ -17,20 +17,20 @@ using System;
 
 namespace NClass.Core
 {
-	public delegate void ProjectItemEventHandler(object sender, ProjectItemEventArgs e);
+    public delegate void ProjectEventHandler(object sender, ProjectEventArgs e);
 
-	public class ProjectItemEventArgs
-	{
-		IProjectItem projectItem;
+    public class ProjectEventArgs : EventArgs
+    {
+        readonly Project project;
 
-		public ProjectItemEventArgs(IProjectItem projectItem)
-		{
-			this.projectItem = projectItem;
-		}
+        public ProjectEventArgs(Project project)
+        {
+            this.project = project;
+        }
 
-		public IProjectItem ProjectItem
-		{
-			get { return projectItem; }
-		}
-	}
+        public Project Project
+        {
+            get { return project; }
+        }
+    }
 }

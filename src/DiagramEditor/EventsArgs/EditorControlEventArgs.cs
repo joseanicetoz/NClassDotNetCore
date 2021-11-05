@@ -17,20 +17,20 @@ using System;
 
 namespace NClass.DiagramEditor
 {
-	public delegate void DocumentEventHandler(object sender, DocumentEventArgs e);
+    public delegate void PopupWindowEventHandler(object sender, PopupWindowEventArgs e);
 
-	public class DocumentEventArgs
-	{
-		IDocument document;
+    public class PopupWindowEventArgs : EventArgs
+    {
+        readonly PopupWindow window;
 
-		public DocumentEventArgs(IDocument document)
-		{
-			this.document = document;
-		}
+        public PopupWindowEventArgs(PopupWindow window)
+        {
+            this.window = window;
+        }
 
-		public IDocument Document
-		{
-			get { return document; }
-		}
-	}
+        public PopupWindow Window
+        {
+            get { return window; }
+        }
+    }
 }

@@ -15,8 +15,8 @@
 
 namespace NClass.AssemblyImport.Lang
 {
-	// Empty partial class for a resgen hack.
-  internal partial class Strings
-	{
-	}
+    // Empty partial class for a resgen hack.
+    internal partial class Strings
+    {
+    }
 }

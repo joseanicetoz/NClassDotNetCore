@@ -13,24 +13,30 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using System;
-
-namespace NClass.Core
+namespace NClass.DiagramEditor
 {
-	public delegate void EntityEventHandler(object sender, EntityEventArgs e);
+    public delegate void DocumentMovedEventHandler(object sender, DocumentMovedEventArgs e);
 
-	public class EntityEventArgs : EventArgs
-	{
-		IEntity entity;
+    public class DocumentMovedEventArgs : DocumentEventArgs
+    {
+        readonly int oldPostion;
+        readonly int newPosition;
 
-		public EntityEventArgs(IEntity entity)
-		{
-			this.entity = entity;
-		}
+        public DocumentMovedEventArgs(IDocument document, int oldPostion, int newPosition)
+            : base(document)
+        {
+            this.oldPostion = oldPostion;
+            this.newPosition = newPosition;
+        }
 
-		public IEntity Entity
-		{
-			get { return entity; }
-		}
-	}
+        public int OldPostion
+        {
+            get { return oldPostion; }
+        }
+
+        public int NewPosition
+        {
+            get { return newPosition; }
+        }
+    }
 }
