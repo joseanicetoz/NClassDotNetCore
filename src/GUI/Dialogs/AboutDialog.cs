@@ -31,17 +31,27 @@ namespace NClass.GUI.Dialogs
             this.Text = Strings.AboutNClass;
             lblTitle.Text = Program.GetVersionString();
             lblCopyright.Text = "Copyright (C) 2006-2009 " + Strings.Author;
-            lblStatus.Text = string.Format(Strings.BetaVersion);
-            lnkEmail.Text = Strings.SendEmail;
-            lnkHomepage.Text = Strings.VisitHomepage;
+            //lblStatus.Text = string.Format(Strings.BetaVersion);
             btnClose.Text = Strings.ButtonClose;
 
+            //lnkHomepage.Text = Strings.VisitHomepage;
             lnkHomepage.Links.Clear();
+            lnkHomepage.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.WebAddress });
+
+            //lnkEmail.Text = Strings.SendEmail;
             lnkEmail.Links.Clear();
-            lnkHomepage.Links.Add(0, lnkHomepage.Text.Length, Properties.Resources.WebAddress);
-            lnkEmail.Links.Add(0, lnkEmail.Text.Length,
-                "mailto:" + Properties.Resources.MailAddress + "?subject=NClass");
+            lnkEmail.Links.Add(new LinkLabel.Link { LinkData = "mailto:" + Properties.Resources.MailAddress + "?subject=NClass" });
+
             lblTranslator.Text = Strings.Translator;
+
+            lnkIcons.Links.Clear();
+            lnkIcons.Links.Add(new LinkLabel.Link { LinkData = @"https://icons8.com" });
+
+            lnkGitHub.Links.Clear();
+            lnkGitHub.Links.Add(new LinkLabel.Link { LinkData = @"https://github.com/joseanicetoz/NClassDotNetCore" });
+
+            lnkLicense.Links.Clear();
+            lnkLicense.Links.Add(new LinkLabel.Link { LinkData = @"https://github.com/joseanicetoz/NClassDotNetCore/blob/master/LICENSE" });        
         }
 
         protected override void OnLoad(EventArgs e)
@@ -52,9 +62,7 @@ namespace NClass.GUI.Dialogs
 
         private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string target = e.Link.LinkData as string;
-
-            if (target != null)
+            if (e.Link.LinkData is string target)
             {
                 try
                 {
@@ -72,9 +80,7 @@ namespace NClass.GUI.Dialogs
 
         private void lnkHomepage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string target = e.Link.LinkData as string;
-
-            if (target != null)
+            if (e.Link.LinkData is string target)
             {
                 try
                 {

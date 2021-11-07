@@ -79,10 +79,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
 
         protected override bool CloneRelationship(Diagram diagram, Shape first, Shape second)
         {
-            TypeBase firstType = first.Entity as TypeBase;
-            InterfaceType secondType = second.Entity as InterfaceType;
-
-            if (firstType != null && secondType != null)
+            if (first.Entity is TypeBase firstType && second.Entity is InterfaceType secondType)
             {
                 RealizationRelationship clone = realization.Clone(firstType, secondType);
                 return diagram.InsertRealization(clone);

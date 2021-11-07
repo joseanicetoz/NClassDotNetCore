@@ -40,8 +40,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Dialogs
 
         private void OnContentsChanged(EventArgs e)
         {
-            if (ContentsChanged != null)
-                ContentsChanged(this, e);
+            ContentsChanged?.Invoke(this, e);
         }
 
         private void UpdateTexts()
@@ -95,11 +94,11 @@ namespace NClass.DiagramEditor.ClassDiagram.Dialogs
             toolNewDestructor.Visible = parent.SupportsDestructors;
             toolNewProperty.Visible = parent.SupportsProperties;
             toolNewEvent.Visible = parent.SupportsEvents;
-            toolOverrideList.Visible = parent is SingleInharitanceType;
+            toolOverrideList.Visible = parent is SingleInheritanceType;
             toolImplementList.Visible = parent is IInterfaceImplementer;
             toolImplementList.Enabled = (parent is IInterfaceImplementer) &&
                 ((IInterfaceImplementer)parent).ImplementsInterface;
-            toolSepAddNew.Visible = parent is SingleInharitanceType ||
+            toolSepAddNew.Visible = parent is SingleInheritanceType ||
                 parent is IInterfaceImplementer;
 
             errorProvider.SetError(txtSyntax, null);
@@ -265,12 +264,9 @@ namespace NClass.DiagramEditor.ClassDiagram.Dialogs
         /// </exception>
         private ListViewItem AddFieldToList(Field field)
         {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
             ListViewItem item = lstMembers.Items.Insert(attributeCount, "");
 
-            item.Tag = field;
+            item.Tag = field ?? throw new ArgumentNullException(nameof(field));
             item.ImageIndex = Icons.GetImageIndex(field);
             item.SubItems.Add(field.Name);
             item.SubItems.Add(field.Type);
@@ -287,12 +283,9 @@ namespace NClass.DiagramEditor.ClassDiagram.Dialogs
         /// </exception>
         private ListViewItem AddOperationToList(Operation operation)
         {
-            if (operation == null)
-                throw new ArgumentNullException("operation");
-
             ListViewItem item = lstMembers.Items.Add("");
 
-            item.Tag = operation;
+            item.Tag = operation ?? throw new ArgumentNullException(nameof(operation));
             item.ImageIndex = Icons.GetImageIndex(operation);
             item.SubItems.Add(operation.Name);
             item.SubItems.Add(operation.Type);
@@ -1027,9 +1020,9 @@ namespace NClass.DiagramEditor.ClassDiagram.Dialogs
 
         private void toolOverrideList_Click(object sender, EventArgs e)
         {
-            if (parent is SingleInharitanceType)
+            if (parent is SingleInheritanceType)
             {
-                SingleInharitanceType derivedType = (SingleInharitanceType)parent;
+                SingleInheritanceType derivedType = (SingleInheritanceType)parent;
                 using (OverrideDialog dialog = new OverrideDialog())
                 {
                     if (dialog.ShowDialog(derivedType) == DialogResult.OK)

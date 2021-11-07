@@ -67,19 +67,19 @@ namespace NClass.Core
                 throw new RelationshipException(Strings.ErrorNotAllowedChild);
             if (!BaseType.IsAllowedParent)
                 throw new RelationshipException(Strings.ErrorNotAllowedParent);
-            if (First is SingleInharitanceType && ((SingleInharitanceType)First).HasExplicitBase)
+            if (First is SingleInheritanceType type && type.HasExplicitBase)
                 throw new RelationshipException(Strings.ErrorMultipleBases);
-            if (First is SingleInharitanceType ^ Second is SingleInharitanceType ||
+            if (First is SingleInheritanceType ^ Second is SingleInheritanceType ||
                 First is InterfaceType ^ Second is InterfaceType)
                 throw new RelationshipException(Strings.ErrorInvalidBaseType);
 
-            if (First is SingleInharitanceType && Second is SingleInharitanceType)
+            if (First is SingleInheritanceType first && Second is SingleInheritanceType second)
             {
-                ((SingleInharitanceType)First).Base = (SingleInharitanceType)Second;
+                first.Base = second;
             }
-            else if (First is InterfaceType && Second is InterfaceType)
+            else if (First is InterfaceType first1 && Second is InterfaceType second1)
             {
-                ((InterfaceType)First).AddBase((InterfaceType)Second);
+                first1.AddBase(second1);
             }
         }
 
@@ -87,10 +87,10 @@ namespace NClass.Core
         {
             base.OnDetaching(e);
 
-            if (First is SingleInharitanceType)
-                ((SingleInharitanceType)First).Base = null;
-            else if (First is InterfaceType)
-                ((InterfaceType)First).RemoveBase(Second as InterfaceType);
+            if (First is SingleInheritanceType singletype)
+                singletype.Base = null;
+            else if (First is InterfaceType interfacetype)
+                interfacetype.RemoveBase(Second as InterfaceType);
         }
 
         public override string ToString()

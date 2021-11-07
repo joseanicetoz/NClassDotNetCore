@@ -67,12 +67,12 @@ namespace NClass.CodeGenerator
 
         private void WriteType(TypeBase type)
         {
-            if (type is CompositeType)
-                WriteCompositeType((CompositeType)type);
-            else if (type is EnumType)
-                WriteEnum((EnumType)type);
-            else if (type is DelegateType)
-                WriteDelegate((DelegateType)type);
+            if (type is CompositeType compositeType)
+                WriteCompositeType(compositeType);
+            else if (type is EnumType enumType)
+                WriteEnum(enumType);
+            else if (type is DelegateType delegateType)
+                WriteDelegate(delegateType);
         }
 
         private void WriteCompositeType(CompositeType type)
@@ -82,9 +82,9 @@ namespace NClass.CodeGenerator
             WriteLine("{");
             IndentLevel++;
 
-            if (type is ClassType)
+            if (type is ClassType classType)
             {
-                foreach (TypeBase nestedType in ((ClassType)type).NestedChilds)
+                foreach (TypeBase nestedType in classType.NestedChilds)
                 {
                     WriteType(nestedType);
                     AddBlankLine();
@@ -148,9 +148,9 @@ namespace NClass.CodeGenerator
         {
             WriteLine(operation.GetDeclaration());
 
-            if (operation is Property)
+            if (operation is Property propertyType)
             {
-                WriteProperty((Property)operation);
+                WriteProperty(propertyType);
             }
             else if (operation.HasBody)
             {

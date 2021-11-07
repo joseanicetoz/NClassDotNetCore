@@ -322,8 +322,7 @@ namespace NClass.Core
 
         private void OnReversed(EventArgs e)
         {
-            if (Reversed != null)
-                Reversed(this, e);
+            Reversed?.Invoke(this, e);
         }
 
         public override string ToString()

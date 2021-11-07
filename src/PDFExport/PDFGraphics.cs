@@ -283,7 +283,7 @@ namespace PDFExport
                     clippingRegion.Complement(region);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("combineMode");
+                    throw new ArgumentOutOfRangeException(nameof(combineMode));
             }
         }
 
@@ -520,18 +520,17 @@ namespace PDFExport
         {
             XBrush xbrush;
             SolidBrush solidBrush;
-            LinearGradientBrush lgBrush;
             if ((solidBrush = brush as SolidBrush) != null)
             {
                 xbrush = new XSolidBrush(solidBrush.Color);
             }
-            else if ((lgBrush = brush as LinearGradientBrush) != null)
+            else if (brush is LinearGradientBrush lgBrush)
             {
                 //There is no way to extract the angle of the gradient out of the GDI-brush.
                 //It only has a transformation matrix. To create a new gradient for pdfsharp,
                 //we use this matrix as follows:
                 //Create a "line" (start and end point) through the rectangle at the half of
-                //the heigth. The two points are p1 and p2. Transform these points with the
+                //the height. The two points are p1 and p2. Transform these points with the
                 //matrix. The transformed points are located on the border of the rectangle.
                 PointF p1 = new PointF(lgBrush.Rectangle.Left, lgBrush.Rectangle.Top + lgBrush.Rectangle.Height / 2.0f);
                 PointF p2 = new PointF(lgBrush.Rectangle.Right, lgBrush.Rectangle.Top + lgBrush.Rectangle.Height / 2.0f);

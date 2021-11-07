@@ -435,33 +435,28 @@ namespace NClass.Core
             if (!loading)
             {
                 isDirty = true;
-                if (Modified != null)
-                    Modified(this, e);
+                Modified?.Invoke(this, e);
             }
         }
 
         private void OnRenamed(EventArgs e)
         {
-            if (Renamed != null)
-                Renamed(this, e);
+            Renamed?.Invoke(this, e);
         }
 
         private void OnItemAdded(ProjectItemEventArgs e)
         {
-            if (ItemAdded != null)
-                ItemAdded(this, e);
+            ItemAdded?.Invoke(this, e);
         }
 
         private void OnItemRemoved(ProjectItemEventArgs e)
         {
-            if (ItemRemoved != null)
-                ItemRemoved(this, e);
+            ItemRemoved?.Invoke(this, e);
         }
 
         private void OnFileStateChanged(EventArgs e)
         {
-            if (FileStateChanged != null)
-                FileStateChanged(this, e);
+            FileStateChanged?.Invoke(this, e);
         }
 
         public override bool Equals(object obj)

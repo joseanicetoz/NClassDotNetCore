@@ -15,6 +15,18 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_1959B6BB95C441F7BA3C80BA1C53360B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D2FCDC8F759E43F9A23E0ED132A7AE3B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E1D7EEBBEA3B4D87891BA808CC9BDCF6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -50,6 +62,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -74,6 +94,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -106,6 +134,46 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1959B6BB95C441F7BA3C80BA1C53360B"
+            {
+            "SourcePath" = "8:..\\src\\CodeGenerator\\Templates\\csproj.template"
+            "TargetName" = "8:csproj.template"
+            "Tag" = "8:"
+            "Folder" = "8:_397BF2C53C1346FA9721F995A53C3CD6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D2FCDC8F759E43F9A23E0ED132A7AE3B"
+            {
+            "SourcePath" = "8:..\\src\\CodeGenerator\\Templates\\sln.template"
+            "TargetName" = "8:sln.template"
+            "Tag" = "8:"
+            "Folder" = "8:_397BF2C53C1346FA9721F995A53C3CD6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E2A01F15DE554853B7CE3F595047A7B2"
             {
             "SourcePath" = "8:..\\src\\GUI\\icons\\nclass.ico"
@@ -153,6 +221,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_397BF2C53C1346FA9721F995A53C3CD6"
+                    {
+                    "Name" = "8:Templates"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_8268025756DD48C0A9020FE15CBF32DD"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_C2D7A68A64784CB4AC4A0ADC5FA00665"
@@ -183,7 +262,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:NClass"
         "ProductCode" = "8:{9AC2A2AA-AB2A-488F-B4B2-DA1DB62EB138}"
-        "PackageCode" = "8:{BCA16D42-71C5-4B74-9C1D-B37B6FAA86FF}"
+        "PackageCode" = "8:{1E838EC1-5A3B-4E11-A7B4-7EE0714319EF}"
         "UpgradeCode" = "8:{04A23FE9-7346-4066-B639-FA5B6B8B6F9A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

@@ -36,10 +36,7 @@ namespace NClass.CodeGenerator
         /// </exception>
         protected SourceFileGenerator(TypeBase type, string rootNamespace)
         {
-            if (type == null)
-                throw new ArgumentNullException("type");
-
-            this.type = type;
+            this.type = type ?? throw new ArgumentNullException(nameof(type));
             this.rootNamespace = rootNamespace;
         }
 

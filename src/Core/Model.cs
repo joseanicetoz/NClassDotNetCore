@@ -48,13 +48,11 @@ namespace NClass.Core
         /// </exception>
         public Model(string name, Language language)
         {
-            if (language == null)
-                throw new ArgumentNullException("language");
             if (name != null && name.Length == 0)
                 throw new ArgumentException("Name cannot empty string.");
 
             this.name = name;
-            this.language = language;
+            this.language = language ?? throw new ArgumentNullException("language");
         }
 
         public string Name
@@ -620,10 +618,7 @@ namespace NClass.Core
             try
             {
                 Language language = Language.GetLanguage(languageElement.InnerText);
-                if (language == null)
-                    throw new InvalidDataException("Invalid project language.");
-
-                this.language = language;
+                this.language = language ?? throw new InvalidDataException("Invalid project language.");
             }
             catch (Exception ex)
             {
@@ -720,10 +715,9 @@ namespace NClass.Core
                 string type = node.GetAttribute("type");
                 string firstString = node.GetAttribute("first");
                 string secondString = node.GetAttribute("second");
-                int firstIndex, secondIndex;
 
-                if (!int.TryParse(firstString, out firstIndex) ||
-                    !int.TryParse(secondString, out secondIndex))
+                if (!int.TryParse(firstString, out int firstIndex) ||
+                    !int.TryParse(secondString, out int secondIndex))
                 {
                     throw new InvalidDataException(Strings.ErrorCorruptSaveFormat);
                 }
@@ -836,62 +830,53 @@ namespace NClass.Core
 
         protected virtual void OnEntityAdded(EntityEventArgs e)
         {
-            if (EntityAdded != null)
-                EntityAdded(this, e);
+            EntityAdded?.Invoke(this, e);
             OnModified(EventArgs.Empty);
         }
 
         protected virtual void OnEntityRemoved(EntityEventArgs e)
         {
-            if (EntityRemoved != null)
-                EntityRemoved(this, e);
+            EntityRemoved?.Invoke(this, e);
             OnModified(EventArgs.Empty);
         }
 
         protected virtual void OnRelationAdded(RelationshipEventArgs e)
         {
-            if (RelationAdded != null)
-                RelationAdded(this, e);
+            RelationAdded?.Invoke(this, e);
             OnModified(EventArgs.Empty);
         }
 
         protected virtual void OnRelationRemoved(RelationshipEventArgs e)
         {
-            if (RelationRemoved != null)
-                RelationRemoved(this, e);
+            RelationRemoved?.Invoke(this, e);
             OnModified(EventArgs.Empty);
         }
 
         protected virtual void OnSerializing(SerializeEventArgs e)
         {
-            if (Serializing != null)
-                Serializing(this, e);
+            Serializing?.Invoke(this, e);
         }
 
         protected virtual void OnDeserializing(SerializeEventArgs e)
         {
-            if (Deserializing != null)
-                Deserializing(this, e);
+            Deserializing?.Invoke(this, e);
             OnModified(EventArgs.Empty);
         }
 
         protected virtual void OnModified(EventArgs e)
         {
             isDirty = true;
-            if (Modified != null)
-                Modified(this, e);
+            Modified?.Invoke(this, e);
         }
 
         protected virtual void OnRenamed(EventArgs e)
         {
-            if (Renamed != null)
-                Renamed(this, e);
+            Renamed?.Invoke(this, e);
         }
 
         protected virtual void OnClosing(EventArgs e)
         {
-            if (Closing != null)
-                Closing(this, e);
+            Closing?.Invoke(this, e);
         }
 
         public override string ToString()

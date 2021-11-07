@@ -28,13 +28,8 @@ namespace NClass.Core
         /// </exception>
         protected TypeRelationship(TypeBase first, TypeBase second)
         {
-            if (first == null)
-                throw new ArgumentNullException("first");
-            if (second == null)
-                throw new ArgumentNullException("second");
-
-            this.first = first;
-            this.second = second;
+            this.first = first ?? throw new ArgumentNullException("first");
+            this.second = second ?? throw new ArgumentNullException("second");
         }
 
         //TODO: inkább abstract property-kre hivatkozzon

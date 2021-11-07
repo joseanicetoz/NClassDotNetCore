@@ -347,8 +347,7 @@ namespace NClass.CSharp
 
             if (operation.IsAbstract)
             {
-                ClassType parent = operation.Parent as ClassType;
-                if (parent == null)
+                if (operation.Parent is not ClassType parent)
                     throw new BadSyntaxException(Strings.ErrorInvalidModifier);
                 else
                     parent.Modifier = ClassModifier.Abstract;
@@ -430,9 +429,9 @@ namespace NClass.CSharp
             CompositeType newParent, bool explicitly)
         {
             if (newParent == null)
-                throw new ArgumentNullException("newParent");
+                throw new ArgumentNullException(nameof(newParent));
             if (operation == null)
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
 
             Operation newOperation = operation.Clone(newParent);
 
@@ -458,13 +457,13 @@ namespace NClass.CSharp
         protected override Operation Override(Operation operation, CompositeType newParent)
         {
             if (operation == null)
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
 
             if (!operation.IsVirtual && !operation.IsAbstract && !operation.IsOverride ||
                 operation.IsSealed)
             {
                 throw new ArgumentException(
-                    Strings.ErrorCannotOverride, "operation");
+                    Strings.ErrorCannotOverride, nameof(operation));
             }
 
             Operation newOperation = operation.Clone(newParent);

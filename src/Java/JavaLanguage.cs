@@ -317,8 +317,7 @@ namespace NClass.Java
 
             if (operation.IsAbstract)
             {
-                ClassType parent = operation.Parent as ClassType;
-                if (parent == null)
+                if (operation.Parent is not ClassType parent)
                     throw new BadSyntaxException(Strings.ErrorInvalidModifier);
                 else
                     parent.Modifier = ClassModifier.Abstract;
@@ -348,14 +347,14 @@ namespace NClass.Java
             CompositeType newParent, bool explicitly)
         {
             if (operation == null)
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             if (newParent == null)
-                throw new ArgumentNullException("newParent");
+                throw new ArgumentNullException(nameof(newParent));
 
             if (explicitly)
             {
                 throw new ArgumentException("Java does not support explicit" +
-                    "interface implementation.", "explicitly");
+                    "interface implementation.", nameof(explicitly));
             }
 
             Operation newOperation = operation.Clone(newParent);
@@ -376,12 +375,12 @@ namespace NClass.Java
         protected override Operation Override(Operation operation, CompositeType newParent)
         {
             if (operation == null)
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
 
             if (operation.Modifier == OperationModifier.Sealed)
             {
                 throw new ArgumentException(
-                    Strings.ErrorCannotOverride, "operation");
+                    Strings.ErrorCannotOverride, nameof(operation));
             }
 
             Operation newOperation = operation.Clone(newParent);

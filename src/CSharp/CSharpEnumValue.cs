@@ -61,8 +61,7 @@ namespace NClass.CSharp
                     Name = nameGroup.Value;
                     if (valueGroup.Success)
                     {
-                        int intValue;
-                        if (int.TryParse(valueGroup.Value, out intValue))
+                        if (int.TryParse(valueGroup.Value, out int intValue))
                             initValue = intValue;
                         else
                             initValue = null;

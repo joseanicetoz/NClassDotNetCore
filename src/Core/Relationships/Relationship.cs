@@ -137,26 +137,22 @@ namespace NClass.Core
 
         protected virtual void OnAttaching(EventArgs e)
         {
-            if (Attaching != null)
-                Attaching(this, e);
+            Attaching?.Invoke(this, e);
         }
 
         protected virtual void OnDetaching(EventArgs e)
         {
-            if (Detaching != null)
-                Detaching(this, e);
+            Detaching?.Invoke(this, e);
         }
 
         private void OnSerializing(SerializeEventArgs e)
         {
-            if (Serializing != null)
-                Serializing(this, e);
+            Serializing?.Invoke(this, e);
         }
 
         private void OnDeserializing(SerializeEventArgs e)
         {
-            if (Deserializing != null)
-                Deserializing(this, e);
+            Deserializing?.Invoke(this, e);
         }
 
         public abstract override string ToString();

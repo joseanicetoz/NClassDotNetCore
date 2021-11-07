@@ -32,10 +32,7 @@ namespace NClass.CodeGenerator
         /// </exception>
         protected SolutionGenerator(Project project)
         {
-            if (project == null)
-                throw new ArgumentNullException("project");
-
-            this.project = project;
+            this.project = project ?? throw new ArgumentNullException(nameof(project));
         }
 
         public string SolutionName
@@ -106,11 +103,10 @@ namespace NClass.CodeGenerator
             projectGenerators.Clear();
             foreach (IProjectItem projectItem in project.Items)
             {
-                Model model = projectItem as Model;
 
-                if (model != null)
+                if (projectItem as Model != null)
                 {
-                    ProjectGenerator projectGenerator = CreateProjectGenerator(model);
+                    ProjectGenerator projectGenerator = CreateProjectGenerator(projectItem as Model);
                     projectGenerators.Add(projectGenerator);
 
                     try

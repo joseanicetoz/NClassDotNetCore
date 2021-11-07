@@ -41,10 +41,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
         /// </exception>
         public BendPoint(Shape relativeShape, bool relativeToStartShape)
         {
-            if (relativeShape == null)
-                throw new ArgumentNullException("relativeShape");
-
-            this.relativeShape = relativeShape;
+            this.relativeShape = relativeShape ?? throw new ArgumentNullException(nameof(relativeShape));
             this.relativeToStartShape = relativeToStartShape;
         }
 
@@ -198,15 +195,13 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
             XmlElement xNode = node["X"];
             if (xNode != null)
             {
-                int x;
-                int.TryParse(xNode.InnerText, out x);
+                int.TryParse(xNode.InnerText, out int x);
                 X = x;
             }
             XmlElement yNode = node["Y"];
             if (yNode != null)
             {
-                int y;
-                int.TryParse(yNode.InnerText, out y);
+                int.TryParse(yNode.InnerText, out int y);
                 Y = y;
             }
         }

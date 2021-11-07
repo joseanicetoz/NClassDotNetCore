@@ -63,7 +63,7 @@ namespace NClass.Core
             if (getType && !string.IsNullOrEmpty(Type))
                 builder.AppendFormat(") : {0}", Type);
             else
-                builder.Append(")");
+                builder.Append(')');
 
             return builder.ToString();
         }

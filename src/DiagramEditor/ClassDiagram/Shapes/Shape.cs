@@ -57,7 +57,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Shapes
         protected Shape(IEntity entity)
         {
             if (entity == null)
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
 
             location = Point.Empty;
             size = DefaultSize;
@@ -547,20 +547,16 @@ namespace NClass.DiagramEditor.ClassDiagram.Shapes
             XmlElement locationNode = e.Node["Location"];
             if (locationNode != null)
             {
-                int left, top;
-
-                int.TryParse(locationNode.GetAttribute("left"), out left);
-                int.TryParse(locationNode.GetAttribute("top"), out top);
+                int.TryParse(locationNode.GetAttribute("left"), out int left);
+                int.TryParse(locationNode.GetAttribute("top"), out int top);
                 this.Location = new Point(left, top);
             }
 
             XmlElement sizeNode = e.Node["Size"];
             if (sizeNode != null)
             {
-                int width, height;
-
-                int.TryParse(sizeNode.GetAttribute("width"), out width);
-                int.TryParse(sizeNode.GetAttribute("height"), out height);
+                int.TryParse(sizeNode.GetAttribute("width"), out int width);
+                int.TryParse(sizeNode.GetAttribute("height"), out int height);
                 this.Size = new Size(width, height);
             }
         }
@@ -730,26 +726,22 @@ namespace NClass.DiagramEditor.ClassDiagram.Shapes
 
         protected virtual void OnMove(MoveEventArgs e)
         {
-            if (Move != null)
-                Move(this, e);
+            Move?.Invoke(this, e);
         }
 
         protected virtual void OnDragging(MoveEventArgs e)
         {
-            if (Dragging != null)
-                Dragging(this, e);
+            Dragging?.Invoke(this, e);
         }
 
         protected virtual void OnResizing(ResizeEventArgs e)
         {
-            if (Resizing != null)
-                Resizing(this, e);
+            Resizing?.Invoke(this, e);
         }
 
         protected virtual void OnResize(ResizeEventArgs e)
         {
-            if (Resize != null)
-                Resize(this, e);
+            Resize?.Invoke(this, e);
         }
 
         protected virtual void OnMouseEnter(EventArgs e)

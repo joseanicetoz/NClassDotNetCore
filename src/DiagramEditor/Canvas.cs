@@ -561,8 +561,7 @@ namespace NClass.DiagramEditor
         {
             UpdateDocumentOffset();
             Invalidate(); //TODO: SetDisplayRectLocation() kellene
-            if (MouseHWheel != null)
-                MouseHWheel(this, e);
+            MouseHWheel?.Invoke(this, e);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -669,20 +668,17 @@ namespace NClass.DiagramEditor
 
         private void OnZoomChanged(EventArgs e)
         {
-            if (ZoomChanged != null)
-                ZoomChanged(this, e);
+            ZoomChanged?.Invoke(this, e);
         }
 
         private void OnDocumentRedrawed(EventArgs e)
         {
-            if (DocumentRedrawed != null)
-                DocumentRedrawed(this, e);
+            DocumentRedrawed?.Invoke(this, e);
         }
 
         private void OnVisibleAreaChanged(EventArgs e)
         {
-            if (VisibleAreaChanged != null)
-                VisibleAreaChanged(this, e);
+            VisibleAreaChanged?.Invoke(this, e);
         }
     }
 }

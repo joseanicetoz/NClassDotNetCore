@@ -25,7 +25,7 @@ namespace NClass.DiagramEditor
             get
             {
                 if (First == null)
-                    return default(T);
+                    return default;
                 else
                     return First.Value;
             }
@@ -36,7 +36,7 @@ namespace NClass.DiagramEditor
             get
             {
                 if (First == null || First.Next == null)
-                    return default(T);
+                    return default;
                 else
                     return First.Next.Value;
             }
@@ -47,7 +47,7 @@ namespace NClass.DiagramEditor
             get
             {
                 if (Last == null || Last.Previous == null)
-                    return default(T);
+                    return default;
                 else
                     return Last.Previous.Value;
             }
@@ -58,7 +58,7 @@ namespace NClass.DiagramEditor
             get
             {
                 if (Last == null)
-                    return default(T);
+                    return default;
                 else
                     return Last.Value;
             }

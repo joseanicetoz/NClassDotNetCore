@@ -29,13 +29,8 @@ namespace NClass.Core
         /// </exception>
         internal CommentRelationship(Comment comment, IEntity entity)
         {
-            if (comment == null)
-                throw new ArgumentNullException("comment");
-            if (entity == null)
-                throw new ArgumentNullException("entity");
-
-            this.comment = comment;
-            this.entity = entity;
+            this.comment = comment ?? throw new ArgumentNullException(nameof(comment));
+            this.entity = entity ?? throw new ArgumentNullException(nameof(entity));
             Attach();
         }
 

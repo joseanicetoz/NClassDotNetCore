@@ -1804,58 +1804,49 @@ namespace NClass.DiagramEditor.ClassDiagram
 
         protected virtual void OnOffsetChanged(EventArgs e)
         {
-            if (OffsetChanged != null)
-                OffsetChanged(this, e);
+            OffsetChanged?.Invoke(this, e);
             UpdateWindowPosition();
         }
 
         protected virtual void OnSizeChanged(EventArgs e)
         {
-            if (SizeChanged != null)
-                SizeChanged(this, e);
+            SizeChanged?.Invoke(this, e);
         }
 
         protected virtual void OnZoomChanged(EventArgs e)
         {
-            if (ZoomChanged != null)
-                ZoomChanged(this, e);
+            ZoomChanged?.Invoke(this, e);
             CloseWindows();
         }
 
         protected virtual void OnSatusChanged(EventArgs e)
         {
-            if (StatusChanged != null)
-                StatusChanged(this, e);
+            StatusChanged?.Invoke(this, e);
         }
 
         protected virtual void OnSelectionChanged(EventArgs e)
         {
-            if (SelectionChanged != null)
-                SelectionChanged(this, e);
+            SelectionChanged?.Invoke(this, e);
         }
 
         protected virtual void OnNeedsRedraw(EventArgs e)
         {
-            if (NeedsRedraw != null)
-                NeedsRedraw(this, e);
+            NeedsRedraw?.Invoke(this, e);
         }
 
         protected virtual void OnClipboardAvailabilityChanged(EventArgs e)
         {
-            if (ClipboardAvailabilityChanged != null)
-                ClipboardAvailabilityChanged(this, e);
+            ClipboardAvailabilityChanged?.Invoke(this, e);
         }
 
         protected virtual void OnShowingWindow(PopupWindowEventArgs e)
         {
-            if (ShowingWindow != null)
-                ShowingWindow(this, e);
+            ShowingWindow?.Invoke(this, e);
         }
 
         protected virtual void OnHidingWindow(PopupWindowEventArgs e)
         {
-            if (HidingWindow != null)
-                HidingWindow(this, e);
+            HidingWindow?.Invoke(this, e);
         }
     }
 }

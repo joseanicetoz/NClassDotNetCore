@@ -28,10 +28,7 @@ namespace NClass.DiagramEditor
         /// </exception>
         public GdiGraphics(Graphics graphics)
         {
-            if (graphics == null)
-                throw new ArgumentNullException("graphics");
-
-            this.graphics = graphics;
+            this.graphics = graphics ?? throw new ArgumentNullException(nameof(graphics));
         }
 
         public Region Clip

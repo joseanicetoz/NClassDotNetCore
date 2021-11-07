@@ -21,6 +21,8 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Text.Json;
 
 namespace NClass.DiagramEditor
 {
@@ -183,8 +185,7 @@ namespace NClass.DiagramEditor
                         currentStyle.Dispose();
                     currentStyle = value.Clone();
                     SaveCurrentStyle();
-                    if (CurrentStyleChanged != null)
-                        CurrentStyleChanged(null, EventArgs.Empty);
+                    CurrentStyleChanged?.Invoke(null, EventArgs.Empty);
                 }
             }
         }
@@ -1432,7 +1433,9 @@ namespace NClass.DiagramEditor
                 {
                     string[] files = Directory.GetFiles(StylesDirectory, "*.dst");
                     foreach (string file in files)
+                    {
                         Load(file);
+                    }
 
                     return true;
                 }

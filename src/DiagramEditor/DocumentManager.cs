@@ -86,7 +86,7 @@ namespace NClass.DiagramEditor
         public void AddOrActivate(IDocument document)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
 
             EndSwitching();
 
@@ -252,26 +252,22 @@ namespace NClass.DiagramEditor
 
         protected virtual void OnActiveDocumentChanged(DocumentEventArgs e)
         {
-            if (ActiveDocumentChanged != null)
-                ActiveDocumentChanged(this, e);
+            ActiveDocumentChanged?.Invoke(this, e);
         }
 
         protected virtual void OnDocumentAdded(DocumentEventArgs e)
         {
-            if (DocumentAdded != null)
-                DocumentAdded(this, e);
+            DocumentAdded?.Invoke(this, e);
         }
 
         protected virtual void OnDocumentRemoved(DocumentEventArgs e)
         {
-            if (DocumentRemoved != null)
-                DocumentRemoved(this, e);
+            DocumentRemoved?.Invoke(this, e);
         }
 
         protected virtual void OnDocumentMoved(DocumentMovedEventArgs e)
         {
-            if (DocumentMoved != null)
-                DocumentMoved(this, e);
+            DocumentMoved?.Invoke(this, e);
         }
     }
 }

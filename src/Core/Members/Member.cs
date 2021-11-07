@@ -37,7 +37,7 @@ namespace NClass.Core
         protected Member(string name, CompositeType parent)
         {
             if (parent == null)
-                throw new ArgumentNullException("parent");
+                throw new ArgumentNullException(nameof(parent));
             if (parent.Language != this.Language)
                 throw new ArgumentException(Strings.ErrorLanguagesDoNotEqual);
 
@@ -65,7 +65,7 @@ namespace NClass.Core
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
 
                 if (parent != value)
                 {

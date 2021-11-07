@@ -59,10 +59,10 @@ namespace NClass.CodeGenerator
 
         private void WriteType(TypeBase type)
         {
-            if (type is CompositeType)
-                WriteCompositeType((CompositeType)type);
-            else if (type is EnumType)
-                WriteEnum((EnumType)type);
+            if (type is CompositeType compositeType)
+                WriteCompositeType(compositeType);
+            else if (type is EnumType enumType)
+                WriteEnum(enumType);
         }
 
         private void WriteCompositeType(CompositeType type)
@@ -72,9 +72,9 @@ namespace NClass.CodeGenerator
             AddBlankLine();
             IndentLevel++;
 
-            if (type is ClassType)
+            if (type is ClassType classType)
             {
-                foreach (TypeBase nestedType in ((ClassType)type).NestedChilds)
+                foreach (TypeBase nestedType in classType.NestedChilds)
                 {
                     WriteType(nestedType);
                     AddBlankLine();

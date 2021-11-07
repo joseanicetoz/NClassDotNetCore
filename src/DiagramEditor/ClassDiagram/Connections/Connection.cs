@@ -63,14 +63,9 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
         protected Connection(Relationship relationship, Shape startShape, Shape endShape)
         {
             if (relationship == null)
-                throw new ArgumentNullException("relationship");
-            if (startShape == null)
-                throw new ArgumentNullException("startShape");
-            if (endShape == null)
-                throw new ArgumentNullException("endShape");
-
-            this.startShape = startShape;
-            this.endShape = endShape;
+                throw new ArgumentNullException(nameof(relationship));
+            this.startShape = startShape ?? throw new ArgumentNullException(nameof(startShape));
+            this.endShape = endShape ?? throw new ArgumentNullException(nameof(endShape));
             InitOrientations();
             bendPoints.Add(new BendPoint(startShape, true));
             bendPoints.Add(new BendPoint(endShape, false));
@@ -270,8 +265,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
 
         private RectangleF GetLabelArea(Style style)
         {
-            bool horizontal;
-            PointF center = GetLineCenter(out horizontal);
+            PointF center = GetLineCenter(out bool horizontal);
 
             SizeF size = Graphics.MeasureString(Relationship.Label,
                 style.RelationshipTextFont, PointF.Empty, stringFormat);
@@ -472,8 +466,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
         {
             if (Relationship.Label != null)
             {
-                bool horizontal;
-                PointF center = GetLineCenter(out horizontal);
+                PointF center = GetLineCenter(out bool horizontal);
 
                 textBrush.Color = style.RelationshipTextColor;
                 if (horizontal)
@@ -1643,14 +1636,12 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
 
         protected virtual void OnRouteChanged(EventArgs e)
         {
-            if (RouteChanged != null)
-                RouteChanged(this, e);
+            RouteChanged?.Invoke(this, e);
         }
 
         protected virtual void OnBendPointMove(BendPointEventArgs e)
         {
-            if (BendPointMove != null)
-                BendPointMove(this, e);
+            BendPointMove?.Invoke(this, e);
         }
 
         protected virtual void OnSerializing(SerializeEventArgs e)
@@ -1684,15 +1675,13 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
             XmlElement oldEndNode = e.Node["EndNode"];
             if (oldStartNode != null && oldEndNode != null)
             {
-                bool isHorizontal;
-                bool.TryParse(oldStartNode.GetAttribute("isHorizontal"), out isHorizontal);
+                bool.TryParse(oldStartNode.GetAttribute("isHorizontal"), out bool isHorizontal);
                 startOrientation = (isHorizontal) ? LineOrientation.Horizontal : LineOrientation.Vertical;
                 bool.TryParse(oldEndNode.GetAttribute("isHorizontal"), out isHorizontal);
                 endOrientation = (isHorizontal) ? LineOrientation.Horizontal : LineOrientation.Vertical;
 
-                int startLocation, endLocation;
-                int.TryParse(oldStartNode.GetAttribute("location"), out startLocation);
-                int.TryParse(oldEndNode.GetAttribute("location"), out endLocation);
+                int.TryParse(oldStartNode.GetAttribute("location"), out int startLocation);
+                int.TryParse(oldEndNode.GetAttribute("location"), out int endLocation);
 
                 Reroute();
                 if (startOrientation == LineOrientation.Vertical)
@@ -1736,8 +1725,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Connections
                     XmlNodeList nodes = e.Node.SelectNodes("child::BendPoint");
                     foreach (XmlElement node in nodes)
                     {
-                        bool relativeToStartShape;
-                        bool.TryParse(node.GetAttribute("relativeToStartShape"), out relativeToStartShape);
+                        bool.TryParse(node.GetAttribute("relativeToStartShape"), out bool relativeToStartShape);
                         Shape relativeShape = relativeToStartShape ? startShape : endShape;
 
                         BendPoint point = new BendPoint(relativeShape, relativeToStartShape, false);

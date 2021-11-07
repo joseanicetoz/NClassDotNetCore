@@ -671,8 +671,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Shapes
 
         protected virtual void OnActiveMemberChanged(EventArgs e)
         {
-            if (ActiveMemberChanged != null)
-                ActiveMemberChanged(this, e);
+            ActiveMemberChanged?.Invoke(this, e);
 
             if (showedEditor != null)
             {
@@ -712,8 +711,7 @@ namespace NClass.DiagramEditor.ClassDiagram.Shapes
             XmlElement collapsedNode = e.Node["Collapsed"];
             if (collapsedNode != null)
             {
-                bool collapsed;
-                if (bool.TryParse(collapsedNode.InnerText, out collapsed))
+                if (bool.TryParse(collapsedNode.InnerText, out bool collapsed))
                     this.Collapsed = collapsed;
             }
             UpdateMinSize();

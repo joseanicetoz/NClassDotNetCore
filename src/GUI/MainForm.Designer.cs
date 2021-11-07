@@ -221,7 +221,7 @@ namespace NClass.GUI
             this.windowClient.Panel2.Controls.Add(this.toolsPanel);
             this.windowClient.Panel2MinSize = 100;
             this.windowClient.Size = new System.Drawing.Size(1041, 697);
-            this.windowClient.SplitterDistance = 798;
+            this.windowClient.SplitterDistance = 796;
             this.windowClient.SplitterWidth = 5;
             this.windowClient.TabIndex = 0;
             // 
@@ -233,7 +233,7 @@ namespace NClass.GUI
             this.tabbedWindow.Location = new System.Drawing.Point(1, 1);
             this.tabbedWindow.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.tabbedWindow.Name = "tabbedWindow";
-            this.tabbedWindow.Size = new System.Drawing.Size(796, 695);
+            this.tabbedWindow.Size = new System.Drawing.Size(794, 695);
             this.tabbedWindow.TabIndex = 0;
             // 
             // toolsPanel
@@ -258,8 +258,8 @@ namespace NClass.GUI
             this.toolsPanel.Panel2.Controls.Add(this.diagramNavigator);
             this.toolsPanel.Panel2.Padding = new System.Windows.Forms.Padding(1);
             this.toolsPanel.Panel2MinSize = 100;
-            this.toolsPanel.Size = new System.Drawing.Size(238, 697);
-            this.toolsPanel.SplitterDistance = 506;
+            this.toolsPanel.Size = new System.Drawing.Size(240, 697);
+            this.toolsPanel.SplitterDistance = 504;
             this.toolsPanel.SplitterWidth = 5;
             this.toolsPanel.TabIndex = 0;
             // 
@@ -267,7 +267,7 @@ namespace NClass.GUI
             // 
             this.modelExplorer.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.modelExplorer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modelExplorer.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.modelExplorer.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.modelExplorer.ImageIndex = 0;
             this.modelExplorer.Indent = 22;
             this.modelExplorer.ItemHeight = 18;
@@ -277,7 +277,7 @@ namespace NClass.GUI
             this.modelExplorer.Name = "modelExplorer";
             this.modelExplorer.SelectedImageIndex = 0;
             this.modelExplorer.ShowRootLines = false;
-            this.modelExplorer.Size = new System.Drawing.Size(236, 504);
+            this.modelExplorer.Size = new System.Drawing.Size(238, 502);
             this.modelExplorer.TabIndex = 0;
             this.modelExplorer.Workspace = null;
             this.modelExplorer.DocumentOpening += new NClass.DiagramEditor.DocumentEventHandler(this.modelExplorer_DocumentOpening);
@@ -290,7 +290,7 @@ namespace NClass.GUI
             this.diagramNavigator.Location = new System.Drawing.Point(1, 1);
             this.diagramNavigator.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.diagramNavigator.Name = "diagramNavigator";
-            this.diagramNavigator.Size = new System.Drawing.Size(236, 184);
+            this.diagramNavigator.Size = new System.Drawing.Size(238, 186);
             this.diagramNavigator.TabIndex = 0;
             this.diagramNavigator.Text = "diagramNavigator";
             // 
@@ -509,6 +509,7 @@ namespace NClass.GUI
             // mnuExit
             // 
             this.mnuExit.Name = "mnuExit";
+            this.mnuExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.mnuExit.Size = new System.Drawing.Size(165, 22);
             this.mnuExit.Text = "E&xit";
             this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);

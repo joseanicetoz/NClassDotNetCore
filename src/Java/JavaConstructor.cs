@@ -141,7 +141,7 @@ namespace NClass.Java
             if (AccessModifier != AccessModifier.Default)
             {
                 builder.Append(Language.GetAccessString(AccessModifier, true));
-                builder.Append(" ");
+                builder.Append(' ');
             }
 
             builder.AppendFormat("{0}(", Name);
@@ -152,7 +152,7 @@ namespace NClass.Java
                 if (i < ArgumentList.Count - 1)
                     builder.Append(", ");
             }
-            builder.Append(")");
+            builder.Append(')');
 
             return builder.ToString();
         }

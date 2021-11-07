@@ -175,7 +175,7 @@ namespace NClass.CSharp
             if (AccessModifier != AccessModifier.Default)
             {
                 builder.Append(Language.GetAccessString(AccessModifier, true));
-                builder.Append(" ");
+                builder.Append(' ');
             }
             if (IsStatic)
             {
@@ -190,7 +190,7 @@ namespace NClass.CSharp
                 if (i < ArgumentList.Count - 1)
                     builder.Append(", ");
             }
-            builder.Append(")");
+            builder.Append(')');
 
             return builder.ToString();
         }

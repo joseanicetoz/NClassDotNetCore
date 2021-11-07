@@ -277,14 +277,12 @@ namespace NClass.Core
 
         private void OnSerializing(SerializeEventArgs e)
         {
-            if (Serializing != null)
-                Serializing(this, e);
+            Serializing?.Invoke(this, e);
         }
 
         private void OnDeserializing(SerializeEventArgs e)
         {
-            if (Deserializing != null)
-                Deserializing(this, e);
+            Deserializing?.Invoke(this, e);
         }
 
         public override string ToString()

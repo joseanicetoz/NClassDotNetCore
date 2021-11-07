@@ -74,8 +74,7 @@ namespace NClass.Core
         private void OnModified(EventArgs e)
         {
             isDirty = true;
-            if (Modified != null)
-                Modified(this, e);
+            Modified?.Invoke(this, e);
         }
     }
 }

@@ -239,14 +239,14 @@ namespace NClass.Core
 
         public void RemoveMember(Member member)
         {
-            if (member is Field)
+            if (member is Field field)
             {
-                if (FieldList.Remove((Field)member))
+                if (FieldList.Remove(field))
                     Changed();
             }
-            else if (member is Operation)
+            else if (member is Operation operation)
             {
-                if (OperationList.Remove((Operation)member))
+                if (OperationList.Remove(operation))
                     Changed();
             }
         }
@@ -374,17 +374,15 @@ namespace NClass.Core
 
         private static int GetMemberOrdinal(Member member)
         {
-            if (member is Field)
+            if (member is Field field)
             {
-                if (((Field)member).IsConstant)
+                if (field.IsConstant)
                     return 0;
                 else
                     return 1;
             }
-            if (member is Property)
+            if (member is Property property)
             {
-                Property property = (Property)member;
-
                 if (property.IsReadonly)
                     return 2;
                 else if (property.IsWriteonly)
@@ -394,7 +392,7 @@ namespace NClass.Core
             }
             if (member is Constructor)
                 return 5;
-            if (member is Method && ((Method)member).IsOperator)
+            if (member is Method method && method.IsOperator)
                 return 6;
             if (member is Destructor)
                 return 8; // (!)

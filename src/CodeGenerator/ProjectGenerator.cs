@@ -30,10 +30,7 @@ namespace NClass.CodeGenerator
         /// </exception>
         protected ProjectGenerator(Model model)
         {
-            if (model == null)
-                throw new ArgumentNullException("model");
-
-            this.model = model;
+            this.model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public string ProjectName
@@ -96,9 +93,7 @@ namespace NClass.CodeGenerator
             fileNames.Clear();
             foreach (IEntity entity in model.Entities)
             {
-                TypeBase type = entity as TypeBase;
-
-                if (type != null && !type.IsNested)
+                if (entity is TypeBase type && !type.IsNested)
                 {
                     SourceFileGenerator sourceFile = CreateSourceFileGenerator(type);
 

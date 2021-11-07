@@ -147,9 +147,7 @@ namespace NClass.Translations
 
         public override bool Equals(object obj)
         {
-            UILanguage other = obj as UILanguage;
-
-            if (other == null)
+            if (obj is not UILanguage other)
                 return false;
             else if (this.IsDefault && other.IsDefault)
                 return true;

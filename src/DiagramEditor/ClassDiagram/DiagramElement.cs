@@ -208,7 +208,7 @@ namespace NClass.DiagramEditor.ClassDiagram
         public void Draw(IGraphics g, Style style)
         {
             if (style == null)
-                throw new ArgumentNullException("style");
+                throw new ArgumentNullException(nameof(style));
 
             Draw(g, false, style);
         }
@@ -242,38 +242,32 @@ namespace NClass.DiagramEditor.ClassDiagram
         {
             isDirty = true;
             NeedsRedraw = true;
-            if (Modified != null)
-                Modified(this, e);
+            Modified?.Invoke(this, e);
         }
 
         protected virtual void OnSelectionChanged(EventArgs e)
         {
-            if (SelectionChanged != null)
-                SelectionChanged(this, e);
+            SelectionChanged?.Invoke(this, e);
         }
 
         protected virtual void OnActivating(EventArgs e)
         {
-            if (Activating != null)
-                Activating(this, e);
+            Activating?.Invoke(this, e);
         }
 
         protected virtual void OnActivated(EventArgs e)
         {
-            if (Activated != null)
-                Activated(this, e);
+            Activated?.Invoke(this, e);
         }
 
         protected virtual void OnDeactivating(EventArgs e)
         {
-            if (Deactivating != null)
-                Deactivating(this, e);
+            Deactivating?.Invoke(this, e);
         }
 
         protected virtual void OnDeactivated(EventArgs e)
         {
-            if (Deactivated != null)
-                Deactivated(this, e);
+            Deactivated?.Invoke(this, e);
         }
 
         protected virtual void OnMouseDown(AbsoluteMouseEventArgs e)
@@ -281,27 +275,23 @@ namespace NClass.DiagramEditor.ClassDiagram
             isMousePressed = true;
             IsSelected = true;
 
-            if (MouseDown != null)
-                MouseDown(this, e);
+            MouseDown?.Invoke(this, e);
         }
 
         protected virtual void OnMouseMove(AbsoluteMouseEventArgs e)
         {
-            if (MouseMove != null)
-                MouseMove(this, e);
+            MouseMove?.Invoke(this, e);
         }
 
         protected virtual void OnMouseUp(AbsoluteMouseEventArgs e)
         {
             isMousePressed = false;
-            if (MouseUp != null)
-                MouseUp(this, e);
+            MouseUp?.Invoke(this, e);
         }
 
         protected virtual void OnDoubleClick(AbsoluteMouseEventArgs e)
         {
-            if (DoubleClick != null)
-                DoubleClick(this, e);
+            DoubleClick?.Invoke(this, e);
         }
 
         internal abstract void MousePressed(AbsoluteMouseEventArgs e);
