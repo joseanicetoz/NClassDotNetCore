@@ -4,6 +4,8 @@
 
 This is an attempt to port [NClass v2.4](http://nclass.sourceforge.net/index.html) by Balazs Tihanyi to .NET Core.
 
+Although .NET Core is cross-platform, NClass is based on WinForms technology and relies on the Mono Framework to run on non-Windows operatiing system.
+
 # Overview
 
 NClass is a free tool to easily create UML class diagrams with full C# and Java language support. The user interface is designed to be simple and user-friendly for easy and fast development. Properties, enums, delegates and other language specific elements are fully supported with strict syntactical and semantical verification.

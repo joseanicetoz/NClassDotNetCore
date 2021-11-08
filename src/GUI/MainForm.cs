@@ -916,5 +916,15 @@ namespace NClass.GUI
         }
 
         #endregion
+
+        private void toolUndo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolRedo_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

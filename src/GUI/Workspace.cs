@@ -303,18 +303,12 @@ namespace NClass.GUI
 
         public bool SaveActiveProject()
         {
-            if (HasActiveProject)
-                return SaveProject(ActiveProject);
-            else
-                return false;
+            return HasActiveProject ? SaveProject(ActiveProject) : false;
         }
 
         public bool SaveActiveProjectAs()
         {
-            if (HasActiveProject)
-                return SaveProjectAs(ActiveProject);
-            else
-                return false;
+            return HasActiveProject ? SaveProjectAs(ActiveProject) : false;
         }
 
         public bool SaveAllProjects()

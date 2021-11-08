@@ -31,7 +31,7 @@ namespace NClass.GUI.Dialogs
             this.Text = Strings.AboutNClass;
             lblTitle.Text = Program.GetVersionString();
             lblCopyright.Text = "Copyright (C) 2006-2009 " + Strings.Author;
-            //lblStatus.Text = string.Format(Strings.BetaVersion);
+            lblStatus.Text = string.Format(Strings.DotNetVersion);
             btnClose.Text = Strings.ButtonClose;
 
             //lnkHomepage.Text = Strings.VisitHomepage;
@@ -45,13 +45,13 @@ namespace NClass.GUI.Dialogs
             lblTranslator.Text = Strings.Translator;
 
             lnkIcons.Links.Clear();
-            lnkIcons.Links.Add(new LinkLabel.Link { LinkData = @"https://icons8.com" });
+            lnkIcons.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.Icons8WebAddress });
 
             lnkGitHub.Links.Clear();
-            lnkGitHub.Links.Add(new LinkLabel.Link { LinkData = @"https://github.com/joseanicetoz/NClassDotNetCore" });
+            lnkGitHub.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.GitHubWebAddress });
 
             lnkLicense.Links.Clear();
-            lnkLicense.Links.Add(new LinkLabel.Link { LinkData = @"https://github.com/joseanicetoz/NClassDotNetCore/blob/master/LICENSE" });        
+            lnkLicense.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.LicenseWebAddress });        
         }
 
         protected override void OnLoad(EventArgs e)

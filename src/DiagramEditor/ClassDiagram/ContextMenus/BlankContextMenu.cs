@@ -99,7 +99,7 @@ namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
             mnuNewNesting = new ToolStripMenuItem(Strings.MenuNesting, Resources.Nesting, mnuNewNesting_Click);
             mnuNewCommentRelationship = new ToolStripMenuItem(Strings.MenuCommentRelationship, Resources.CommentRel, mnuNewCommentRelationship_Click);
 
-            mnuMembersFormat = new ToolStripMenuItem(Strings.MenuMembersFormat, null);
+            mnuMembersFormat = new ToolStripMenuItem(Strings.MenuMembersFormat, Resources.Format);
             mnuShowType = new ToolStripMenuItem(Strings.MenuType, null);
             mnuShowType.CheckedChanged += mnuShowType_CheckedChanged;
             mnuShowType.CheckOnClick = true;
@@ -152,120 +152,101 @@ namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
 
         private void mnuNewClass_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Class);
+            Diagram?.CreateShape(EntityType.Class);
         }
 
         private void mnuNewStructure_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Structure);
+            Diagram?.CreateShape(EntityType.Structure);
         }
 
         private void mnuNewInterface_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Interface);
+            Diagram?.CreateShape(EntityType.Interface);
         }
 
         private void mnuNewEnum_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Enum);
+            Diagram?.CreateShape(EntityType.Enum);
         }
 
         private void mnuNewDelegate_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Delegate);
+            Diagram?.CreateShape(EntityType.Delegate);
         }
 
         private void mnuNewComment_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateShape(EntityType.Comment);
+            Diagram?.CreateShape(EntityType.Comment);
         }
 
         private void mnuNewAssociation_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Association);
+            Diagram?.CreateConnection(RelationshipType.Association);
         }
 
         private void mnuNewComposition_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Composition);
+            Diagram?.CreateConnection(RelationshipType.Composition);
         }
 
         private void mnuNewAggregation_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Aggregation);
+            Diagram?.CreateConnection(RelationshipType.Aggregation);
         }
 
         private void mnuNewGeneralization_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Generalization);
+            Diagram?.CreateConnection(RelationshipType.Generalization);
         }
 
         private void mnuNewRealization_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Realization);
+            Diagram?.CreateConnection(RelationshipType.Realization);
         }
 
         private void mnuNewDependency_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Dependency);
+            Diagram?.CreateConnection(RelationshipType.Dependency);
         }
 
         private void mnuNewNesting_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Nesting);
+            Diagram?.CreateConnection(RelationshipType.Nesting);
         }
 
         private void mnuNewCommentRelationship_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CreateConnection(RelationshipType.Comment);
+            Diagram?.CreateConnection(RelationshipType.Comment);
         }
 
         private void mnuShowType_CheckedChanged(object sender, EventArgs e)
         {
             DiagramEditor.Settings.Default.ShowType = ((ToolStripMenuItem)sender).Checked;
-            if (Diagram != null)
-                Diagram.Redraw();
+            Diagram?.Redraw();
         }
 
         private void mnuShowParameters_CheckedChanged(object sender, EventArgs e)
         {
             DiagramEditor.Settings.Default.ShowParameters = ((ToolStripMenuItem)sender).Checked;
-            if (Diagram != null)
-                Diagram.Redraw();
+            Diagram?.Redraw();
         }
 
         private void mnuShowParameterNames_CheckedChanged(object sender, EventArgs e)
         {
             DiagramEditor.Settings.Default.ShowParameterNames = ((ToolStripMenuItem)sender).Checked;
-            if (Diagram != null)
-                Diagram.Redraw();
+            Diagram?.Redraw();
         }
 
         private void mnuShowInitialValue_CheckedChanged(object sender, EventArgs e)
         {
             DiagramEditor.Settings.Default.ShowInitialValue = ((ToolStripMenuItem)sender).Checked;
-            if (Diagram != null)
-                Diagram.Redraw();
+            Diagram?.Redraw();
         }
 
         private void mnuPaste_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.Paste();
+            Diagram?.Paste();
         }
 
         private void mnuSaveAsImage_Click(object sender, EventArgs e)
@@ -276,8 +257,7 @@ namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
 
         private void mnuSelectAll_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.SelectAll();
+            Diagram?.SelectAll();
         }
     }
 }

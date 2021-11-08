@@ -1102,4 +1102,7 @@ Szeretné most letölteni a szükséges keretrendszert a Microsoft honlapjáról
   <data name="ButtonClear" xml:space="preserve">
     <value>Törlés</value>
   </data>
+  <data name="DotNetVersion" xml:space="preserve">
+    <value>.NET Core version</value>
+  </data>
 </root>

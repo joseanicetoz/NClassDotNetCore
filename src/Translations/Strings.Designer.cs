@@ -3008,5 +3008,13 @@ namespace NClass.Translations {
                 return ResourceManager.GetString("ZoomOut", resourceCulture);
             }
         }
+
+        public static string DotNetVersion
+        {
+            get
+            {
+                return ResourceManager.GetString("DotNetVersion", resourceCulture);
+            }
+        }
     }
 }

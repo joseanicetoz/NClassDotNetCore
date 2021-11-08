@@ -221,7 +221,7 @@ namespace NClass.GUI
             this.windowClient.Panel2.Controls.Add(this.toolsPanel);
             this.windowClient.Panel2MinSize = 100;
             this.windowClient.Size = new System.Drawing.Size(1041, 697);
-            this.windowClient.SplitterDistance = 796;
+            this.windowClient.SplitterDistance = 795;
             this.windowClient.SplitterWidth = 5;
             this.windowClient.TabIndex = 0;
             // 
@@ -233,7 +233,7 @@ namespace NClass.GUI
             this.tabbedWindow.Location = new System.Drawing.Point(1, 1);
             this.tabbedWindow.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.tabbedWindow.Name = "tabbedWindow";
-            this.tabbedWindow.Size = new System.Drawing.Size(794, 695);
+            this.tabbedWindow.Size = new System.Drawing.Size(793, 695);
             this.tabbedWindow.TabIndex = 0;
             // 
             // toolsPanel
@@ -258,8 +258,8 @@ namespace NClass.GUI
             this.toolsPanel.Panel2.Controls.Add(this.diagramNavigator);
             this.toolsPanel.Panel2.Padding = new System.Windows.Forms.Padding(1);
             this.toolsPanel.Panel2MinSize = 100;
-            this.toolsPanel.Size = new System.Drawing.Size(240, 697);
-            this.toolsPanel.SplitterDistance = 504;
+            this.toolsPanel.Size = new System.Drawing.Size(241, 697);
+            this.toolsPanel.SplitterDistance = 503;
             this.toolsPanel.SplitterWidth = 5;
             this.toolsPanel.TabIndex = 0;
             // 
@@ -277,7 +277,7 @@ namespace NClass.GUI
             this.modelExplorer.Name = "modelExplorer";
             this.modelExplorer.SelectedImageIndex = 0;
             this.modelExplorer.ShowRootLines = false;
-            this.modelExplorer.Size = new System.Drawing.Size(238, 502);
+            this.modelExplorer.Size = new System.Drawing.Size(239, 501);
             this.modelExplorer.TabIndex = 0;
             this.modelExplorer.Workspace = null;
             this.modelExplorer.DocumentOpening += new NClass.DiagramEditor.DocumentEventHandler(this.modelExplorer_DocumentOpening);
@@ -290,7 +290,7 @@ namespace NClass.GUI
             this.diagramNavigator.Location = new System.Drawing.Point(1, 1);
             this.diagramNavigator.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.diagramNavigator.Name = "diagramNavigator";
-            this.diagramNavigator.Size = new System.Drawing.Size(238, 186);
+            this.diagramNavigator.Size = new System.Drawing.Size(239, 187);
             this.diagramNavigator.TabIndex = 0;
             this.diagramNavigator.Text = "diagramNavigator";
             // 
@@ -537,7 +537,7 @@ namespace NClass.GUI
             this.mnuUndo.Image = global::NClass.GUI.Properties.Resources.Undo;
             this.mnuUndo.Name = "mnuUndo";
             this.mnuUndo.ShortcutKeyDisplayString = "Ctrl+Z";
-            this.mnuUndo.Size = new System.Drawing.Size(164, 22);
+            this.mnuUndo.Size = new System.Drawing.Size(180, 22);
             this.mnuUndo.Text = "&Undo";
             this.mnuUndo.Visible = false;
             this.mnuUndo.Click += new System.EventHandler(this.mnuUndo_Click);
@@ -547,7 +547,7 @@ namespace NClass.GUI
             this.mnuRedo.Image = global::NClass.GUI.Properties.Resources.Redo;
             this.mnuRedo.Name = "mnuRedo";
             this.mnuRedo.ShortcutKeyDisplayString = "Ctrl+Y";
-            this.mnuRedo.Size = new System.Drawing.Size(164, 22);
+            this.mnuRedo.Size = new System.Drawing.Size(180, 22);
             this.mnuRedo.Text = "&Redo";
             this.mnuRedo.Visible = false;
             this.mnuRedo.Click += new System.EventHandler(this.mnuRedo_Click);
@@ -555,7 +555,7 @@ namespace NClass.GUI
             // mnuSepReso
             // 
             this.mnuSepReso.Name = "mnuSepReso";
-            this.mnuSepReso.Size = new System.Drawing.Size(161, 6);
+            this.mnuSepReso.Size = new System.Drawing.Size(177, 6);
             this.mnuSepReso.Visible = false;
             // 
             // mnuCut
@@ -563,7 +563,7 @@ namespace NClass.GUI
             this.mnuCut.Image = global::NClass.GUI.Properties.Resources.Cut;
             this.mnuCut.Name = "mnuCut";
             this.mnuCut.ShortcutKeyDisplayString = "Ctrl+X";
-            this.mnuCut.Size = new System.Drawing.Size(164, 22);
+            this.mnuCut.Size = new System.Drawing.Size(180, 22);
             this.mnuCut.Text = "Cu&t";
             this.mnuCut.Click += new System.EventHandler(this.mnuCut_Click);
             // 
@@ -572,7 +572,7 @@ namespace NClass.GUI
             this.mnuCopy.Image = global::NClass.GUI.Properties.Resources.Copy;
             this.mnuCopy.Name = "mnuCopy";
             this.mnuCopy.ShortcutKeyDisplayString = "Ctrl+C";
-            this.mnuCopy.Size = new System.Drawing.Size(164, 22);
+            this.mnuCopy.Size = new System.Drawing.Size(180, 22);
             this.mnuCopy.Text = "&Copy";
             this.mnuCopy.Click += new System.EventHandler(this.mnuCopy_Click);
             // 
@@ -581,7 +581,7 @@ namespace NClass.GUI
             this.mnuPaste.Image = global::NClass.GUI.Properties.Resources.Paste;
             this.mnuPaste.Name = "mnuPaste";
             this.mnuPaste.ShortcutKeyDisplayString = "Ctrl+V";
-            this.mnuPaste.Size = new System.Drawing.Size(164, 22);
+            this.mnuPaste.Size = new System.Drawing.Size(180, 22);
             this.mnuPaste.Text = "&Paste";
             this.mnuPaste.Click += new System.EventHandler(this.mnuPaste_Click);
             // 
@@ -590,21 +590,21 @@ namespace NClass.GUI
             this.mnuDelete.Image = global::NClass.GUI.Properties.Resources.Delete;
             this.mnuDelete.Name = "mnuDelete";
             this.mnuDelete.ShortcutKeyDisplayString = "Del";
-            this.mnuDelete.Size = new System.Drawing.Size(164, 22);
+            this.mnuDelete.Size = new System.Drawing.Size(180, 22);
             this.mnuDelete.Text = "&Delete";
             this.mnuDelete.Click += new System.EventHandler(this.mnuDelete_Click);
             // 
             // mnuSepDelete
             // 
             this.mnuSepDelete.Name = "mnuSepDelete";
-            this.mnuSepDelete.Size = new System.Drawing.Size(161, 6);
+            this.mnuSepDelete.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuSelectAll
             // 
             this.mnuSelectAll.Name = "mnuSelectAll";
             this.mnuSelectAll.ShortcutKeyDisplayString = "";
             this.mnuSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.mnuSelectAll.Size = new System.Drawing.Size(164, 22);
+            this.mnuSelectAll.Size = new System.Drawing.Size(180, 22);
             this.mnuSelectAll.Text = "Select &All";
             this.mnuSelectAll.Click += new System.EventHandler(this.mnuSelectAll_Click);
             // 
@@ -645,60 +645,60 @@ namespace NClass.GUI
             // mnuZoom10
             // 
             this.mnuZoom10.Name = "mnuZoom10";
-            this.mnuZoom10.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom10.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom10.Text = "10%";
             this.mnuZoom10.Click += new System.EventHandler(this.mnuZoom10_Click);
             // 
             // mnuZoom25
             // 
             this.mnuZoom25.Name = "mnuZoom25";
-            this.mnuZoom25.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom25.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom25.Text = "25%";
             this.mnuZoom25.Click += new System.EventHandler(this.mnuZoom25_Click);
             // 
             // mnuZoom50
             // 
             this.mnuZoom50.Name = "mnuZoom50";
-            this.mnuZoom50.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom50.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom50.Text = "50%";
             this.mnuZoom50.Click += new System.EventHandler(this.mnuZoom50_Click);
             // 
             // mnuSep50
             // 
             this.mnuSep50.Name = "mnuSep50";
-            this.mnuSep50.Size = new System.Drawing.Size(99, 6);
+            this.mnuSep50.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuZoom100
             // 
             this.mnuZoom100.Image = global::NClass.GUI.Properties.Resources.ActualSize;
             this.mnuZoom100.Name = "mnuZoom100";
-            this.mnuZoom100.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom100.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom100.Text = "100%";
             this.mnuZoom100.Click += new System.EventHandler(this.mnuZoom100_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(99, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuZoom150
             // 
             this.mnuZoom150.Name = "mnuZoom150";
-            this.mnuZoom150.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom150.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom150.Text = "150%";
             this.mnuZoom150.Click += new System.EventHandler(this.mnuZoom150_Click);
             // 
             // mnuZoom200
             // 
             this.mnuZoom200.Name = "mnuZoom200";
-            this.mnuZoom200.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom200.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom200.Text = "200%";
             this.mnuZoom200.Click += new System.EventHandler(this.mnuZoom200_Click);
             // 
             // mnuZoom400
             // 
             this.mnuZoom400.Name = "mnuZoom400";
-            this.mnuZoom400.Size = new System.Drawing.Size(102, 22);
+            this.mnuZoom400.Size = new System.Drawing.Size(180, 22);
             this.mnuZoom400.Text = "400%";
             this.mnuZoom400.Click += new System.EventHandler(this.mnuZoom400_Click);
             // 
@@ -833,7 +833,7 @@ namespace NClass.GUI
             this.toolAutoZoom});
             this.standardToolStrip.Location = new System.Drawing.Point(3, 24);
             this.standardToolStrip.Name = "standardToolStrip";
-            this.standardToolStrip.Size = new System.Drawing.Size(396, 25);
+            this.standardToolStrip.Size = new System.Drawing.Size(479, 25);
             this.standardToolStrip.TabIndex = 1;
             // 
             // toolNew
@@ -1004,6 +1004,7 @@ namespace NClass.GUI
             this.toolUndo.Name = "toolUndo";
             this.toolUndo.Size = new System.Drawing.Size(23, 22);
             this.toolUndo.Visible = false;
+            this.toolUndo.Click += new System.EventHandler(this.toolUndo_Click);
             // 
             // toolRedo
             // 
@@ -1014,6 +1015,7 @@ namespace NClass.GUI
             this.toolRedo.Name = "toolRedo";
             this.toolRedo.Size = new System.Drawing.Size(23, 22);
             this.toolRedo.Visible = false;
+            this.toolRedo.Click += new System.EventHandler(this.toolRedo_Click);
             // 
             // toolSepRedo
             // 

@@ -83,32 +83,27 @@ namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
 
         private void mnuCut_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.Cut();
+            Diagram?.Cut();
         }
 
         private void mnuCopy_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.Copy();
+            Diagram?.Copy();
         }
 
         private void mnuDelete_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.DeleteSelectedElements();
+            Diagram?.DeleteSelectedElements();
         }
 
         private void mnuCopyAsImage_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.CopyAsImage();
+            Diagram?.CopyAsImage();
         }
 
         private void mnuSaveAsImage_Click(object sender, EventArgs e)
         {
-            if (Diagram != null)
-                Diagram.SaveAsImage(true);
+            Diagram?.SaveAsImage(true);
         }
     }
 }
