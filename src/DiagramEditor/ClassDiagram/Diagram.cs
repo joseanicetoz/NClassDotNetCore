@@ -370,14 +370,17 @@ namespace NClass.DiagramEditor.ClassDiagram
             if (CanCopyToClipboard)
             {
                 ElementContainer elements = new ElementContainer();
+
                 foreach (Shape shape in GetSelectedShapes())
                 {
                     elements.AddShape(shape);
                 }
+
                 foreach (Connection connection in GetSelectedConnections())
                 {
                     elements.AddConnection(connection);
                 }
+
                 Clipboard.Item = elements;
             }
         }

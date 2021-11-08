@@ -19,7 +19,7 @@ namespace NClass.DiagramEditor
 {
     public static class Clipboard
     {
-        public static IClipboardItem Item { get; set;  }
+        public static IClipboardItem Item { get; set; }
 
         public static bool IsEmpty { get { return (Item == null); } }
 
@@ -30,7 +30,7 @@ namespace NClass.DiagramEditor
 
         public static void Paste(IDocument document)
         {
-            if(document != null)
+            if (document != null)
             {
                 Item?.Paste(document);
             }
@@ -41,7 +41,10 @@ namespace NClass.DiagramEditor
         //public static IClipboardItem Item
         //{
         //    get { return Clipboard.item; }
-        //    set { Clipboard.item = value; }
+        //    set 
+        //    { 
+        //        Clipboard.item = value;
+        //    }
         //}
 
         //public static bool IsEmpty
