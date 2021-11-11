@@ -4,7 +4,7 @@
 
 This is an attempt to port [NClass v2.4](http://nclass.sourceforge.net/index.html) by Balazs Tihanyi to .NET Core.
 
-Although .NET Core is cross-platform, NClass is based on WinForms technology and relies on the Mono Framework to run on non-Windows operatiing system.
+Although .NET Core is a cross-platform framework, NClass is based on WinForms technology. Unfortunately at the moment, .NET Core/WinForms is only supported on the Windows operating system.
 
 # Overview
 
