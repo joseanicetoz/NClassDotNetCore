@@ -5,7 +5,7 @@
 This is an attempt to port [NClass v2.4](http://nclass.sourceforge.net/index.html) by Balazs Tihanyi to .NET Core.
 
 NClass is based on WinForms technology and although .NET Core is a cross-platform framework, unfortunately this project can only run on Windows operating system.
-This project curently no plans to port or convert NClass to a modern UI frameworks such as WinUI3 or .NET Maui.
+This project curently has no plans to port or convert NClass to a modern UI frameworks such as WinUI3 or .NET Maui.
 
 # Overview
 

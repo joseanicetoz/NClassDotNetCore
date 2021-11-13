@@ -36,7 +36,7 @@ namespace NClass.GUI
         {
         }
 
-        public Language GetInstance(string name)
+        public Language GetLanguage(string name)
         {
             return Languages.Find(o => o.Name.Equals(name));
         }
