@@ -23,7 +23,6 @@ Please note, NClass is far from complete. There are many missing features that a
 * Configurable diagram styles
 * Printing / saving to image
 * Multilingual user interface
-* Mono support for non-Windows users
 
 # Other NClass Projects
 
