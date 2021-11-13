@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -625,7 +625,7 @@ Biztos, hogy folytatni akarja?</value>
     <value>Függőség</value>
   </data>
   <data name="MenuDiagram" xml:space="preserve">
-    <value>&amp;Diagram</value>
+    <value>Diagram</value>
   </data>
   <data name="MenuDiagramSize" xml:space="preserve">
     <value>&amp;Diagram mérete...</value>

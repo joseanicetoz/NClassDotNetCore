@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -332,7 +332,7 @@
     <value>Mover para Baixo</value>
   </data>
   <data name="MenuAddNew" xml:space="preserve">
-    <value>&amp;Adicionar Novo</value>
+    <value>Adicionar Novo</value>
   </data>
   <data name="SaveAs" xml:space="preserve">
     <value>Salvar Como </value>
@@ -500,7 +500,7 @@ Não é possível definir o acesso modificador explícito em execução.</value>
     <value>Agregação</value>
   </data>
   <data name="MenuDiagram" xml:space="preserve">
-    <value>&amp;Diagrama</value>
+    <value>Diagrama</value>
   </data>
   <data name="MenuExport" xml:space="preserve">
     <value>&amp;Exportar</value>

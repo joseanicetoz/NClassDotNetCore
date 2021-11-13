@@ -328,7 +328,7 @@
     <value>Nach unten</value>
   </data>
   <data name="MenuAddNew" xml:space="preserve">
-    <value>&amp;Neu Hinzufügen</value>
+    <value>Neu Hinzufügen</value>
   </data>
   <data name="SaveAs" xml:space="preserve">
     <value>Speichern unter...</value>
@@ -495,7 +495,7 @@
     <value>Aggregator</value>
   </data>
   <data name="MenuDiagram" xml:space="preserve">
-    <value>&amp;Diagramm</value>
+    <value>Diagramm</value>
   </data>
   <data name="MenuExport" xml:space="preserve">
     <value>&amp;Exportieren</value>

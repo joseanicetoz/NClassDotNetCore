@@ -322,7 +322,7 @@
     <value>下移</value>
   </data>
   <data name="MenuAddNew" xml:space="preserve">
-    <value>新建(&amp;A)</value>
+    <value>新建</value>
   </data>
   <data name="SaveAs" xml:space="preserve">
     <value>另存为</value>
@@ -481,7 +481,7 @@
     <value>聚合</value>
   </data>
   <data name="MenuDiagram" xml:space="preserve">
-    <value>图(&amp;D)</value>
+    <value>图</value>
   </data>
   <data name="MenuExport" xml:space="preserve">
     <value>导出(&amp;E)</value>

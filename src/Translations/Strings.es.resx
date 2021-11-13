@@ -525,7 +525,7 @@
     <value>&amp;Sobre NClass...</value>
   </data>
   <data name="MenuAddNew" xml:space="preserve">
-    <value>Añadir &amp;nuevo</value>
+    <value>Añadir nuevo</value>
   </data>
   <data name="MenuAggregation" xml:space="preserve">
     <value>A&amp;gregación</value>
@@ -576,7 +576,7 @@
     <value>&amp;Dependencia</value>
   </data>
   <data name="MenuDiagram" xml:space="preserve">
-    <value>&amp;Diagrama</value>
+    <value>Diagrama</value>
   </data>
   <data name="MenuDirection" xml:space="preserve">
     <value>&amp;Dirección</value>

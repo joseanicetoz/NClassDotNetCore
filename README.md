@@ -1,4 +1,4 @@
-![NClassDotNetCore](/nclass_small.png)
+![NClassDotNetCore](/src/GUI/icons/nclass_small.png)
 
 # NClassDotNetCore
 
@@ -27,3 +27,20 @@ Please note, NClass is far from complete. There are many missing features that a
 # Other NClass Projects
 
 Here are other NClass projects on [GitHub](https://github.com/search?q=nclass+uml&type=Repositories).
+
+# How to build
+
+* Use [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/older-downloads/)
+
+* Run PowerShell script
+
+```
+Build-Sources.ps1
+```
+
+# Visual Studio Extensions (recommended)
+
+The following additional Visual Studio Extensions are recommended:
+
+* [ResXManager](https://marketplace.visualstudio.com/items?itemName=TomEnglert.ResXManager)
+* [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=visualstudioclient.MicrosoftVisualStudio2017InstallerProjects)
