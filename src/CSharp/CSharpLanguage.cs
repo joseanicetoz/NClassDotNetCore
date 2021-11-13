@@ -188,7 +188,7 @@ namespace NClass.CSharp
             };
         }
 
-        public CSharpLanguage()
+        private CSharpLanguage()
         {
         }
 

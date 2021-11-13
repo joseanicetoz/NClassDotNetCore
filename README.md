@@ -1,4 +1,4 @@
-![NClassDotNetCore](/src/GUI/icons/nclass_small.png)
+![NClassDotNetCore](/nclass_small.png)
 
 # NClassDotNetCore
 

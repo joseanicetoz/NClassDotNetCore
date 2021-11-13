@@ -17,7 +17,6 @@ using NClass.Core;
 using NClass.DiagramEditor;
 using NClass.Translations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -30,8 +29,6 @@ namespace NClass.GUI.ModelExplorer
         Font boldFont, normalFont;
 
         public event DocumentEventHandler DocumentOpening;
-
-        public List<Language> Languages { get; set; } = new List<Language>();
 
         public ModelView()
         {
@@ -87,8 +84,7 @@ namespace NClass.GUI.ModelExplorer
 
         private void AddProject(Project project)
         {
-            ModelNode projectNode = new ProjectNode(project, Languages);
-
+            ModelNode projectNode = new ProjectNode(project);
             Nodes.Add(projectNode);
             projectNode.AfterInitialized();
 
@@ -234,7 +230,8 @@ namespace NClass.GUI.ModelExplorer
         //TODO: ez így nem szép! nem kéne internal!
         protected internal virtual void OnDocumentOpening(DocumentEventArgs e)
         {
-            DocumentOpening?.Invoke(this, e);
+            if (DocumentOpening != null)
+                DocumentOpening(this, e);
         }
 
         protected override void OnFontChanged(EventArgs e)

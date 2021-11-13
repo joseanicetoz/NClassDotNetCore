@@ -11,11 +11,10 @@
     <Authors>Balazs Tihanyi</Authors>
     <Description>NClass is a free tool to easily create UML class diagrams.</Description>
     <NeutralLanguage>en-AU</NeutralLanguage>
-    <ApplicationIcon>nclass.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,10 +63,6 @@
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PlugIns\" />
   </ItemGroup>
 
 </Project>

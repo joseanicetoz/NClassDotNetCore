@@ -164,7 +164,7 @@ namespace NClass.Java
             };
         }
 
-        public JavaLanguage()
+        private JavaLanguage()
         {
         }
 

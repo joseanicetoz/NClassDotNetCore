@@ -21,34 +21,45 @@ using NClass.GUI.Properties;
 using NClass.Java;
 using NClass.Translations;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace NClass.GUI.ModelExplorer
 {
     public sealed class ProjectNode : ModelNode
     {
-        readonly List<Language> languages = new List<Language>();
-
         readonly Project project;
-
         static readonly ContextMenuStrip contextMenu = new ContextMenuStrip();
+
+        static ProjectNode()
+        {
+            contextMenu.Items.AddRange(new ToolStripItem[] {
+                new ToolStripMenuItem(Strings.MenuAddNew, Resources.NewDocument,
+                    new ToolStripMenuItem(Strings.MenuCSharpDiagram, null, newCSharpDiagram_Click),
+                    new ToolStripMenuItem(Strings.MenuJavaDiagram, null, newJavaDiagram_Click)
+                ),
+                new ToolStripSeparator(),
+                new ToolStripMenuItem(Strings.MenuSave, Resources.Save, save_Click),
+                new ToolStripMenuItem(Strings.MenuSaveAs, null, saveAs_Click),
+                new ToolStripMenuItem(Strings.MenuRename, null, rename_Click, Keys.F2),
+                new ToolStripSeparator(),
+                new ToolStripMenuItem(Strings.MenuCloseProject, null, close_Click)
+            });
+        }
 
         /// <exception cref="ArgumentNullException">
         /// <paramref name="project"/> is null.
         /// </exception>
-        public ProjectNode(Project project, List<Language> languages)
+        public ProjectNode(Project project)
         {
-            this.project = project ?? throw new ArgumentNullException(nameof(project));
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            this.project = project;
             this.Text = project.Name;
             this.ImageKey = "project";
             this.SelectedImageKey = "project";
 
-            this.languages = languages;
-            CreateProjectContextMenu(languages);
-
             AddProjectItemNodes(project);
-
             project.Renamed += new EventHandler(project_Renamed);
             project.ItemAdded += new ProjectItemEventHandler(project_ItemAdded);
             project.ItemRemoved += new ProjectItemEventHandler(project_ItemRemoved);
@@ -70,27 +81,6 @@ namespace NClass.GUI.ModelExplorer
             {
                 base.ContextMenuStrip = value;
             }
-        }
-
-        private void CreateProjectContextMenu(List<Language> languages)
-        {
-            ToolStripMenuItem diagramMenu = new ToolStripMenuItem(Strings.MenuAddNew + " Diagram", Resources.NewDocument);
-
-            foreach (Language lang in languages)
-            {
-                ToolStripMenuItem item = new ToolStripMenuItem(lang.Name, null, newDiagram_Click, lang.Name);
-                diagramMenu.DropDownItems.Add(item);
-            }
-
-            contextMenu.Items.AddRange(new ToolStripItem[] {
-                diagramMenu,
-                new ToolStripSeparator(),
-                new ToolStripMenuItem(Strings.MenuSave, Resources.Save, save_Click),
-                new ToolStripMenuItem(Strings.MenuSaveAs, null, saveAs_Click),
-                new ToolStripMenuItem(Strings.MenuRename, null, rename_Click, Keys.F2),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem(Strings.MenuCloseProject, null, close_Click)
-            });
         }
 
         private void AddProjectItemNodes(Project project)
@@ -189,19 +179,27 @@ namespace NClass.GUI.ModelExplorer
             base.BeforeDelete();
         }
 
-        private void newDiagram_Click(object sender, EventArgs e)
+        private static void newCSharpDiagram_Click(object sender, EventArgs e)
         {
             ToolStripItem menuItem = (ToolStripItem)sender;
             Project project = ((ProjectNode)menuItem.OwnerItem.Owner.Tag).Project;
 
-            Language language = languages.Find(o => o.Name.Equals(menuItem.Name));
+            Diagram diagram = new Diagram(CSharpLanguage.Instance);
+            project.Add(diagram);
+            Settings.Default.DefaultLanguageName = CSharpLanguage.Instance.AssemblyName;
+        }
 
-            Diagram diagram = new Diagram(language);
-            Settings.Default.DefaultLanguageName = language.AssemblyName;
+        private static void newJavaDiagram_Click(object sender, EventArgs e)
+        {
+            ToolStripItem menuItem = (ToolStripItem)sender;
+            Project project = ((ProjectNode)menuItem.OwnerItem.Owner.Tag).Project;
+
+            Diagram diagram = new Diagram(JavaLanguage.Instance);
+            Settings.Default.DefaultLanguageName = JavaLanguage.Instance.AssemblyName;
             project.Add(diagram);
         }
 
-        private void rename_Click(object sender, EventArgs e)
+        private static void rename_Click(object sender, EventArgs e)
         {
             ToolStripItem menuItem = (ToolStripItem)sender;
             ProjectNode node = (ProjectNode)menuItem.Owner.Tag;
@@ -209,7 +207,7 @@ namespace NClass.GUI.ModelExplorer
             node.EditLabel();
         }
 
-        private void save_Click(object sender, EventArgs e)
+        private static void save_Click(object sender, EventArgs e)
         {
             ToolStripItem menuItem = (ToolStripItem)sender;
             Project project = ((ProjectNode)menuItem.Owner.Tag).Project;
@@ -217,7 +215,7 @@ namespace NClass.GUI.ModelExplorer
             Workspace.Default.SaveProject(project);
         }
 
-        private void saveAs_Click(object sender, EventArgs e)
+        private static void saveAs_Click(object sender, EventArgs e)
         {
             ToolStripItem menuItem = (ToolStripItem)sender;
             Project project = ((ProjectNode)menuItem.Owner.Tag).Project;
@@ -225,7 +223,7 @@ namespace NClass.GUI.ModelExplorer
             Workspace.Default.SaveProjectAs(project);
         }
 
-        private void close_Click(object sender, EventArgs e)
+        private static void close_Click(object sender, EventArgs e)
         {
             ToolStripItem menuItem = (ToolStripItem)sender;
             Project project = ((ProjectNode)menuItem.Owner.Tag).Project;
