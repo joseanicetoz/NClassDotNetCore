@@ -37,6 +37,8 @@ namespace NClass.GUI
         DynamicMenu dynamicMenu = null;
         readonly List<Plugin> plugins = new List<Plugin>();
 
+        LanguageManager languageManager;
+
         public MainForm()
         {
             InitializeComponent();
@@ -47,13 +49,14 @@ namespace NClass.GUI
             Workspace.Default.ActiveProjectChanged += delegate { UpdateTitleBar(); };
             Workspace.Default.ActiveProjectStateChanged += delegate { UpdateTitleBar(); };
             Workspace.Default.ProjectAdded += delegate { ShowModelExplorer = true; };
+
             docManager.ActiveDocumentChanged += docManager_ActiveDocumentChanged;
-            modelExplorer.Workspace = Workspace.Default;
             tabbedWindow.DocumentManager = docManager;
+
             diagramNavigator.DocumentVisualizer = tabbedWindow.Canvas;
 
             UpdateTexts();
-            UpdateStatusBar();
+            UpdateStatusBar();            
         }
 
         private bool ShowModelExplorer
@@ -116,30 +119,31 @@ namespace NClass.GUI
         {
             LoadPlugins();
             LoadWindowSettings();
+            LoadLanguages();
+
+            UpdateModelExplorer();            
+        }
+
+        private void LoadLanguages()
+        {
+            languageManager = new LanguageManager();
+            languageManager.OnError += LanguageLoadErrorHandler;
+            languageManager.LoadLanguages();
+        }
+
+        private void LanguageLoadErrorHandler(object sender, NClassEventArgs e)
+        {
+            MessageBox.Show(
+                string.Format(Strings.ErrorCouldNotLoadPlugins, e.Message),
+                Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void LoadPlugins()
         {
-            try
-            {
-                string pluginsPath = Path.Combine(Application.StartupPath, "Plugins");
-                if (!Directory.Exists(pluginsPath))
-                    return;
-
-                DirectoryInfo directory = new DirectoryInfo(pluginsPath);
-
-                foreach (FileInfo file in directory.GetFiles("*.dll"))
-                {
-                    Assembly assembly = Assembly.LoadFile(file.FullName);
-                    LoadPlugin(assembly);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    string.Format(Strings.ErrorCouldNotLoadPlugins, ex.Message),
-                    Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            PlugInManager pluginManager = new PlugInManager { DocumentManager = docManager };
+            pluginManager.OnError += PlugInLoadErrorHandler;
+            pluginManager.LoadPlugins();
+            plugins.AddRange(pluginManager.PlugIns);
 
             if (plugins.Count > 0)
             {
@@ -153,27 +157,11 @@ namespace NClass.GUI
             }
         }
 
-        private void LoadPlugin(Assembly assembly)
+        private void PlugInLoadErrorHandler(object sender, NClassEventArgs e)
         {
-            try
-            {
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (type.IsSubclassOf(typeof(Plugin)))
-                    {
-                        NClassEnvironment environment =
-                            new NClassEnvironment(Workspace.Default, docManager);
-                        Plugin plugin = (Plugin)Activator.CreateInstance(type, environment);
-                        plugins.Add(plugin);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    string.Format(Strings.ErrorCouldNotLoadPlugins, assembly.FullName + "\n" + ex.Message),
-                    Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            MessageBox.Show(
+                string.Format(Strings.ErrorCouldNotLoadPlugins, e.Message),
+                Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void LoadWindowSettings()
@@ -390,6 +378,12 @@ namespace NClass.GUI
                 lblStatus.Text = string.Empty;
                 lblLanguage.Text = string.Empty;
             }
+        }
+
+        private void UpdateModelExplorer()
+        {
+            modelExplorer.Languages = languageManager.Languages;
+            modelExplorer.Workspace = Workspace.Default;
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
