@@ -22,9 +22,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Windows.Forms;
 
-namespace NClass.GUI
+namespace NClass.Shared
 {
     public class LanguageManager
     {
@@ -45,11 +44,9 @@ namespace NClass.GUI
         {
             try
             {
-                string pluginsPath = Path.Combine(Application.StartupPath);
-                if (!Directory.Exists(pluginsPath))
-                    return;
+                string execPath = Environment.CurrentDirectory;
 
-                DirectoryInfo directory = new DirectoryInfo(pluginsPath);
+                DirectoryInfo directory = new DirectoryInfo(execPath);
 
                 foreach (FileInfo file in directory.GetFiles("*.dll"))
                 {
@@ -75,8 +72,9 @@ namespace NClass.GUI
                 {
                     if (type.IsSubclassOf(typeof(Language)))
                     {
+#if DEBUG
                         Debug.WriteLine(">>> Found language! " + type.Name);
-
+#endif
                         Language language = (Language)Activator.CreateInstance(type);
                         Languages.Add(language);
                     }

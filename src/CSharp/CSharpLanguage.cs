@@ -17,6 +17,8 @@ using NClass.Core;
 using NClass.Translations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -209,7 +211,7 @@ namespace NClass.CSharp
 
         public override string AssemblyName
         {
-            get { return "CSharp"; }
+            get { return Assembly.GetExecutingAssembly().GetName().Name; }
         }
 
         [XmlIgnore]

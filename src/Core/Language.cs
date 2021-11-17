@@ -126,7 +126,7 @@ namespace NClass.Core
             try
             {
                 string languageString = languageName;
-                Assembly assembly = Assembly.Load("NClass." + languageString);
+                Assembly assembly = Assembly.Load(languageString);
 
                 foreach (Type type in assembly.GetTypes())
                 {

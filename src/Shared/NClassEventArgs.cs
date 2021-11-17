@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NClass.GUI
+namespace NClass.Shared
 {
     public class NClassEventArgs : EventArgs
     {

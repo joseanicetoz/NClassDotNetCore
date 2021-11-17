@@ -20,6 +20,7 @@ using NClass.DiagramEditor.ClassDiagram;
 using NClass.GUI.Dialogs;
 using NClass.GUI.Properties;
 using NClass.Java;
+using NClass.Shared;
 using NClass.Translations;
 using System;
 using System.Collections.Generic;

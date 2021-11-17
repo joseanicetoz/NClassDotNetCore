@@ -2,7 +2,7 @@
   <Name>Shapes</Name>
   <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <Name>Shapes</Name>
-    <Language>CSharp</Language>
+    <Language>NClass.CSharp</Language>
     <Entities>
       <Entity type="Class">
         <Name>Shape</Name>

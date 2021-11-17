@@ -17,6 +17,7 @@ using NClass.Core;
 using NClass.Translations;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -185,7 +186,7 @@ namespace NClass.Java
 
         public override string AssemblyName
         {
-            get { return "Java"; }
+            get { return Assembly.GetExecutingAssembly().GetName().Name; }
         }
 
         public override bool SupportsInterfaces
