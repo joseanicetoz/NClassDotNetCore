@@ -6,7 +6,7 @@ This is an attempt to port [NClass v2.4](http://nclass.sourceforge.net/index.htm
 
 .NET Core is a cross-platform framework and now supports WinForms but .NET Core + WinForms will only work on a Windows operating system. Since NClass is based on WinForms technology, therefore this project will only work on Windows. We curently have no plans to port or convert NClass to a modern UI frameworks such as [WinUI3](https://blogs.windows.com/windowsdeveloper/2020/07/07/a-deep-dive-into-winui-3-in-desktop-apps/) or [.NET Maui](https://docs.microsoft.com/en-us/dotnet/maui/what-is-maui).
 
-<p><img src="screenshot1.png" width=800 alt="NClass screenshot"/></p>
+![screenshot](/screenshot1.png)
 
 # Overview
 
