@@ -79,9 +79,9 @@ namespace NClass.CodeGenerator
         {
             Language language = model.Language;
 
-            if (language == CSharpLanguage.Instance)
+            if (language.Name.Equals(CSharpLanguage.Instance.Name))
                 return new CSharpProjectGenerator(model, Version);
-            if (language == JavaLanguage.Instance)
+            if (language.Name.Equals(JavaLanguage.Instance.Name))
                 return new JavaProjectGenerator(model);
 
             throw new ArgumentException("The model has an unknown language.");

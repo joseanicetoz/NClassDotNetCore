@@ -67,7 +67,7 @@ namespace NClass.CodeGenerator
 
         private void UpdateImportList()
         {
-            Language language = null;
+            Language language = string.IsNullOrEmpty((string)cboLanguage.SelectedItem) ? null  : LanguageManager.Instance.GetLanguage((string)cboLanguage.SelectedItem);
 
             //TODO: ezt le kellene kérdezni egy LanguageManager-től
             if (object.Equals(cboLanguage.SelectedItem, "C#"))
