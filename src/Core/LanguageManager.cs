@@ -1,7 +1,7 @@
 ﻿// NClass - Free class diagram editor
 // Copyright (C) 2006-2009 Balazs Tihanyi
 // 
-// NClass.GUI.PlugInManager
+// NClass.GUI.LanguageManager
 // Copyright (C) 2021 Jose Aniceto
 //
 // This program is free software; you can redistribute it and/or modify it under 
@@ -17,60 +17,66 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
-using NClass.DiagramEditor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace NClass.GUI
+namespace NClass.Core
 {
-    public class PlugInManager
+    public class LanguageManager
     {
-        readonly static PlugInManager instance = new PlugInManager();
+        readonly static LanguageManager instance = new LanguageManager();
 
-        List<Plugin> plugins;
+        List<Language> languages;
 
-        public DocumentManager DocumentManager { get; set; }
-
-        public List<Plugin> PlugIns
+        public List<Language> Languages
         {
             get
             {
-                if (plugins == null)
-                    LoadPlugins();
-                return plugins;
+                if (languages == null)
+                    LoadLanguages();
+                return languages;
             }
         }
 
         public EventHandler<NClassEventArgs> OnError { get; set; }
 
-        public static PlugInManager Instance
+        public static LanguageManager Instance
         {
-            get
-            {
-                return instance;
+            get {
+                return instance; 
             }
         }
 
-        private void LoadPlugins()
+        public LanguageManager()
+        {
+        }
+
+        public Language GetLanguage(string name)
+        {
+            if (languages == null)
+                LoadLanguages();
+
+            return languages.Find(o => o.Name.Equals(name));
+        }
+
+        private void LoadLanguages()
         {
             try
             {
-                if(plugins == null)
-                    plugins = new List<Plugin>();
+                if (languages == null)
+                    languages = new List<Language>();
 
-                string pluginsPath = Path.Combine(Environment.CurrentDirectory, "Plugins");
-                if (!Directory.Exists(pluginsPath))
-                    return;
+                string execPath = Environment.CurrentDirectory;
 
-                DirectoryInfo directory = new DirectoryInfo(pluginsPath);
+                DirectoryInfo directory = new DirectoryInfo(execPath);
 
                 foreach (FileInfo file in directory.GetFiles("*.dll"))
                 {
                     Assembly assembly = Assembly.LoadFile(file.FullName);
-                    LoadPlugin(assembly);
+                    LoadLanguage(assembly);
                 }
             }
             catch (Exception ex)
@@ -83,18 +89,19 @@ namespace NClass.GUI
             }
         }
 
-        private void LoadPlugin(Assembly assembly)
+        private void LoadLanguage(Assembly assembly)
         {
             try
             {
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (type.IsSubclassOf(typeof(Plugin)))
+                    if (type.IsSubclassOf(typeof(Language)))
                     {
-                        NClassEnvironment environment =
-                            new NClassEnvironment(Workspace.Default, DocumentManager);
-                        Plugin plugin = (Plugin)Activator.CreateInstance(type, environment);
-                        PlugIns.Add(plugin);
+#if DEBUG
+                        Debug.WriteLine(">>> Found language! " + type.Name);
+#endif
+                        Language language = (Language)Activator.CreateInstance(type);
+                        languages.Add(language);
                     }
                 }
             }

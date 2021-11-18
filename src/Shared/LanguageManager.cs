@@ -27,9 +27,28 @@ namespace NClass.Shared
 {
     public class LanguageManager
     {
-        public List<Language> Languages { get; set; } = new List<Language>();
+        readonly static LanguageManager instance = new LanguageManager();
+
+        List<Language> languages;
+
+        public List<Language> Languages
+        {
+            get
+            {
+                if (languages == null)
+                    LoadLanguages();
+                return languages;
+            }
+        }
 
         public EventHandler<NClassEventArgs> OnError { get; set; }
+
+        public static LanguageManager Instance
+        {
+            get {
+                return instance; 
+            }
+        }
 
         public LanguageManager()
         {
@@ -37,13 +56,19 @@ namespace NClass.Shared
 
         public Language GetLanguage(string name)
         {
-            return Languages.Find(o => o.Name.Equals(name));
+            if (languages == null)
+                LoadLanguages();
+
+            return languages.Find(o => o.Name.Equals(name));
         }
 
-        public void LoadLanguages()
+        private void LoadLanguages()
         {
             try
             {
+                if (languages == null)
+                    languages = new List<Language>();
+
                 string execPath = Environment.CurrentDirectory;
 
                 DirectoryInfo directory = new DirectoryInfo(execPath);
@@ -76,7 +101,7 @@ namespace NClass.Shared
                         Debug.WriteLine(">>> Found language! " + type.Name);
 #endif
                         Language language = (Language)Activator.CreateInstance(type);
-                        Languages.Add(language);
+                        languages.Add(language);
                     }
                 }
             }

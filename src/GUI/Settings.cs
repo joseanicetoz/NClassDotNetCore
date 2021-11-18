@@ -33,7 +33,7 @@ namespace NClass.GUI {
 
         public Language GetDefaultLanguage()
         {
-            Language defaultLanguage = Language.GetLanguage(DefaultLanguageName);
+            Language defaultLanguage = LanguageManager.Instance.GetLanguage(DefaultLanguageName);
 
             return defaultLanguage ?? CSharpLanguage.Instance;
         }

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="COPY $(TargetPath) $(SolutionDir)GUI\$(OutDir)\PlugIns$(TargetFileName)" />
+    <Exec Command="COPY $(TargetPath) $(SolutionDir)GUI\$(OutDir)\PlugIns\$(TargetFileName)" />
   </Target>
 
 </Project>

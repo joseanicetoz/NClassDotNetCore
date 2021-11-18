@@ -121,6 +121,7 @@ namespace NClass.Core
         }
 
         //TODO: a languageName ne az assembly neve legyen, hanem a Name property!
+        [Obsolete("Use LanguageManager instead")]
         public static Language GetLanguage(string languageName)
         {
             try

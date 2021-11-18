@@ -52,7 +52,7 @@ namespace NClass.Core
                 throw new ArgumentException("Name cannot empty string.");
 
             this.name = name;
-            this.language = language ?? throw new ArgumentNullException("language");
+            this.language = language ?? throw new ArgumentNullException(nameof(language));
         }
 
         public string Name
@@ -587,7 +587,7 @@ namespace NClass.Core
             node.AppendChild(nameElement);
 
             XmlElement languageElement = node.OwnerDocument.CreateElement("Language");
-            languageElement.InnerText = Language.AssemblyName;
+            languageElement.InnerText = Language.Name;
             node.AppendChild(languageElement);
 
             SaveEntitites(node);
@@ -617,7 +617,7 @@ namespace NClass.Core
             XmlElement languageElement = node["Language"];
             try
             {
-                Language language = Language.GetLanguage(languageElement.InnerText);
+                Language language = LanguageManager.Instance.GetLanguage(languageElement.InnerText);
                 this.language = language ?? throw new InvalidDataException("Invalid project language.");
             }
             catch (Exception ex)
@@ -705,7 +705,7 @@ namespace NClass.Core
         private void LoadRelationships(XmlNode root)
         {
             if (root == null)
-                throw new ArgumentNullException("root");
+                throw new ArgumentNullException(nameof(root));
 
             XmlNodeList nodeList = root.SelectNodes(
                 "Relationships/Relationship|Relations/Relation"); // old file format

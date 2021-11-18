@@ -14,19 +14,14 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
-using NClass.CSharp;
 using NClass.DiagramEditor;
 using NClass.DiagramEditor.ClassDiagram;
 using NClass.GUI.Dialogs;
 using NClass.GUI.Properties;
-using NClass.Java;
-using NClass.Shared;
 using NClass.Translations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace NClass.GUI
@@ -37,8 +32,6 @@ namespace NClass.GUI
         bool showModelExplorer = true;
         bool showNavigator = true;
         DynamicMenu dynamicMenu = null;
-        LanguageManager languageManager;
-        List<Plugin> plugIns = new List<Plugin>();
 
         public MainForm()
         {
@@ -119,21 +112,19 @@ namespace NClass.GUI
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            LoadPlugins();
+            LanguageManager.Instance.OnError += LanguageLoadErrorHandler;
+
+            PlugInManager.Instance.DocumentManager = docManager;
+            PlugInManager.Instance.OnError += PlugInLoadErrorHandler;
+
             LoadWindowSettings();
-            LoadLanguages();
 
             UpdateModelExplorer();
-            UpdateMenuStrip(languageManager.Languages);
-            UpdateMenuStrip(plugIns);
-            UpdateToolStrip(languageManager.Languages);
-        }
 
-        private void LoadLanguages()
-        {
-            languageManager = new LanguageManager();
-            languageManager.OnError += LanguageLoadErrorHandler;
-            languageManager.LoadLanguages();
+            UpdateMenuStrip(LanguageManager.Instance.Languages);
+            UpdateMenuStrip(PlugInManager.Instance.PlugIns);
+
+            UpdateToolStrip(LanguageManager.Instance.Languages);
         }
 
         private void LanguageLoadErrorHandler(object sender, NClassEventArgs e)
@@ -145,32 +136,30 @@ namespace NClass.GUI
 
         private void UpdateMenuStrip(List<Language> languages)
         {
-            ToolStripMenuItem diagramMenu = new ToolStripMenuItem(Strings.MenuDiagram, Resources.NewDocument);
-
-            foreach (Language lang in languages)
+            if(languages != null)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(lang.Name, null, newDiagram_Click, lang.Name);
-                diagramMenu.DropDownItems.Add(item);
-            }
+                ToolStripMenuItem diagramMenu = new ToolStripMenuItem(Strings.MenuDiagram, Resources.NewDocument);
 
-            mnuNew.DropDownItems.Add(diagramMenu);
+                foreach (Language lang in languages)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(lang.Name, null, newDiagram_Click, lang.Name);
+                    diagramMenu.DropDownItems.Add(item);
+                }
+
+                mnuNew.DropDownItems.Add(diagramMenu);
+            }
         }
 
         private void UpdateToolStrip(List<Language> languages)
         {
-            foreach (Language lang in languages)
+            if(languages != null)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(lang.Name, null, newDiagram_Click, lang.Name);
-                toolNewDiagram.DropDownItems.Add(item);
+                foreach (Language lang in languages)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(lang.Name, null, newDiagram_Click, lang.Name);
+                    toolNewDiagram.DropDownItems.Add(item);
+                }
             }
-        }
-
-        private void LoadPlugins()
-        {
-            PlugInManager pluginManager = new PlugInManager { DocumentManager = docManager };
-            pluginManager.OnError += PlugInLoadErrorHandler;
-            pluginManager.LoadPlugins();
-            plugIns = pluginManager.PlugIns;
         }
 
         private void PlugInLoadErrorHandler(object sender, NClassEventArgs e)
@@ -182,7 +171,7 @@ namespace NClass.GUI
 
         private void UpdateMenuStrip(List<Plugin> plugins)
         {
-            if (plugins.Count > 0)
+            if (plugins != null && plugins.Count > 0)
             {
                 mnuPlugins.Visible = true;
                 mnuPlugins.Enabled = true;
@@ -257,8 +246,8 @@ namespace NClass.GUI
             mnuNew.Text = Strings.MenuNew;
             mnuNewProject.Text = Strings.MenuProject;
             
-            mnuNewCSharpDiagram.Text = Strings.MenuCSharpDiagram;
-            mnuNewJavaDiagram.Text = Strings.MenuJavaDiagram;
+            //mnuNewCSharpDiagram.Text = Strings.MenuCSharpDiagram;
+            //mnuNewJavaDiagram.Text = Strings.MenuJavaDiagram;
             mnuOpen.Text = Strings.MenuOpen;
             mnuOpenFile.Text = Strings.MenuOpenFile;
             mnuSave.Text = Strings.MenuSave;
@@ -420,7 +409,7 @@ namespace NClass.GUI
 
         private void UpdateModelExplorer()
         {
-            modelExplorer.Languages = languageManager.Languages;
+            modelExplorer.Languages = LanguageManager.Instance.Languages;
             modelExplorer.Workspace = Workspace.Default;
         }
 
@@ -575,27 +564,11 @@ namespace NClass.GUI
         private void mnuNewCSharpDiagram_Click(object sender, EventArgs e)
         {
             NewDiagram("C#");
-
-            //if (Workspace.Default.HasActiveProject)
-            //{
-            //    ShowModelExplorer = true;
-            //    Diagram diagram = new Diagram(CSharpLanguage.Instance);
-            //    Workspace.Default.ActiveProject.Add(diagram);
-            //    Settings.Default.DefaultLanguageName = CSharpLanguage.Instance.AssemblyName;
-            //}
         }
 
         private void mnuNewJavaDiagram_Click(object sender, EventArgs e)
         {
             NewDiagram("Java");
-
-            //if (Workspace.Default.HasActiveProject)
-            //{
-            //    ShowModelExplorer = true;
-            //    Diagram diagram = new Diagram(JavaLanguage.Instance);
-            //    Workspace.Default.ActiveProject.Add(diagram);
-            //    Settings.Default.DefaultLanguageName = JavaLanguage.Instance.AssemblyName;
-            //}
         }
 
         private void newDiagram_Click(object sender, EventArgs e)
@@ -608,7 +581,7 @@ namespace NClass.GUI
         {
             if (Workspace.Default.HasActiveProject)
             {
-                Language language = languageManager.GetLanguage(languageName);
+                Language language = LanguageManager.Instance.GetLanguage(languageName);
                 if (language != null)
                 {
                     ShowModelExplorer = true;

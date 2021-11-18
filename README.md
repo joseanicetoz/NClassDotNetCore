@@ -30,7 +30,7 @@ Here are other NClass projects on [GitHub](https://github.com/search?q=nclass+um
 
 # How to build
 
-* Use [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/older-downloads/)
+* Use [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/older-downloads/) or [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/)
 
 * Run PowerShell script
 
