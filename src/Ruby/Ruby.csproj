@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>NClass.Ruby</AssemblyName>
+    <Authors>Jose Aniceto</Authors>
+    <Copyright>Copyright (C) 2021, Jose Aniceto</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Translations\Translations.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="COPY $(TargetPath) $(SolutionDir)GUI\bin\$(ConfigurationName)\net5.0-windows" />
+  </Target>
+
+</Project>
