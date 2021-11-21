@@ -159,7 +159,7 @@ namespace NClass.Core
 
         public bool InsertClass(ClassType newClass)
         {
-            if (newClass != null && !entities.Contains(newClass) && newClass.Language.Name == language.Name)
+            if (newClass != null && !entities.Contains(newClass) && newClass.Language == language)
             {
                 AddClass(newClass);
                 return true;
@@ -188,7 +188,7 @@ namespace NClass.Core
         public bool InsertStructure(StructureType structure)
         {
             if (structure != null && !entities.Contains(structure) &&
-                structure.Language.Name == language.Name)
+                structure.Language == language)
             {
                 AddStructure(structure);
                 return true;
@@ -214,7 +214,7 @@ namespace NClass.Core
         public bool InsertInterface(InterfaceType newInterface)
         {
             if (newInterface != null && !entities.Contains(newInterface) &&
-                newInterface.Language.Name == language.Name)
+                newInterface.Language == language)
             {
                 AddInterface(newInterface);
                 return true;
@@ -240,7 +240,7 @@ namespace NClass.Core
         public bool InsertEnum(EnumType newEnum)
         {
             if (newEnum != null && !entities.Contains(newEnum) &&
-                newEnum.Language.Name == language.Name)
+                newEnum.Language == language)
             {
                 AddEnum(newEnum);
                 return true;
@@ -269,7 +269,7 @@ namespace NClass.Core
         public bool InsertDelegate(DelegateType newDelegate)
         {
             if (newDelegate != null && !entities.Contains(newDelegate) &&
-                newDelegate.Language.Name == language.Name)
+                newDelegate.Language == language)
             {
                 AddDelegate(newDelegate);
                 return true;
