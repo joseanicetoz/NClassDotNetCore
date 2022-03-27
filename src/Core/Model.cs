@@ -159,7 +159,7 @@ namespace NClass.Core
 
         public bool InsertClass(ClassType newClass)
         {
-            if (newClass != null && !entities.Contains(newClass) && newClass.Language == language)
+            if (newClass != null && !entities.Contains(newClass) && newClass.Language.Name == language.Name)
             {
                 AddClass(newClass);
                 return true;
