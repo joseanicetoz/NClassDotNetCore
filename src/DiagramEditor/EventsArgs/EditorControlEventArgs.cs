@@ -15,22 +15,22 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor.EventsArgs;
+
+public delegate void PopupWindowEventHandler(object sender, PopupWindowEventArgs e);
+
+public class PopupWindowEventArgs : EventArgs
 {
-    public delegate void PopupWindowEventHandler(object sender, PopupWindowEventArgs e);
+    private readonly PopupWindow window;
 
-    public class PopupWindowEventArgs : EventArgs
+    public PopupWindowEventArgs(PopupWindow window)
     {
-        readonly PopupWindow window;
+        this.window = window;
+    }
 
-        public PopupWindowEventArgs(PopupWindow window)
-        {
-            this.window = window;
-        }
-
-        public PopupWindow Window
-        {
-            get { return window; }
-        }
+    public PopupWindow Window
+    {
+        get { return window; }
+        set => throw new NotImplementedException();
     }
 }

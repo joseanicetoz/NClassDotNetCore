@@ -15,44 +15,43 @@
 
 using System.Collections.Generic;
 
-namespace NClass.DiagramEditor.ClassDiagram
+namespace NClass.DiagramEditor.ClassDiagram;
+
+public class ElementList<T> : OrderedList<T> where T : DiagramElement
 {
-    public class ElementList<T> : OrderedList<T> where T : DiagramElement
+    public IEnumerable<T> GetSelectedElements()
     {
-        public IEnumerable<T> GetSelectedElements()
+        foreach (T element in GetModifiableList())
         {
-            foreach (T element in GetModifiableList())
-            {
-                if (element.IsSelected)
-                    yield return element;
-            }
+            if (element.IsSelected)
+                yield return element;
         }
+    }
 
-        public IEnumerable<T> GetUnselectedElements()
+    public IEnumerable<T> GetUnselectedElements()
+    {
+        foreach (T element in GetModifiableList())
         {
-            foreach (T element in GetModifiableList())
-            {
-                if (!element.IsSelected)
-                    yield return element;
-            }
+            if (!element.IsSelected)
+                yield return element;
         }
+    }
 
-        public IEnumerable<T> GetSelectedElementsReversed()
+    public IEnumerable<T> GetSelectedElementsReversed()
+    {
+        foreach (T element in GetReversedList())
         {
-            foreach (T element in GetReversedList())
-            {
-                if (element.IsSelected)
-                    yield return element;
-            }
+            if (element.IsSelected)
+                yield return element;
         }
+    }
 
-        public IEnumerable<T> GetUnselectedElementsReversed()
+    public IEnumerable<T> GetUnselectedElementsReversed()
+    {
+        foreach (T element in GetReversedList())
         {
-            foreach (T element in GetReversedList())
-            {
-                if (!element.IsSelected)
-                    yield return element;
-            }
+            if (!element.IsSelected)
+                yield return element;
         }
     }
 }

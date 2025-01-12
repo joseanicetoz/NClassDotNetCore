@@ -15,66 +15,51 @@
 
 using System;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public abstract class Element : IModifiable
 {
-    public abstract class Element : IModifiable
+    private int dontRaiseRequestCount;
+
+    public event EventHandler Modified;
+
+    public bool IsDirty { get; set; }
+
+    public virtual void Clean()
     {
-        bool isDirty = false;
-        bool initializing = false;
-        int dontRaiseRequestCount = 0;
+        IsDirty = false;
+    }
 
-        public event EventHandler Modified;
+    protected bool Initializing { get; set; }
 
-        public bool IsDirty
+    protected bool RaiseChangedEvent
+    {
+        get { return (dontRaiseRequestCount == 0); }
+        set
         {
-            get { return isDirty; }
-        }
+            if (!value)
+                dontRaiseRequestCount++;
+            else if (dontRaiseRequestCount > 0)
+                dontRaiseRequestCount--;
 
-        public virtual void Clean()
-        {
-            isDirty = false;
-            //TODO: tagok tisztítása
+            if (RaiseChangedEvent && IsDirty)
+                OnModified(System.EventArgs.Empty);
         }
+    }
 
-        protected bool Initializing
-        {
-            get { return initializing; }
-            set { initializing = value; }
-        }
+    protected void Changed()
+    {
+        if (Initializing) return;
+        
+        if (RaiseChangedEvent)
+            OnModified(System.EventArgs.Empty);
+        
+        IsDirty = true;
+    }
 
-        protected bool RaiseChangedEvent
-        {
-            get
-            {
-                return (dontRaiseRequestCount == 0);
-            }
-            set
-            {
-                if (!value)
-                    dontRaiseRequestCount++;
-                else if (dontRaiseRequestCount > 0)
-                    dontRaiseRequestCount--;
-
-                if (RaiseChangedEvent && isDirty)
-                    OnModified(EventArgs.Empty);
-            }
-        }
-
-        protected void Changed()
-        {
-            if (!Initializing)
-            {
-                if (RaiseChangedEvent)
-                    OnModified(EventArgs.Empty);
-                else
-                    isDirty = true;
-            }
-        }
-
-        private void OnModified(EventArgs e)
-        {
-            isDirty = true;
-            Modified?.Invoke(this, e);
-        }
+    private void OnModified(System.EventArgs e)
+    {
+        IsDirty = true;
+        Modified?.Invoke(this, e);
     }
 }

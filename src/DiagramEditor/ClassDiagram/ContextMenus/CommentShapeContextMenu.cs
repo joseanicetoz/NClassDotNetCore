@@ -19,57 +19,57 @@ using NClass.Translations;
 using System;
 using System.Windows.Forms;
 
-namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
+namespace NClass.DiagramEditor.ClassDiagram.ContextMenus;
+
+internal sealed class CommentShapeContextMenu : DiagramContextMenu
 {
-    internal sealed class CommentShapeContextMenu : DiagramContextMenu
+    private static readonly CommentShapeContextMenu _default = new CommentShapeContextMenu();
+
+    private ToolStripMenuItem mnuEditComment;
+
+    private CommentShapeContextMenu()
     {
-        static readonly CommentShapeContextMenu _default = new CommentShapeContextMenu();
+        InitMenuItems();
+    }
 
-        ToolStripMenuItem mnuEditComment;
+    public static CommentShapeContextMenu Default
+    {
+        get { return _default; }
+        set => throw new NotImplementedException();
+    }
 
-        private CommentShapeContextMenu()
+    private void UpdateTexts()
+    {
+        mnuEditComment.Text = Strings.MenuEditComment;
+    }
+
+    public override void ValidateMenuItems(Diagram diagram)
+    {
+        base.ValidateMenuItems(diagram);
+        ShapeContextMenu.Default.ValidateMenuItems(diagram);
+        mnuEditComment.Enabled = (diagram.SelectedElementCount == 1);
+    }
+
+    private void InitMenuItems()
+    {
+        mnuEditComment = new ToolStripMenuItem(
+            Strings.MenuEditComment,
+            Resources.EditComment, mnuEditComment_Click);
+
+        MenuList.AddRange(ShapeContextMenu.Default.MenuItems);
+        MenuList.AddRange(new ToolStripItem[] {
+            new ToolStripSeparator(),
+            mnuEditComment,
+        });
+    }
+
+    private void mnuEditComment_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            InitMenuItems();
-        }
-
-        public static CommentShapeContextMenu Default
-        {
-            get { return _default; }
-        }
-
-        private void UpdateTexts()
-        {
-            mnuEditComment.Text = Strings.MenuEditComment;
-        }
-
-        public override void ValidateMenuItems(Diagram diagram)
-        {
-            base.ValidateMenuItems(diagram);
-            ShapeContextMenu.Default.ValidateMenuItems(diagram);
-            mnuEditComment.Enabled = (diagram.SelectedElementCount == 1);
-        }
-
-        private void InitMenuItems()
-        {
-            mnuEditComment = new ToolStripMenuItem(
-                Strings.MenuEditComment,
-                Resources.EditComment, mnuEditComment_Click);
-
-            MenuList.AddRange(ShapeContextMenu.Default.MenuItems);
-            MenuList.AddRange(new ToolStripItem[] {
-                new ToolStripSeparator(),
-                mnuEditComment,
-            });
-        }
-
-        private void mnuEditComment_Click(object sender, EventArgs e)
-        {
-            if (Diagram != null)
-            {
-                CommentShape commentShape = Diagram.TopSelectedElement as CommentShape;
-                if (commentShape != null)
-                    commentShape.EditText();
-            }
+            CommentShape commentShape = Diagram.TopSelectedElement as CommentShape;
+            if (commentShape != null)
+                commentShape.EditText();
         }
     }
 }

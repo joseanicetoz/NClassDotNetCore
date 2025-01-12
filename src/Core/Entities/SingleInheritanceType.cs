@@ -13,135 +13,103 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Translations;
 using System;
 using System.Collections.Generic;
+using NClass.Core.Members;
+using NClass.Core.Relationships;
+using NClass.Translations;
 
-namespace NClass.Core
+namespace NClass.Core.Entities;
+
+public abstract class SingleInheritanceType : CompositeType, IInterfaceImplementer
 {
-    public abstract class SingleInheritanceType : CompositeType, IInterfaceImplementer
+    private readonly List<InterfaceType> interfaceList = new List<InterfaceType>();
+
+    protected SingleInheritanceType(string name) : base(name)
     {
-        readonly List<InterfaceType> interfaceList = new List<InterfaceType>();
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        protected SingleInheritanceType(string name) : base(name)
+    public abstract SingleInheritanceType Base
+    {
+        get;
+        set;
+    }
+
+    public abstract IEnumerable<Operation> OverridableOperations { get; }
+
+    protected List<InterfaceType> InterfaceList
+    {
+        get { return interfaceList; }
+    }
+
+    public IEnumerable<InterfaceType> Interfaces
+    {
+        get { return interfaceList; }
+    }
+
+    public bool ImplementsInterface
+    {
+        get { return (interfaceList.Count > 0); }
+    }
+
+    public virtual void AddInterface(InterfaceType interfaceType)
+    {
+        if (interfaceType == null)
+            throw new ArgumentNullException(nameof(interfaceType));
+
+        foreach (InterfaceType implementedInterface in InterfaceList)
         {
+            if (interfaceType == implementedInterface)
+                throw new RelationshipException(Strings.ErrorCannotAddSameInterface);
         }
 
-        /// <exception cref="RelationshipException">
-        /// The base and derived types do not equal.-or-
-        /// The <paramref name="value"/> is descendant of the type.
-        /// </exception>
-        public abstract SingleInheritanceType Base
-        {
-            get;
-            set;
-        }
+        InterfaceList.Add(interfaceType);
+        Changed();
+    }
 
-        public abstract IEnumerable<Operation> OverridableOperations
-        {
-            get;
-        }
-
-        protected List<InterfaceType> InterfaceList
-        {
-            get { return interfaceList; }
-        }
-
-        public IEnumerable<InterfaceType> Interfaces
-        {
-            get { return interfaceList; }
-        }
-
-        public bool ImplementsInterface
-        {
-            get
-            {
-                return (interfaceList.Count > 0);
-            }
-        }
-
-        /// <exception cref="RelationshipException">
-        /// The language of <paramref name="interfaceType"/> does not equal.-or-
-        /// <paramref name="interfaceType"/> is earlier implemented interface.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="interfaceType"/> is null.
-        /// </exception>
-        public virtual void AddInterface(InterfaceType interfaceType)
-        {
-            if (interfaceType == null)
-                throw new ArgumentNullException("interfaceType");
-
-            foreach (InterfaceType implementedInterface in InterfaceList)
-            {
-                if (interfaceType == implementedInterface)
-                    throw new RelationshipException(Strings.ErrorCannotAddSameInterface);
-            }
-
-            InterfaceList.Add(interfaceType);
+    public void RemoveInterface(InterfaceType interfaceType)
+    {
+        if (InterfaceList.Remove(interfaceType))
             Changed();
-        }
+    }
 
-        public void RemoveInterface(InterfaceType interfaceType)
+    public Operation Implement(Operation operation, bool explicitly)
+    {
+        if (operation == null)
+            throw new ArgumentNullException(nameof(operation));
+
+        if (operation.Language != this.Language)
+            throw new ArgumentException(Strings.ErrorLanguagesDoNotEqual);
+
+        if (!(operation.Parent is InterfaceType))
         {
-            if (InterfaceList.Remove(interfaceType))
-                Changed();
+            throw new ArgumentException("The operation is not a member of an interface.");
         }
 
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="operation"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="operation"/> is null.
-        /// </exception>
-        public Operation Implement(Operation operation, bool explicitly)
+        if (explicitly && !operation.Language.SupportsExplicitImplementation)
         {
-            if (operation == null)
-                throw new ArgumentNullException("operation");
-
-            if (operation.Language != this.Language)
-                throw new ArgumentException(Strings.ErrorLanguagesDoNotEqual);
-
-            if (!(operation.Parent is InterfaceType))
-            {
-                throw new ArgumentException("The operation is not a member of an interface.");
-            }
-
-            if (explicitly && !operation.Language.SupportsExplicitImplementation)
-            {
-                throw new ArgumentException(
-                    Strings.ErrorExplicitImplementation, "explicitly");
-            }
-
-            Operation newOperation = Language.Implement(operation, this, explicitly);
-            newOperation.Parent = this;
-
-            AddOperation(newOperation);
-            return newOperation;
+            throw new ArgumentException(
+                Strings.ErrorExplicitImplementation, nameof(explicitly));
         }
 
-        /// <exception cref="ArgumentException">
-        /// <paramref name="operation"/> cannot be overridden.-or-
-        /// The language of <paramref name="operation"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="operation"/> is null.
-        /// </exception>
-        public Operation Override(Operation operation)
-        {
-            if (operation == null)
-                throw new ArgumentNullException("operation");
+        Operation newOperation = Language.Implement(operation, this, explicitly);
+        newOperation.Parent = this;
 
-            if (operation.Language != this.Language)
-                throw new ArgumentException(Strings.ErrorLanguagesDoNotEqual);
+        AddOperation(newOperation);
+        return newOperation;
+    }
 
-            Operation newOperation = Language.Override(operation, this);
+    public Operation Override(Operation operation)
+    {
+        if (operation == null)
+            throw new ArgumentNullException(nameof(operation));
 
-            AddOperation(newOperation);
-            return newOperation;
-        }
+        if (operation.Language != this.Language)
+            throw new ArgumentException(Strings.ErrorLanguagesDoNotEqual);
+
+        Operation newOperation = Language.Override(operation, this);
+
+        AddOperation(newOperation);
+        return newOperation;
     }
 }

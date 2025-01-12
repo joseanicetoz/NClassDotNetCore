@@ -14,66 +14,54 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
+using NClass.Core.Parameters;
 using NClass.Translations;
 
-namespace NClass.Java
+namespace NClass.Java;
+
+internal sealed class JavaParameter : Parameter
 {
-    internal sealed class JavaParameter : Parameter
+    public override string Type
     {
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> or <paramref name="type"/> 
-        /// does not fit to the syntax.
-        /// </exception>
-        internal JavaParameter(string name, string type) : base(name, type, ParameterModifier.In, null)
+        get { return base.Type; }
+        protected set
         {
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="value"/> does not fit to the syntax.
-        /// </exception>
-        public override string Type
-        {
-            get
+            if (value == "void")
             {
-                return base.Type;
+                throw new BadSyntaxException(
+                    Strings.ErrorInvalidParameterDeclaration);
             }
-            protected set
-            {
-                if (value == "void")
-                {
-                    throw new BadSyntaxException(
-                        Strings.ErrorInvalidParameterDeclaration);
-                }
-                base.Type = value;
-            }
-        }
-
-        public override string DefaultValue
-        {
-            get
-            {
-                return null;
-            }
-            protected set
-            {
-                if (value != null)
-                    throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-            }
-        }
-
-        public override Language Language
-        {
-            get { return JavaLanguage.Instance; }
-        }
-
-        public override string GetDeclaration()
-        {
-            return Type + " " + Name;
-        }
-
-        public override Parameter Clone()
-        {
-            return new JavaParameter(Name, Type);
+            base.Type = value;
         }
     }
+
+    public override string DefaultValue
+    {
+        get { return null; }
+        protected set
+        {
+            if (value != null)
+                throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
+        }
+    }
+
+    public override Language Language
+    {
+        get { return JavaLanguage.Instance; }
+    }
+
+    internal JavaParameter(string name, string type) : base(name, type, ParameterModifier.In, null)
+    {
+    }
+
+    public override string GetDeclaration()
+    {
+        return Type + " " + Name;
+    }
+
+    public override Parameter Clone()
+    {
+        return new JavaParameter(Name, Type);
+    }
 }
+

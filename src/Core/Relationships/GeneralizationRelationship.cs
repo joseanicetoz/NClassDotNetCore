@@ -13,90 +13,75 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Translations;
 using System;
+using NClass.Core.Entities;
+using NClass.Translations;
 
-namespace NClass.Core
+namespace NClass.Core.Relationships;
+
+public sealed class GeneralizationRelationship : TypeRelationship
 {
-    public sealed class GeneralizationRelationship : TypeRelationship
+
+    public override RelationshipType RelationshipType { get; set; } = RelationshipType.Generalization;
+    private CompositeType DerivedType
     {
-        /// <exception cref="RelationshipException">
-        /// Cannot create generalization.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="derivedType"/> is null.-or-
-        /// <paramref name="baseType"/> is null.
-        /// </exception>
-        internal GeneralizationRelationship(CompositeType derivedType, CompositeType baseType)
-            : base(derivedType, baseType)
+        get { return (CompositeType)First; }
+    }
+
+    private CompositeType BaseType
+    {
+        get { return (CompositeType)Second; }
+    }
+
+    internal GeneralizationRelationship(CompositeType derivedType, CompositeType baseType) : base(derivedType, baseType)
+    {
+        Attach();
+    }
+
+    public GeneralizationRelationship Clone(CompositeType derivedType, CompositeType baseType)
+    {
+        GeneralizationRelationship generalization =
+            new GeneralizationRelationship(derivedType, baseType);
+        generalization.CopyFrom(this);
+        return generalization;
+    }
+
+    protected override void OnAttaching(System.EventArgs e)
+    {
+        base.OnAttaching(e);
+
+        if (!DerivedType.IsAllowedChild)
+            throw new RelationshipException(Strings.ErrorNotAllowedChild);
+        if (!BaseType.IsAllowedParent)
+            throw new RelationshipException(Strings.ErrorNotAllowedParent);
+        if (First is SingleInheritanceType type && type.HasExplicitBase)
+            throw new RelationshipException(Strings.ErrorMultipleBases);
+        if (First is SingleInheritanceType ^ Second is SingleInheritanceType ||
+            First is InterfaceType ^ Second is InterfaceType)
+            throw new RelationshipException(Strings.ErrorInvalidBaseType);
+
+        if (First is SingleInheritanceType first && Second is SingleInheritanceType second)
         {
-            Attach();
+            first.Base = second;
         }
-
-        public override RelationshipType RelationshipType
+        else if (First is InterfaceType first1 && Second is InterfaceType second1)
         {
-            get { return RelationshipType.Generalization; }
+            first1.AddBase(second1);
         }
+    }
 
-        private CompositeType DerivedType
-        {
-            get { return (CompositeType)First; }
-        }
+    protected override void OnDetaching(System.EventArgs e)
+    {
+        base.OnDetaching(e);
 
-        private CompositeType BaseType
-        {
-            get { return (CompositeType)Second; }
-        }
+        if (First is SingleInheritanceType singletype)
+            singletype.Base = null;
+        else if (First is InterfaceType interfacetype)
+            interfacetype.RemoveBase(Second as InterfaceType);
+    }
 
-        public GeneralizationRelationship Clone(CompositeType derivedType, CompositeType baseType)
-        {
-            GeneralizationRelationship generalization =
-                new GeneralizationRelationship(derivedType, baseType);
-            generalization.CopyFrom(this);
-            return generalization;
-        }
-
-        /// <exception cref="RelationshipException">
-        /// Cannot finalize relationship.
-        /// </exception>
-        protected override void OnAttaching(EventArgs e)
-        {
-            base.OnAttaching(e);
-
-            if (!DerivedType.IsAllowedChild)
-                throw new RelationshipException(Strings.ErrorNotAllowedChild);
-            if (!BaseType.IsAllowedParent)
-                throw new RelationshipException(Strings.ErrorNotAllowedParent);
-            if (First is SingleInheritanceType type && type.HasExplicitBase)
-                throw new RelationshipException(Strings.ErrorMultipleBases);
-            if (First is SingleInheritanceType ^ Second is SingleInheritanceType ||
-                First is InterfaceType ^ Second is InterfaceType)
-                throw new RelationshipException(Strings.ErrorInvalidBaseType);
-
-            if (First is SingleInheritanceType first && Second is SingleInheritanceType second)
-            {
-                first.Base = second;
-            }
-            else if (First is InterfaceType first1 && Second is InterfaceType second1)
-            {
-                first1.AddBase(second1);
-            }
-        }
-
-        protected override void OnDetaching(EventArgs e)
-        {
-            base.OnDetaching(e);
-
-            if (First is SingleInheritanceType singletype)
-                singletype.Base = null;
-            else if (First is InterfaceType interfacetype)
-                interfacetype.RemoveBase(Second as InterfaceType);
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} --> {2}",
-                Strings.Generalization, First.Name, Second.Name);
-        }
+    public override string ToString()
+    {
+        return $@"{Strings.Generalization}: {First.Name} --> {Second.Name}";
     }
 }

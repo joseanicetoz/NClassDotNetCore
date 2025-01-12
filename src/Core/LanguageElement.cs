@@ -15,25 +15,26 @@
 
 using System;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public abstract class LanguageElement : Element
 {
-    public abstract class LanguageElement : Element
+    public abstract string GetDeclaration();
+
+    public override string ToString()
     {
-        public abstract string GetDeclaration();
+        return GetDeclaration();
+    }
 
-        public override string ToString()
-        {
-            return GetDeclaration();
-        }
-
-        [Obsolete] //TODO: ezt a metódust meg kell szüntetni
-        protected static string GetNameWithoutGeneric(string name)
-        {
-            int index = name.IndexOf('<');
-            if (index > 0)
-                return name.Substring(0, index);
-            else
-                return name;
-        }
+    protected static string GetNameWithoutGeneric(string name)
+    {
+        int index = name.IndexOf('<');
+        return index > 0 ? name.Substring(index) : name;
+    }
+    protected static string GetNameWithoutGeneric(Type t)
+    {
+        string name = t.Name;
+        int index = name.IndexOf('`');
+        return index == -1 ? name : name.Substring(0, index);
     }
 }

@@ -15,27 +15,28 @@
 
 using NClass.DiagramEditor;
 
-namespace NClass.GUI
+namespace NClass.GUI;
+
+public sealed class NClassEnvironment
 {
-    public sealed class NClassEnvironment
+    private Workspace workspace;
+    private DocumentManager docManager;
+
+    internal NClassEnvironment(Workspace workspace, DocumentManager docManager)
     {
-        readonly Workspace workspace;
-        readonly DocumentManager docManager;
+        this.workspace = workspace;
+        this.docManager = docManager;
+    }
 
-        internal NClassEnvironment(Workspace workspace, DocumentManager docManager)
-        {
-            this.workspace = workspace;
-            this.docManager = docManager;
-        }
+    public Workspace Workspace
+    {
+        get { return workspace; }
+        set { workspace = value; }
+    }
 
-        public Workspace Workspace
-        {
-            get { return workspace; }
-        }
-
-        public DocumentManager DocumentManager
-        {
-            get { return docManager; }
-        }
+    public DocumentManager DocumentManager
+    {
+        get { return docManager; }
+        set { docManager = value; }
     }
 }

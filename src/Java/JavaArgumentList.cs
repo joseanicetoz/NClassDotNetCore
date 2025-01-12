@@ -16,127 +16,130 @@
 using NClass.Core;
 using NClass.Translations;
 using System.Text.RegularExpressions;
+using NClass.Core.Parameters;
 
-namespace NClass.Java
+namespace NClass.Java;
+
+internal class JavaArgumentList : ArgumentList
 {
-    internal class JavaArgumentList : ArgumentList
+    // <type> <name> [,]
+    private const string JavaParameterPattern =
+        @"\s*(?<type>" + JavaLanguage.GenericTypePattern2 + @")\s+" +
+        @"(?<name>" + JavaLanguage.NamePattern + @")\s*(,|$)";
+
+    private const string ParameterStringPattern = @"^\s*(" + JavaParameterPattern + ")*$";
+
+    private static readonly Regex parameterRegex =
+        new Regex(JavaParameterPattern, RegexOptions.ExplicitCapture);
+
+    private static readonly Regex singleParamterRegex =
+        new Regex("^" + JavaParameterPattern + "$", RegexOptions.ExplicitCapture);
+
+    private static readonly Regex parameterStringRegex =
+        new Regex(ParameterStringPattern, RegexOptions.ExplicitCapture);
+
+    internal JavaArgumentList()
     {
-        // <type> <name> [,]
-        const string JavaParameterPattern =
-            @"\s*(?<type>" + JavaLanguage.GenericTypePattern2 + @")\s+" +
-            @"(?<name>" + JavaLanguage.NamePattern + @")\s*(,|$)";
-        const string ParameterStringPattern = @"^\s*(" + JavaParameterPattern + ")*$";
+    }
 
-        static readonly Regex parameterRegex =
-            new Regex(JavaParameterPattern, RegexOptions.ExplicitCapture);
-        static readonly Regex singleParamterRegex =
-            new Regex("^" + JavaParameterPattern + "$", RegexOptions.ExplicitCapture);
-        static readonly Regex parameterStringRegex =
-            new Regex(ParameterStringPattern, RegexOptions.ExplicitCapture);
+    internal JavaArgumentList(int capacity)
+        : base(capacity)
+    {
+    }
 
-        internal JavaArgumentList()
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ReservedNameException">
+    /// The parameter name is already exists.
+    /// </exception>
+    public override Parameter Add(string declaration)
+    {
+        Match match = singleParamterRegex.Match(declaration);
+
+        if (match.Success)
         {
+            Group nameGroup = match.Groups["name"];
+            Group typeGroup = match.Groups["type"];
+
+            if (IsReservedName(nameGroup.Value))
+                throw new ReservedNameException(nameGroup.Value);
+
+            Parameter parameter = new JavaParameter(nameGroup.Value, typeGroup.Value);
+            InnerList.Add(parameter);
+
+            return parameter;
         }
-
-        internal JavaArgumentList(int capacity)
-            : base(capacity)
+        else
         {
+            throw new BadSyntaxException(
+                Strings.ErrorInvalidParameterDeclaration);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public override Parameter Add(string declaration)
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ReservedNameException">
+    /// The parameter name is already exists.
+    /// </exception>
+    public override Parameter ModifyParameter(Parameter parameter, string declaration)
+    {
+        Match match = singleParamterRegex.Match(declaration);
+        int index = InnerList.IndexOf(parameter);
+
+        if (index < 0)
+            return parameter;
+
+        if (match.Success)
         {
-            Match match = singleParamterRegex.Match(declaration);
+            Group nameGroup = match.Groups["name"];
+            Group typeGroup = match.Groups["type"];
 
-            if (match.Success)
+            if (IsReservedName(nameGroup.Value, index))
+                throw new ReservedNameException(nameGroup.Value);
+
+            Parameter newParameter = new JavaParameter(nameGroup.Value, typeGroup.Value);
+            InnerList[index] = newParameter;
+            return newParameter;
+        }
+        else
+        {
+            throw new BadSyntaxException(
+                Strings.ErrorInvalidParameterDeclaration);
+        }
+    }
+
+    public override ArgumentList Clone()
+    {
+        JavaArgumentList argumentList = new JavaArgumentList(Capacity);
+        foreach (Parameter parameter in InnerList)
+        {
+            argumentList.InnerList.Add(parameter.Clone());
+        }
+        return argumentList;
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    public override void InitFromString(string declaration)
+    {
+        if (parameterStringRegex.IsMatch(declaration))
+        {
+            Clear();
+            foreach (Match match in parameterRegex.Matches(declaration))
             {
                 Group nameGroup = match.Groups["name"];
                 Group typeGroup = match.Groups["type"];
 
-                if (IsReservedName(nameGroup.Value))
-                    throw new ReservedNameException(nameGroup.Value);
-
-                Parameter parameter = new JavaParameter(nameGroup.Value, typeGroup.Value);
-                InnerList.Add(parameter);
-
-                return parameter;
-            }
-            else
-            {
-                throw new BadSyntaxException(
-                    Strings.ErrorInvalidParameterDeclaration);
+                InnerList.Add(new JavaParameter(nameGroup.Value, typeGroup.Value));
             }
         }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public override Parameter ModifyParameter(Parameter parameter, string declaration)
+        else
         {
-            Match match = singleParamterRegex.Match(declaration);
-            int index = InnerList.IndexOf(parameter);
-
-            if (index < 0)
-                return parameter;
-
-            if (match.Success)
-            {
-                Group nameGroup = match.Groups["name"];
-                Group typeGroup = match.Groups["type"];
-
-                if (IsReservedName(nameGroup.Value, index))
-                    throw new ReservedNameException(nameGroup.Value);
-
-                Parameter newParameter = new JavaParameter(nameGroup.Value, typeGroup.Value);
-                InnerList[index] = newParameter;
-                return newParameter;
-            }
-            else
-            {
-                throw new BadSyntaxException(
-                    Strings.ErrorInvalidParameterDeclaration);
-            }
-        }
-
-        public override ArgumentList Clone()
-        {
-            JavaArgumentList argumentList = new JavaArgumentList(Capacity);
-            foreach (Parameter parameter in InnerList)
-            {
-                argumentList.InnerList.Add(parameter.Clone());
-            }
-            return argumentList;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        public override void InitFromString(string declaration)
-        {
-            if (parameterStringRegex.IsMatch(declaration))
-            {
-                Clear();
-                foreach (Match match in parameterRegex.Matches(declaration))
-                {
-                    Group nameGroup = match.Groups["name"];
-                    Group typeGroup = match.Groups["type"];
-
-                    InnerList.Add(new JavaParameter(nameGroup.Value, typeGroup.Value));
-                }
-            }
-            else
-            {
-                throw new BadSyntaxException(
-                    Strings.ErrorInvalidParameterDeclaration);
-            }
+            throw new BadSyntaxException(
+                Strings.ErrorInvalidParameterDeclaration);
         }
     }
 }

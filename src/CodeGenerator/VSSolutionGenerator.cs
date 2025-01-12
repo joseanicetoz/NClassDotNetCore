@@ -20,123 +20,117 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+internal sealed class VSSolutionGenerator : SolutionGenerator
 {
-    internal sealed class VSSolutionGenerator : SolutionGenerator
+    private SolutionType version = SolutionType.VisualStudio2008;
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="project"/> is null.
+    /// </exception>
+    public VSSolutionGenerator(Project project, SolutionType version) : base(project)
     {
-        SolutionType version = SolutionType.VisualStudio2008;
+        Version = version;
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="project"/> is null.
-        /// </exception>
-        public VSSolutionGenerator(Project project, SolutionType version) : base(project)
+    public SolutionType Version
+    {
+        get { return version; }
+        set
         {
-            Version = version;
-        }
-
-        public SolutionType Version
-        {
-            get
+            if (value == SolutionType.VisualStudio2005 ||
+                value == SolutionType.VisualStudio2008)
             {
-                return version;
+                version = value;
             }
-            set
+        }
+    }
+
+    private string VersionNumber
+    {
+        get
+        {
+            if (Version == SolutionType.VisualStudio2005)
+                return "9.00";
+            return "10.00";
+        }
+    }
+
+    private string VersionString
+    {
+        get
+        {
+            if (Version == SolutionType.VisualStudio2005)
+                return "Visual Studio 2005";
+            return "Visual Studio 2008";
+        }
+    }
+
+    /// <exception cref="ArgumentException">
+    /// The <paramref name="model"/> has invalid language.
+    /// </exception>
+    protected override ProjectGenerator CreateProjectGenerator(Model model)
+    {
+        Language language = model.Language;
+
+        if (language.Name.Equals(CSharpLanguage.Instance.Name))
+            return new CSharpProjectGenerator(model, Version);
+        if (language.Name.Equals(JavaLanguage.Instance.Name))
+            return new JavaProjectGenerator(model);
+
+        throw new ArgumentException("The model has an unknown language.");
+    }
+
+    protected override bool GenerateSolutionFile(string location)
+    {
+        try
+        {
+            string templateDir = Path.Combine(Application.StartupPath, "Templates");
+            string templatePath = Path.Combine(templateDir, "sln.template");
+            string solutionDir = Path.Combine(location, SolutionName);
+            string solutionPath = Path.Combine(solutionDir, SolutionName + ".sln");
+
+            using (StreamReader reader = new StreamReader(templatePath))
+            using (StreamWriter writer = new StreamWriter(
+                       solutionPath, false, reader.CurrentEncoding))
             {
-                if (value == SolutionType.VisualStudio2005 ||
-                    value == SolutionType.VisualStudio2008)
+                while (!reader.EndOfStream)
                 {
-                    version = value;
+                    CopyLine(reader, writer);
                 }
             }
+            return true;
         }
-
-        private string VersionNumber
+        catch
         {
-            get
-            {
-                if (Version == SolutionType.VisualStudio2005)
-                    return "9.00";
-                else
-                    return "10.00";
-            }
+            return false;
         }
+    }
 
-        private string VersionString
+    private void CopyLine(StreamReader reader, StreamWriter writer)
+    {
+        string line = reader.ReadLine();
+
+        line = line.Replace("${VersionNumber}", VersionNumber);
+        line = line.Replace("${VersionString}", VersionString);
+
+        if (line.Contains("${ProjectFile}"))
         {
-            get
+            string nextLine = reader.ReadLine();
+            foreach (ProjectGenerator generator in ProjectGenerators)
             {
-                if (Version == SolutionType.VisualStudio2005)
-                    return "Visual Studio 2005";
-                else
-                    return "Visual Studio 2008";
-            }
-        }
+                string newLine = line.Replace("${ProjectFile}",
+                    generator.RelativeProjectFileName);
+                newLine = newLine.Replace("${ProjectName}", generator.ProjectName);
 
-        /// <exception cref="ArgumentException">
-        /// The <paramref name="model"/> has invalid language.
-        /// </exception>
-        protected override ProjectGenerator CreateProjectGenerator(Model model)
-        {
-            Language language = model.Language;
-
-            if (language.Name.Equals(CSharpLanguage.Instance.Name))
-                return new CSharpProjectGenerator(model, Version);
-            if (language.Name.Equals(JavaLanguage.Instance.Name))
-                return new JavaProjectGenerator(model);
-
-            throw new ArgumentException("The model has an unknown language.");
-        }
-
-        protected override bool GenerateSolutionFile(string location)
-        {
-            try
-            {
-                string templateDir = Path.Combine(Application.StartupPath, "Templates");
-                string templatePath = Path.Combine(templateDir, "sln.template");
-                string solutionDir = Path.Combine(location, SolutionName);
-                string solutionPath = Path.Combine(solutionDir, SolutionName + ".sln");
-
-                using (StreamReader reader = new StreamReader(templatePath))
-                using (StreamWriter writer = new StreamWriter(
-                    solutionPath, false, reader.CurrentEncoding))
-                {
-                    while (!reader.EndOfStream)
-                    {
-                        CopyLine(reader, writer);
-                    }
-                }
-                return true;
-            }
-            catch
-            {
-                return false;
+                writer.WriteLine(newLine);
+                writer.WriteLine(nextLine);
             }
         }
-
-        private void CopyLine(StreamReader reader, StreamWriter writer)
+        else
         {
-            string line = reader.ReadLine();
-
-            line = line.Replace("${VersionNumber}", VersionNumber);
-            line = line.Replace("${VersionString}", VersionString);
-
-            if (line.Contains("${ProjectFile}"))
-            {
-                string nextLine = reader.ReadLine();
-                foreach (ProjectGenerator generator in ProjectGenerators)
-                {
-                    string newLine = line.Replace("${ProjectFile}",
-                        generator.RelativeProjectFileName);
-                    newLine = newLine.Replace("${ProjectName}", generator.ProjectName);
-
-                    writer.WriteLine(newLine);
-                    writer.WriteLine(nextLine);
-                }
-            }
-            else
-            {
-                writer.WriteLine(line);
-            }
+            writer.WriteLine(line);
         }
     }
 }

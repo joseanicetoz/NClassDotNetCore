@@ -17,88 +17,87 @@ using NClass.Translations;
 using System;
 using System.Windows.Forms;
 
-namespace NClass.GUI.Dialogs
+namespace NClass.GUI.Dialogs;
+
+public partial class AboutDialog : Form
 {
-    public partial class AboutDialog : Form
+    public AboutDialog()
     {
-        public AboutDialog()
+        InitializeComponent();
+    }
+
+    private void UpdateTexts()
+    {
+        this.Text = Strings.AboutNClass;
+        lblTitle.Text = Program.GetVersionString();
+        lblCopyright.Text = "Copyright (C) 2006-2009 " + Strings.Author;
+        lblStatus.Text = string.Format(Strings.DotNetVersion);
+        btnClose.Text = Strings.ButtonClose;
+
+        //lnkHomepage.Text = Strings.VisitHomepage;
+        lnkHomepage.Links.Clear();
+        lnkHomepage.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.WebAddress });
+
+        //lnkEmail.Text = Strings.SendEmail;
+        lnkEmail.Links.Clear();
+        lnkEmail.Links.Add(new LinkLabel.Link { LinkData = "mailto:" + Properties.Resources.MailAddress + "?subject=NClass" });
+
+        lblTranslator.Text = Strings.Translator;
+
+        lnkIcons.Links.Clear();
+        lnkIcons.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.Icons8WebAddress });
+
+        lnkGitHub.Links.Clear();
+        lnkGitHub.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.GitHubWebAddress });
+
+        lnkLicense.Links.Clear();
+        lnkLicense.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.LicenseWebAddress });        
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+        UpdateTexts();
+    }
+
+    private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (e.Link.LinkData is string target)
         {
-            InitializeComponent();
-        }
-
-        private void UpdateTexts()
-        {
-            this.Text = Strings.AboutNClass;
-            lblTitle.Text = Program.GetVersionString();
-            lblCopyright.Text = "Copyright (C) 2006-2009 " + Strings.Author;
-            lblStatus.Text = string.Format(Strings.DotNetVersion);
-            btnClose.Text = Strings.ButtonClose;
-
-            //lnkHomepage.Text = Strings.VisitHomepage;
-            lnkHomepage.Links.Clear();
-            lnkHomepage.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.WebAddress });
-
-            //lnkEmail.Text = Strings.SendEmail;
-            lnkEmail.Links.Clear();
-            lnkEmail.Links.Add(new LinkLabel.Link { LinkData = "mailto:" + Properties.Resources.MailAddress + "?subject=NClass" });
-
-            lblTranslator.Text = Strings.Translator;
-
-            lnkIcons.Links.Clear();
-            lnkIcons.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.Icons8WebAddress });
-
-            lnkGitHub.Links.Clear();
-            lnkGitHub.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.GitHubWebAddress });
-
-            lnkLicense.Links.Clear();
-            lnkLicense.Links.Add(new LinkLabel.Link { LinkData = Properties.Resources.LicenseWebAddress });        
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            UpdateTexts();
-        }
-
-        private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            if (e.Link.LinkData is string target)
+            try
             {
-                try
-                {
-                    System.Diagnostics.Process.Start(target);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        string.Format("{0}\n{1}: {2}", Strings.CommandFailed,
-                            Strings.ErrorsReason, ex.Message),
-                        Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                System.Diagnostics.Process.Start(target);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format("{0}\n{1}: {2}", Strings.CommandFailed,
+                        Strings.ErrorsReason, ex.Message),
+                    Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+    }
 
-        private void lnkHomepage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    private void lnkHomepage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (e.Link.LinkData is string target)
         {
-            if (e.Link.LinkData is string target)
+            try
             {
-                try
-                {
-                    System.Diagnostics.Process.Start(target);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        string.Format("{0}\n{1}: {2}", Strings.CommandFailed,
-                            Strings.ErrorsReason, ex.Message),
-                        Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                System.Diagnostics.Process.Start(target);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format("{0}\n{1}: {2}", Strings.CommandFailed,
+                        Strings.ErrorsReason, ex.Message),
+                    Strings.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+    }
 
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+    private void btnClose_Click(object sender, EventArgs e)
+    {
+        this.Close();
     }
 }

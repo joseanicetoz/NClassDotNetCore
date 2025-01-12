@@ -16,199 +16,171 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using NClass.Core.Parameters;
 
-namespace NClass.Core
+namespace NClass.Core.Entities;
+
+public abstract class DelegateType : TypeBase
 {
-    public abstract class DelegateType : TypeBase
+    private string returnType;
+    private ArgumentList argumentList;
+    protected DelegateType(string name) : base(name)
     {
-        string returnType;
-        ArgumentList argumentList;
+        argumentList = Language.CreateParameterCollection();
+        returnType = DefaultReturnType;
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        protected DelegateType(string name) : base(name)
-        {
-            argumentList = Language.CreateParameterCollection();
-            returnType = DefaultReturnType;
-        }
+    public sealed override EntityType EntityType { get; set; } = EntityType.Delegate;
 
-        public sealed override EntityType EntityType
+    public virtual string ReturnType
+    {
+        get { return returnType; }
+        set
         {
-            get { return EntityType.Delegate; }
-        }
+            string newReturnType = Language.GetValidTypeName(value);
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="value"/> does not fit to the syntax.
-        /// </exception>
-        public virtual string ReturnType
-        {
-            get
+            if (newReturnType != returnType)
             {
-                return returnType;
-            }
-            set
-            {
-                string newReturnType = Language.GetValidTypeName(value);
-
-                if (newReturnType != returnType)
-                {
-                    returnType = newReturnType;
-                    Changed();
-                }
-            }
-        }
-
-        public IEnumerable<Parameter> Arguments
-        {
-            get { return argumentList; }
-        }
-
-        public int ArgumentCount
-        {
-            get { return argumentList.Count; }
-        }
-
-        public sealed override string Signature
-        {
-            get
-            {
-                return (Language.GetAccessString(Access, false) + " Delegate");
-            }
-        }
-
-        public override string Stereotype
-        {
-            get { return "«delegate»"; }
-        }
-
-        protected abstract string DefaultReturnType
-        {
-            get;
-        }
-
-        public Parameter GetArgument(int index)
-        {
-            if (index >= 0 && index < argumentList.Count)
-                return argumentList[index];
-            else
-                return null;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The name does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public Parameter AddParameter(string declaration)
-        {
-            Parameter parameter = argumentList.Add(declaration);
-
-            parameter.Modified += delegate { Changed(); };
-            Changed();
-            return parameter;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The name does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public Parameter ModifyParameter(Parameter parameter, string declaration)
-        {
-            Parameter modified = argumentList.ModifyParameter(parameter, declaration);
-
-            Changed();
-            return modified;
-        }
-
-        public void RemoveParameter(Parameter parameter)
-        {
-            argumentList.Remove(parameter);
-            Changed();
-        }
-
-        public override bool MoveUpItem(object item)
-        {
-            if (item is Parameter && MoveUp(argumentList, item))
-            {
+                returnType = newReturnType;
                 Changed();
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
+    }
 
-        public override bool MoveDownItem(object item)
+    public IEnumerable<Parameter> Arguments
+    {
+        get { return argumentList; }
+        set { argumentList = (ArgumentList)value; }
+    }
+
+    public int ArgumentCount
+    {
+        get { return argumentList.Count; }
+    }
+
+    public sealed override string Signature
+    {
+        get { return (Language.GetAccessString(Access, false) + " Delegate"); }
+    }
+
+    public override string Stereotype
+    {
+        get { return "ï¿½delegateï¿½"; }
+    }
+
+    protected abstract string DefaultReturnType { get; }
+
+    public Parameter GetArgument(int index)
+    {
+        if (index >= 0 && index < argumentList.Count)
+            return argumentList[index];
+        else
+            return null;
+    }
+    public Parameter AddParameter(string declaration)
+    {
+        Parameter parameter = argumentList.Add(declaration);
+
+        parameter.Modified += delegate { Changed(); };
+        Changed();
+        return parameter;
+    }
+
+    public Parameter ModifyParameter(Parameter parameter, string declaration)
+    {
+        Parameter modified = argumentList.ModifyParameter(parameter, declaration);
+
+        Changed();
+        return modified;
+    }
+
+    public void RemoveParameter(Parameter parameter)
+    {
+        argumentList.Remove(parameter);
+        Changed();
+    }
+
+    public override bool MoveUpItem(object item)
+    {
+        if (item is Parameter && MoveUp(argumentList, item))
         {
-            if (item is Parameter && MoveDown(argumentList, item))
-            {
-                Changed();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            Changed();
+            return true;
         }
-
-        protected override void CopyFrom(TypeBase type)
+        else
         {
-            base.CopyFrom(type);
-
-            DelegateType delegateType = (DelegateType)type;
-            returnType = delegateType.returnType;
-            argumentList = delegateType.argumentList.Clone();
+            return false;
         }
+    }
 
-        public abstract DelegateType Clone();
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>
-        protected internal override void Serialize(XmlElement node)
+    public override bool MoveDownItem(object item)
+    {
+        if (item is Parameter && MoveDown(argumentList, item))
         {
-            base.Serialize(node);
-
-            XmlElement returnTypeNode = node.OwnerDocument.CreateElement("ReturnType");
-            returnTypeNode.InnerText = ReturnType.ToString();
-            node.AppendChild(returnTypeNode);
-
-            foreach (Parameter parameter in argumentList)
-            {
-                XmlElement paramNode = node.OwnerDocument.CreateElement("Param");
-                paramNode.InnerText = parameter.ToString();
-                node.AppendChild(paramNode);
-            }
+            Changed();
+            return true;
         }
-
-        /// <exception cref="BadSyntaxException">
-        /// An error occured while deserializing.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// The XML document is corrupt.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>
-        protected internal override void Deserialize(XmlElement node)
+        else
         {
-            RaiseChangedEvent = false;
+            return false;
+        }
+    }
 
-            XmlElement returnTypeNode = node["ReturnType"];
-            if (returnTypeNode != null)
-                ReturnType = returnTypeNode.InnerText;
+    protected override void CopyFrom(TypeBase type)
+    {
+        base.CopyFrom(type);
 
-            XmlNodeList nodeList = node.SelectNodes("Param");
+        DelegateType delegateType = (DelegateType)type;
+        returnType = delegateType.returnType;
+        argumentList = delegateType.argumentList.Clone();
+    }
+
+    public abstract DelegateType Clone();
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="node"/> is null.
+    /// </exception>
+    protected internal override void Serialize(XmlElement node)
+    {
+        base.Serialize(node);
+
+        XmlElement returnTypeNode = node.OwnerDocument.CreateElement("ReturnType");
+        returnTypeNode.InnerText = ReturnType;
+        node.AppendChild(returnTypeNode);
+
+        foreach (Parameter parameter in argumentList)
+        {
+            XmlElement paramNode = node.OwnerDocument.CreateElement("Param");
+            paramNode.InnerText = parameter.ToString();
+            node.AppendChild(paramNode);
+        }
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// An error occured while deserializing.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// The XML document is corrupt.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="node"/> is null.
+    /// </exception>
+    protected internal override void Deserialize(XmlElement node)
+    {
+        RaiseChangedEvent = false;
+
+        XmlElement returnTypeNode = node["ReturnType"];
+        if (returnTypeNode != null)
+            ReturnType = returnTypeNode.InnerText;
+
+        XmlNodeList nodeList = node.SelectNodes("Param");
+        if (nodeList != null)
+        {
             foreach (XmlNode parameterNode in nodeList)
                 argumentList.Add(parameterNode.InnerText);
-
-            base.Deserialize(node);
-            RaiseChangedEvent = true;
         }
+
+        base.Deserialize(node);
+        RaiseChangedEvent = true;
     }
 }

@@ -15,14 +15,13 @@
 
 using System;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public interface IModifiable
 {
-    public interface IModifiable
-    {
-        event EventHandler Modified;
+    event EventHandler Modified;
 
-        bool IsDirty { get; }
+    bool IsDirty { get; set; }
 
-        void Clean();
-    }
+    void Clean();
 }

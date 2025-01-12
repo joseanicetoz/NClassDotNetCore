@@ -18,192 +18,176 @@ using System;
 using System.Drawing;
 using System.Xml;
 
-namespace NClass.DiagramEditor.ClassDiagram.Connections
+namespace NClass.DiagramEditor.ClassDiagram.Connections;
+
+public sealed class BendPoint
 {
-    public sealed class BendPoint
+    private const int Spacing = Connection.Spacing;
+    internal const int SquareSize = 8;
+
+    private static readonly Color darkStartColor = Color.Blue;
+    private static readonly Color darkEndColor = Color.Red;
+    private static readonly Color lightStartColor = Color.FromArgb(178, 178, 255);
+    private static readonly Color lightEndColor = Color.FromArgb(255, 178, 178);
+    private static readonly Pen squarePen = new Pen(Color.Black);
+    private static readonly SolidBrush squareBrush = new SolidBrush(Color.Black);
+    private readonly Shape relativeShape;
+    private bool relativeToStartShape;
+    private bool autoPosition = true;
+    private Size relativePosition = Size.Empty;
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="relativeShape"/> is null.
+    /// </exception>
+    public BendPoint(Shape relativeShape, bool relativeToStartShape)
     {
-        const int Spacing = Connection.Spacing;
-        internal const int SquareSize = 8;
+        this.relativeShape = relativeShape ?? throw new ArgumentNullException(nameof(relativeShape));
+        this.relativeToStartShape = relativeToStartShape;
+    }
 
-        static readonly Color darkStartColor = Color.Blue;
-        static readonly Color darkEndColor = Color.Red;
-        static readonly Color lightStartColor = Color.FromArgb(178, 178, 255);
-        static readonly Color lightEndColor = Color.FromArgb(255, 178, 178);
-        static readonly Pen squarePen = new Pen(Color.Black);
-        static readonly SolidBrush squareBrush = new SolidBrush(Color.Black);
-        readonly Shape relativeShape;
-        bool relativeToStartShape;
-        bool autoPosition = true;
-        Size relativePosition = Size.Empty;
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="relativeShape"/> is null.
+    /// </exception>
+    public BendPoint(Shape relativeShape, bool relativeToStartShape, bool autoPosition)
+        : this(relativeShape, relativeToStartShape)
+    {
+        this.autoPosition = autoPosition;
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="relativeShape"/> is null.
-        /// </exception>
-        public BendPoint(Shape relativeShape, bool relativeToStartShape)
+    public bool RelativeToStartShape
+    {
+        get { return relativeToStartShape; }
+        set { relativeToStartShape = value; }
+    }
+
+    internal bool AutoPosition
+    {
+        get { return autoPosition; }
+        set { autoPosition = value; }
+    }
+
+    public int X
+    {
+        get { return (relativeShape.X + relativePosition.Width); }
+        internal set { relativePosition.Width = value - relativeShape.X; }
+    }
+
+    public int Y
+    {
+        get { return (relativeShape.Y + relativePosition.Height); }
+        internal set { relativePosition.Height = value - relativeShape.Y; }
+    }
+
+    public Point Location
+    {
+        get { return (relativeShape.Location + relativePosition); }
+        set
         {
-            this.relativeShape = relativeShape ?? throw new ArgumentNullException(nameof(relativeShape));
-            this.relativeToStartShape = relativeToStartShape;
-        }
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="relativeShape"/> is null.
-        /// </exception>
-        public BendPoint(Shape relativeShape, bool relativeToStartShape, bool autoPosition)
-            : this(relativeShape, relativeToStartShape)
-        {
-            this.autoPosition = autoPosition;
-        }
-
-        public bool RelativeToStartShape
-        {
-            get { return relativeToStartShape; }
-            set { relativeToStartShape = value; }
-        }
-
-        internal bool AutoPosition
-        {
-            get { return autoPosition; }
-            set { autoPosition = value; }
-        }
-
-        public int X
-        {
-            get
+            if (value.X > relativeShape.Left - Spacing &&
+                value.X < relativeShape.Right + Spacing &&
+                value.Y > relativeShape.Top - Spacing &&
+                value.Y < relativeShape.Bottom + Spacing)
             {
-                return (relativeShape.X + relativePosition.Width);
-            }
-            internal set
-            {
-                relativePosition.Width = value - relativeShape.X;
-            }
-        }
-
-        public int Y
-        {
-            get
-            {
-                return (relativeShape.Y + relativePosition.Height);
-            }
-            internal set
-            {
-                relativePosition.Height = value - relativeShape.Y;
-            }
-        }
-
-        public Point Location
-        {
-            get
-            {
-                return (relativeShape.Location + relativePosition);
-            }
-            set
-            {
-                if (value.X > relativeShape.Left - Spacing &&
-                    value.X < relativeShape.Right + Spacing &&
-                    value.Y > relativeShape.Top - Spacing &&
-                    value.Y < relativeShape.Bottom + Spacing)
+                if (X <= relativeShape.Left - Spacing)
                 {
-                    if (X <= relativeShape.Left - Spacing)
-                    {
-                        X = relativeShape.Left - Spacing;
-                        Y = value.Y;
-                    }
-                    else if (X >= relativeShape.Right + Spacing)
-                    {
-                        X = relativeShape.Right + Spacing;
-                        Y = value.Y;
-                    }
-                    else if (Y <= relativeShape.Top - Spacing)
-                    {
-                        X = value.X;
-                        Y = relativeShape.Top - Spacing;
-                    }
-                    else
-                    {
-                        X = value.X;
-                        Y = relativeShape.Bottom + Spacing;
-                    }
+                    X = relativeShape.Left - Spacing;
+                    Y = value.Y;
+                }
+                else if (X >= relativeShape.Right + Spacing)
+                {
+                    X = relativeShape.Right + Spacing;
+                    Y = value.Y;
+                }
+                else if (Y <= relativeShape.Top - Spacing)
+                {
+                    X = value.X;
+                    Y = relativeShape.Top - Spacing;
                 }
                 else
                 {
                     X = value.X;
-                    Y = value.Y;
+                    Y = relativeShape.Bottom + Spacing;
                 }
-            }
-        }
-
-        public object Clone()
-        {
-            return this.MemberwiseClone();
-        }
-
-        internal void Draw(Graphics g, bool onScreen, float zoom, Point offset)
-        {
-            int x = (int)(X * zoom) - SquareSize / 2 - offset.X;
-            int y = (int)(Y * zoom) - SquareSize / 2 - offset.Y;
-            Rectangle square = new Rectangle(x, y, SquareSize, SquareSize);
-
-            if (AutoPosition)
-            {
-                squarePen.Color = RelativeToStartShape ? lightStartColor : lightEndColor;
-                g.DrawRectangle(squarePen, square.X, square.Y, square.Width, square.Height);
             }
             else
             {
-                squarePen.Color = RelativeToStartShape ? darkStartColor : darkEndColor;
-                squareBrush.Color = RelativeToStartShape ? lightStartColor : lightEndColor;
-
-                g.FillRectangle(squareBrush, square);
-                g.DrawRectangle(squarePen, square);
+                X = value.X;
+                Y = value.Y;
             }
         }
+    }
 
-        internal bool Contains(PointF point, float zoom)
+    public object Clone()
+    {
+        return this.MemberwiseClone();
+    }
+
+    internal void Draw(Graphics g, bool onScreen, float zoom, Point offset)
+    {
+        int x = (int)(X * zoom) - SquareSize / 2 - offset.X;
+        int y = (int)(Y * zoom) - SquareSize / 2 - offset.Y;
+        Rectangle square = new Rectangle(x, y, SquareSize, SquareSize);
+
+        if (AutoPosition)
         {
-            float halfSize = SquareSize / zoom / 2;
-
-            return (
-                point.X >= X - halfSize && point.X <= X + halfSize &&
-                point.Y >= Y - halfSize && point.Y <= Y + halfSize
-            );
+            squarePen.Color = RelativeToStartShape ? lightStartColor : lightEndColor;
+            g.DrawRectangle(squarePen, square.X, square.Y, square.Width, square.Height);
         }
-
-        internal void ShapeResized(Size size)
+        else
         {
-            if (X >= relativeShape.Left && X <= relativeShape.Right && Y > relativeShape.Top)
-                Y += size.Height;
+            squarePen.Color = RelativeToStartShape ? darkStartColor : darkEndColor;
+            squareBrush.Color = RelativeToStartShape ? lightStartColor : lightEndColor;
 
-            if (Y >= relativeShape.Top && Y <= relativeShape.Bottom && X > relativeShape.Left)
-                X += size.Width;
+            g.FillRectangle(squareBrush, square);
+            g.DrawRectangle(squarePen, square);
         }
+    }
 
-        internal void Serialize(XmlElement node)
+    internal bool Contains(PointF point, float zoom)
+    {
+        float halfSize = SquareSize / zoom / 2;
+
+        return (
+            point.X >= X - halfSize && point.X <= X + halfSize &&
+            point.Y >= Y - halfSize && point.Y <= Y + halfSize
+        );
+    }
+
+    internal void ShapeResized(Size size)
+    {
+        if (X >= relativeShape.Left && X <= relativeShape.Right && Y > relativeShape.Top)
+            Y += size.Height;
+
+        if (Y >= relativeShape.Top && Y <= relativeShape.Bottom && X > relativeShape.Left)
+            X += size.Width;
+    }
+
+    internal void Serialize(XmlElement node)
+    {
+        XmlDocument document = node.OwnerDocument;
+
+        XmlElement xNode = document.CreateElement("X");
+        xNode.InnerText = X.ToString();
+        node.AppendChild(xNode);
+
+        XmlElement yNode = document.CreateElement("Y");
+        yNode.InnerText = Y.ToString();
+        node.AppendChild(yNode);
+    }
+
+    internal void Deserialize(XmlElement node)
+    {
+        XmlElement xNode = node["X"];
+        if (xNode != null)
         {
-            XmlDocument document = node.OwnerDocument;
-
-            XmlElement xNode = document.CreateElement("X");
-            xNode.InnerText = X.ToString();
-            node.AppendChild(xNode);
-
-            XmlElement yNode = document.CreateElement("Y");
-            yNode.InnerText = Y.ToString();
-            node.AppendChild(yNode);
+            int.TryParse(xNode.InnerText, out int x);
+            X = x;
         }
-
-        internal void Deserialize(XmlElement node)
+        XmlElement yNode = node["Y"];
+        if (yNode != null)
         {
-            XmlElement xNode = node["X"];
-            if (xNode != null)
-            {
-                int.TryParse(xNode.InnerText, out int x);
-                X = x;
-            }
-            XmlElement yNode = node["Y"];
-            if (yNode != null)
-            {
-                int.TryParse(yNode.InnerText, out int y);
-                Y = y;
-            }
+            int.TryParse(yNode.InnerText, out int y);
+            Y = y;
         }
     }
 }

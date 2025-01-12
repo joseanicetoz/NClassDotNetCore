@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>NClass.CodeGenerator</AssemblyName>
     <RootNamespace>NClass.CodeGenerator</RootNamespace>
     <ApplicationIcon />
     <StartupObject />
+    <LangVersion>10</LangVersion>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\CSharp\CSharp.csproj" />
     <ProjectReference Include="..\Java\Java.csproj" />
   </ItemGroup>

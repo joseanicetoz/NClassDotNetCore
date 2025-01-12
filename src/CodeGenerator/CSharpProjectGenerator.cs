@@ -14,102 +14,98 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
-using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NClass.Core.Entities;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+internal sealed class CSharpProjectGenerator : ProjectGenerator
 {
-    internal sealed class CSharpProjectGenerator : ProjectGenerator
+    private readonly SolutionType solutionType;
+
+    public CSharpProjectGenerator(Model model, SolutionType solutionType) : base(model)
     {
-        readonly SolutionType solutionType;
+        this.solutionType = solutionType;
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="model"/> is null.
-        /// </exception>
-        public CSharpProjectGenerator(Model model, SolutionType solutionType) : base(model)
+    public override string RelativeProjectFileName
+    {
+        get
         {
-            this.solutionType = solutionType;
+            string fileName = $"{ProjectName}.csproj";
+            string directoryName = ProjectName;
+
+            return Path.Combine(directoryName, fileName);
         }
+    }
 
-        public override string RelativeProjectFileName
+    protected override SourceFileGenerator CreateSourceFileGenerator(TypeBase type)
+    {
+        return new CSharpSourceFileGenerator(type, RootNamespace);
+    }
+
+    protected override bool GenerateProjectFiles(string location)
+    {
+        try
         {
-            get
+            string templateDir = Path.Combine(Application.StartupPath, "Templates");
+            string templateFile = Path.Combine(templateDir, "csproj.template");
+            string projectFile = Path.Combine(location, RelativeProjectFileName);
+
+            using StreamReader reader = new StreamReader(templateFile);
+            using StreamWriter writer = new StreamWriter(projectFile, false, reader.CurrentEncoding);
+            while (!reader.EndOfStream)
             {
-                string fileName = ProjectName + ".csproj";
-                string directoryName = ProjectName;
+                string line = reader.ReadLine();
 
-                return Path.Combine(directoryName, fileName);
-            }
-        }
+                if (line == null) continue;
+                    
+                line = line.Replace("${RootNamespace}", RootNamespace);
+                line = line.Replace("${AssemblyName}", ProjectName);
 
-        protected override SourceFileGenerator CreateSourceFileGenerator(TypeBase type)
-        {
-            return new CSharpSourceFileGenerator(type, RootNamespace);
-        }
-
-        protected override bool GenerateProjectFiles(string location)
-        {
-            try
-            {
-                string templateDir = Path.Combine(Application.StartupPath, "Templates");
-                string templateFile = Path.Combine(templateDir, "csproj.template");
-                string projectFile = Path.Combine(location, RelativeProjectFileName);
-
-                using (StreamReader reader = new StreamReader(templateFile))
-                using (StreamWriter writer = new StreamWriter(
-                    projectFile, false, reader.CurrentEncoding))
+                if (line.Contains("${VS2005:"))
                 {
-                    while (!reader.EndOfStream)
-                    {
-                        string line = reader.ReadLine();
+                    if (solutionType == SolutionType.VisualStudio2005)
+                        line = Regex.Replace(line, @"\${VS2005:(?<content>.+?)}", "${content}");
+                    else
+                        line = Regex.Replace(line, @"\${VS2005:(?<content>.+?)}", "");
 
-                        line = line.Replace("${RootNamespace}", RootNamespace);
-                        line = line.Replace("${AssemblyName}", ProjectName);
-
-                        if (line.Contains("${VS2005:"))
-                        {
-                            if (solutionType == SolutionType.VisualStudio2005)
-                                line = Regex.Replace(line, @"\${VS2005:(?<content>.+?)}", "${content}");
-                            else
-                                line = Regex.Replace(line, @"\${VS2005:(?<content>.+?)}", "");
-
-                            if (line.Length == 0)
-                                continue;
-                        }
-                        if (line.Contains("${VS2008:"))
-                        {
-                            if (solutionType == SolutionType.VisualStudio2008)
-                                line = Regex.Replace(line, @"\${VS2008:(?<content>.+?)}", "${content}");
-                            else
-                                line = Regex.Replace(line, @"\${VS2008:(?<content>.+?)}", "");
-
-                            if (line.Length == 0)
-                                continue;
-                        }
-
-                        if (line.Contains("${SourceFile}"))
-                        {
-                            foreach (string fileName in FileNames)
-                            {
-                                string newLine = line.Replace("${SourceFile}", fileName);
-                                writer.WriteLine(newLine);
-                            }
-                        }
-                        else
-                        {
-                            writer.WriteLine(line);
-                        }
-                    }
+                    if (line.Length == 0)
+                        continue;
                 }
 
-                return true;
+                if (line.Contains("${VS2008:"))
+                {
+                    if (solutionType == SolutionType.VisualStudio2008)
+                        line = Regex.Replace(line, @"\${VS2008:(?<content>.+?)}", "${content}");
+                    else
+                        line = Regex.Replace(line, @"\${VS2008:(?<content>.+?)}", "");
+
+                    if (line.Length == 0)
+                        continue;
+                }
+
+                if (line.Contains("${SourceFile}"))
+                {
+                    foreach (string fileName in FileNames)
+                    {
+                        string newLine = line.Replace("${SourceFile}", fileName);
+                        writer.WriteLine(newLine);
+                    }
+                }
+                else
+                {
+                    writer.WriteLine(line);
+                }
             }
-            catch
-            {
-                return false;
-            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

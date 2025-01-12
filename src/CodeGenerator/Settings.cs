@@ -20,38 +20,37 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+internal sealed partial class Settings
 {
-    internal sealed partial class Settings
+    private readonly Dictionary<Language, StringCollection> importLists = new Dictionary<Language, StringCollection>();
+
+    public Settings()
     {
-        readonly Dictionary<Language, StringCollection> importLists = new Dictionary<Language, StringCollection>();
+        this.SettingsLoaded += Settings_SettingsLoaded;
+    }
 
-        public Settings()
+    public IDictionary<Language, StringCollection> ImportList
+    {
+        get { return importLists; }
+    }
+
+    private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
+    {
+        if (CSharpImportList == null)
+            CSharpImportList = new StringCollection();
+        if (JavaImportList == null)
+            JavaImportList = new StringCollection();
+
+        ImportList.Clear();
+        ImportList.Add(CSharp.CSharpLanguage.Instance, CSharpImportList);
+        ImportList.Add(Java.JavaLanguage.Instance, JavaImportList);
+
+        if (string.IsNullOrEmpty(DestinationPath))
         {
-            this.SettingsLoaded += Settings_SettingsLoaded;
-        }
-
-        public IDictionary<Language, StringCollection> ImportList
-        {
-            get { return importLists; }
-        }
-
-        private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
-        {
-            if (CSharpImportList == null)
-                CSharpImportList = new StringCollection();
-            if (JavaImportList == null)
-                JavaImportList = new StringCollection();
-
-            ImportList.Clear();
-            ImportList.Add(CSharp.CSharpLanguage.Instance, CSharpImportList);
-            ImportList.Add(Java.JavaLanguage.Instance, JavaImportList);
-
-            if (string.IsNullOrEmpty(DestinationPath))
-            {
-                string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                DestinationPath = Path.Combine(myDocuments, "NClass Generated Projects");
-            }
+            string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            DestinationPath = Path.Combine(myDocuments, "NClass Generated Projects");
         }
     }
 }

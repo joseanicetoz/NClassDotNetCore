@@ -16,33 +16,24 @@
 using NClass.Translations;
 using System;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public class ReservedNameException : BadSyntaxException
 {
-    public class ReservedNameException : BadSyntaxException
+    public ReservedNameException() : base(Strings.ErrorReservedName)
     {
-        readonly string name;
-
-        public ReservedNameException()
-            : base(Strings.ErrorReservedName)
-        {
-            name = null;
-        }
-
-        public ReservedNameException(string name)
-            : base(Strings.ErrorReservedName)
-        {
-            this.name = name;
-        }
-
-        public ReservedNameException(string name, Exception innerException)
-            : base(Strings.ErrorReservedName, innerException)
-        {
-            this.name = name;
-        }
-
-        public string ReservedName
-        {
-            get { return name; }
-        }
+        ReservedName = null;
     }
+
+    public ReservedNameException(string name) : base(Strings.ErrorReservedName)
+    {
+        ReservedName = name;
+    }
+
+    public ReservedNameException(string name, Exception innerException) : base(Strings.ErrorReservedName, innerException)
+    {
+        ReservedName = name;
+    }
+
+    public string ReservedName { get; set; }
 }

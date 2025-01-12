@@ -18,139 +18,133 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using NClass.Core.Entities;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+public abstract class SourceFileGenerator
 {
-    public abstract class SourceFileGenerator
+    // This builder object is static to increase performance
+    private static StringBuilder codeBuilder;
+    private const int DefaultBuilderCapacity = 10240; // 10 KB
+
+    private readonly TypeBase type;
+    private readonly string rootNamespace;
+    private int indentLevel = 0;
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="type"/> is null.
+    /// </exception>
+    protected SourceFileGenerator(TypeBase type, string rootNamespace)
     {
-        // This builder object is static to increase performance
-        static StringBuilder codeBuilder;
-        const int DefaultBuilderCapacity = 10240; // 10 KB
+        this.type = type ?? throw new ArgumentNullException(nameof(type));
+        this.rootNamespace = rootNamespace;
+    }
 
-        readonly TypeBase type;
-        readonly string rootNamespace;
-        int indentLevel = 0;
+    protected TypeBase Type
+    {
+        get { return type; }
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="type"/> is null.
-        /// </exception>
-        protected SourceFileGenerator(TypeBase type, string rootNamespace)
+    protected string RootNamespace
+    {
+        get { return rootNamespace; }
+    }
+
+    protected int IndentLevel
+    {
+        get { return indentLevel; }
+        set
         {
-            this.type = type ?? throw new ArgumentNullException(nameof(type));
-            this.rootNamespace = rootNamespace;
+            if (value >= 0)
+                indentLevel = value;
         }
+    }
 
-        protected TypeBase Type
-        {
-            get { return type; }
-        }
+    protected abstract string Extension { get; }
 
-        protected string RootNamespace
+    /// <exception cref="FileGenerationException">
+    /// An error has occured while generating the source file.
+    /// </exception>
+    public string Generate(string directory)
+    {
+        try
         {
-            get { return rootNamespace; }
-        }
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
 
-        protected int IndentLevel
-        {
-            get
+            string fileName = Type.Name + Extension;
+            fileName = Regex.Replace(fileName, @"\<(?<type>.+)\>", @"[${type}]");
+            string path = Path.Combine(directory, fileName);
+
+            using (StreamWriter writer = new StreamWriter(path, false))
             {
-                return indentLevel;
+                WriteFileContent(writer);
             }
-            set
-            {
-                if (value >= 0)
-                    indentLevel = value;
-            }
+            return fileName;
         }
-
-        protected abstract string Extension
+        catch (Exception ex)
         {
-            get;
+            throw new FileGenerationException(directory, ex);
         }
+    }
 
-        /// <exception cref="FileGenerationException">
-        /// An error has occured while generating the source file.
-        /// </exception>
-        public string Generate(string directory)
-        {
-            try
-            {
-                if (!Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
+    /// <exception cref="IOException">
+    /// An I/O error occurs.
+    /// </exception>
+    /// <exception cref="ObjectDisposedException">
+    /// The <see cref="TextWriter"/> is closed.
+    /// </exception>
+    private void WriteFileContent(TextWriter writer)
+    {
+        if (codeBuilder == null)
+            codeBuilder = new StringBuilder(DefaultBuilderCapacity);
+        else
+            codeBuilder.Length = 0;
 
-                string fileName = Type.Name + Extension;
-                fileName = Regex.Replace(fileName, @"\<(?<type>.+)\>", @"[${type}]");
-                string path = Path.Combine(directory, fileName);
+        WriteFileContent();
+        writer.Write(codeBuilder.ToString());
+    }
 
-                using (StreamWriter writer = new StreamWriter(path, false))
-                {
-                    WriteFileContent(writer);
-                }
-                return fileName;
-            }
-            catch (Exception ex)
-            {
-                throw new FileGenerationException(directory, ex);
-            }
-        }
+    protected abstract void WriteFileContent();
 
-        /// <exception cref="IOException">
-        /// An I/O error occurs.
-        /// </exception>
-        /// <exception cref="ObjectDisposedException">
-        /// The <see cref="TextWriter"/> is closed.
-        /// </exception>
-        private void WriteFileContent(TextWriter writer)
-        {
-            if (codeBuilder == null)
-                codeBuilder = new StringBuilder(DefaultBuilderCapacity);
-            else
-                codeBuilder.Length = 0;
+    internal static void FinishWork()
+    {
+        codeBuilder = null;
+    }
 
-            WriteFileContent();
-            writer.Write(codeBuilder.ToString());
-        }
+    protected void AddBlankLine()
+    {
+        AddBlankLine(false);
+    }
 
-        protected abstract void WriteFileContent();
+    protected void AddBlankLine(bool indentation)
+    {
+        if (indentation)
+            AddIndent();
+        codeBuilder.AppendLine();
+    }
 
-        internal static void FinishWork()
-        {
-            codeBuilder = null;
-        }
+    protected void WriteLine(string text)
+    {
+        WriteLine(text, true);
+    }
 
-        protected void AddBlankLine()
-        {
-            AddBlankLine(false);
-        }
+    protected void WriteLine(string text, bool indentation)
+    {
+        if (indentation)
+            AddIndent();
+        codeBuilder.AppendLine(text);
+    }
 
-        protected void AddBlankLine(bool indentation)
-        {
-            if (indentation)
-                AddIndent();
-            codeBuilder.AppendLine();
-        }
+    private void AddIndent()
+    {
+        string indentString;
+        if (Settings.Default.UseTabsForIndents)
+            indentString = new string('\t', IndentLevel);
+        else
+            indentString = new string(' ', IndentLevel * Settings.Default.IndentSize);
 
-        protected void WriteLine(string text)
-        {
-            WriteLine(text, true);
-        }
-
-        protected void WriteLine(string text, bool indentation)
-        {
-            if (indentation)
-                AddIndent();
-            codeBuilder.AppendLine(text);
-        }
-
-        private void AddIndent()
-        {
-            string indentString;
-            if (Settings.Default.UseTabsForIndents)
-                indentString = new string('\t', IndentLevel);
-            else
-                indentString = new string(' ', IndentLevel * Settings.Default.IndentSize);
-
-            codeBuilder.Append(indentString);
-        }
+        codeBuilder.Append(indentString);
     }
 }

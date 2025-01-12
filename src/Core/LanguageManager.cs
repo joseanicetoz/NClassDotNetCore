@@ -16,103 +16,92 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using NClass.Core.EventArgs;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public class LanguageManager
 {
-    public class LanguageManager
+    private static readonly LanguageManager instance = new LanguageManager();
+
+    private List<Language> languages = new List<Language>();
+
+    public List<Language> Languages
     {
-        readonly static LanguageManager instance = new LanguageManager();
-
-        List<Language> languages;
-
-        public List<Language> Languages
+        get
         {
-            get
+            if (languages == null) LoadLanguages();
+            return languages;
+        }
+    }
+
+    public EventHandler<NClassEventArgs> OnError { get; set; }
+
+    public static LanguageManager Instance
+    {
+        get { return instance; }
+    }
+
+    public Language GetLanguage(string name)
+    {
+        if (languages.Count < 1)
+            LoadLanguages();
+
+        return languages?.Find(o => o.Name.Equals(name));
+    }
+
+    private void LoadLanguages()
+    {
+        try
+        {
+            languages.Clear();
+            
+            string execPath = Environment.CurrentDirectory;
+
+            DirectoryInfo directory = new DirectoryInfo(execPath);
+
+            foreach (FileInfo file in directory.GetFiles("*.dll"))
             {
-                if (languages == null)
-                    LoadLanguages();
-                return languages;
+                Assembly assembly = Assembly.LoadFile(file.FullName);
+                LoadLanguage(assembly);
             }
         }
-
-        public EventHandler<NClassEventArgs> OnError { get; set; }
-
-        public static LanguageManager Instance
+        catch (Exception ex)
         {
-            get {
-                return instance; 
-            }
-        }
-
-        public LanguageManager()
-        {
-        }
-
-        public Language GetLanguage(string name)
-        {
-            if (languages == null)
-                LoadLanguages();
-
-            return languages.Find(o => o.Name.Equals(name));
-        }
-
-        private void LoadLanguages()
-        {
-            try
-            {
-                if (languages == null)
-                    languages = new List<Language>();
-
-                string execPath = Environment.CurrentDirectory;
-
-                DirectoryInfo directory = new DirectoryInfo(execPath);
-
-                foreach (FileInfo file in directory.GetFiles("*.dll"))
-                {
-                    Assembly assembly = Assembly.LoadFile(file.FullName);
-                    LoadLanguage(assembly);
-                }
-            }
-            catch (Exception ex)
-            {
 #if DEBUG
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine(ex.StackTrace);
 #endif
-                OnError?.Invoke(this, new NClassEventArgs { Message = ex.Message });
+            OnError?.Invoke(this, new NClassEventArgs { Message = ex.Message });
+        }
+    }
+
+    private void LoadLanguage(Assembly assembly)
+    {
+        try
+        {
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (!type.IsSubclassOf(typeof(Language))) continue;
+#if DEBUG
+                Debug.WriteLine(">>> Found language! " + type.Name);
+#endif
+                Language language = (Language)Activator.CreateInstance(type);
+                languages.Add(language);
             }
         }
-
-        private void LoadLanguage(Assembly assembly)
+        catch (Exception ex)
         {
-            try
-            {
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (type.IsSubclassOf(typeof(Language)))
-                    {
 #if DEBUG
-                        Debug.WriteLine(">>> Found language! " + type.Name);
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine(ex.StackTrace);
 #endif
-                        Language language = (Language)Activator.CreateInstance(type);
-                        languages.Add(language);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-#endif
-                OnError?.Invoke(this, new NClassEventArgs { Message = assembly.FullName + "\n" + ex.Message });
-            }
+            OnError?.Invoke(this, new NClassEventArgs { Message = assembly.FullName + "\n" + ex.Message });
         }
     }
 }

@@ -15,31 +15,31 @@
 
 using System.Windows.Forms;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+public class ToolStripSimplifiedRenderer : ToolStripProfessionalRenderer
 {
-    public class ToolStripSimplifiedRenderer : ToolStripProfessionalRenderer
+    private static readonly ToolStripSimplifiedRenderer renderer = new ToolStripSimplifiedRenderer();
+
+    private ToolStripSimplifiedRenderer()
     {
-        static readonly ToolStripSimplifiedRenderer renderer = new ToolStripSimplifiedRenderer();
+    }
 
-        private ToolStripSimplifiedRenderer()
-        {
-        }
+    public static ToolStripSimplifiedRenderer Default
+    {
+        get { return renderer; }
+        set => throw new System.NotImplementedException();
+    }
 
-        public static ToolStripSimplifiedRenderer Default
-        {
-            get { return renderer; }
-        }
+    protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
+    {
+        if (e.ToolStrip is ToolStripDropDown)
+            base.OnRenderToolStripBackground(e);
+    }
 
-        protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
-        {
-            if (e.ToolStrip is ToolStripDropDown)
-                base.OnRenderToolStripBackground(e);
-        }
-
-        protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
-        {
-            if (e.ToolStrip is ToolStripDropDown)
-                base.OnRenderToolStripBorder(e);
-        }
+    protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+    {
+        if (e.ToolStrip is ToolStripDropDown)
+            base.OnRenderToolStripBorder(e);
     }
 }

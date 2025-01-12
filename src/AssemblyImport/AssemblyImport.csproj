@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>NClass.AssemblyImport</AssemblyName>
     <RootNamespace>NClass.AssemblyImport</RootNamespace>
@@ -11,6 +11,7 @@
     <Version>2.0</Version>
     <Copyright>Copyright © Malte Ried 2011</Copyright>
     <Authors>Malte Ried</Authors>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,9 +27,5 @@
       <HintPath>libs\NReflect.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="COPY $(TargetPath) $(SolutionDir)GUI\$(OutDir)\PlugIns\$(TargetFileName)" />
-  </Target>
 
 </Project>

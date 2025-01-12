@@ -23,89 +23,85 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using NClass.Core.EventArgs;
 
-namespace NClass.GUI
+namespace NClass.GUI;
+
+public class PlugInManager
 {
-    public class PlugInManager
+    private readonly static PlugInManager instance = new PlugInManager();
+
+    private List<Plugin> plugins;
+
+    public DocumentManager DocumentManager { get; set; }
+
+    public List<Plugin> PlugIns
     {
-        readonly static PlugInManager instance = new PlugInManager();
-
-        List<Plugin> plugins;
-
-        public DocumentManager DocumentManager { get; set; }
-
-        public List<Plugin> PlugIns
+        get
         {
-            get
+            if (plugins == null) LoadPlugins();
+            return plugins;
+        }
+    }
+
+    public EventHandler<NClassEventArgs> OnError { get; set; }
+
+    public static PlugInManager Instance
+    {
+        get { return instance; }
+    }
+
+    private void LoadPlugins()
+    {
+        try
+        {
+            if(plugins == null)
+                plugins = new List<Plugin>();
+
+            string pluginsPath = Path.Combine(Environment.CurrentDirectory, "Plugins");
+            if (!Directory.Exists(pluginsPath))
+                return;
+
+            DirectoryInfo directory = new DirectoryInfo(pluginsPath);
+
+            foreach (FileInfo file in directory.GetFiles("*.dll"))
             {
-                if (plugins == null)
-                    LoadPlugins();
-                return plugins;
+                Assembly assembly = Assembly.LoadFile(file.FullName);
+                LoadPlugin(assembly);
             }
         }
-
-        public EventHandler<NClassEventArgs> OnError { get; set; }
-
-        public static PlugInManager Instance
+        catch (Exception ex)
         {
-            get
-            {
-                return instance;
-            }
+#if DEBUG
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine(ex.StackTrace);
+#endif
+            OnError?.Invoke(this, new NClassEventArgs { Message = ex.Message });
         }
+    }
 
-        private void LoadPlugins()
+    private void LoadPlugin(Assembly assembly)
+    {
+        try
         {
-            try
+            foreach (Type type in assembly.GetTypes())
             {
-                if(plugins == null)
-                    plugins = new List<Plugin>();
-
-                string pluginsPath = Path.Combine(Environment.CurrentDirectory, "Plugins");
-                if (!Directory.Exists(pluginsPath))
-                    return;
-
-                DirectoryInfo directory = new DirectoryInfo(pluginsPath);
-
-                foreach (FileInfo file in directory.GetFiles("*.dll"))
+                if (type.IsSubclassOf(typeof(Plugin)))
                 {
-                    Assembly assembly = Assembly.LoadFile(file.FullName);
-                    LoadPlugin(assembly);
+                    NClassEnvironment environment =
+                        new NClassEnvironment(Workspace.Default, DocumentManager);
+                    Plugin plugin = (Plugin)Activator.CreateInstance(type, environment);
+                    PlugIns.Add(plugin);
                 }
             }
-            catch (Exception ex)
-            {
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-#endif
-                OnError?.Invoke(this, new NClassEventArgs { Message = ex.Message });
-            }
         }
-
-        private void LoadPlugin(Assembly assembly)
+        catch (Exception ex)
         {
-            try
-            {
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (type.IsSubclassOf(typeof(Plugin)))
-                    {
-                        NClassEnvironment environment =
-                            new NClassEnvironment(Workspace.Default, DocumentManager);
-                        Plugin plugin = (Plugin)Activator.CreateInstance(type, environment);
-                        PlugIns.Add(plugin);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
 #if DEBUG
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine(ex.StackTrace);
 #endif
-                OnError?.Invoke(this, new NClassEventArgs { Message = assembly.FullName + "\n" + ex.Message });
-            }
+            OnError?.Invoke(this, new NClassEventArgs { Message = assembly.FullName + "\n" + ex.Message });
         }
     }
 }

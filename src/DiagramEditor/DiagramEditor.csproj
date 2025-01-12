@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon />
     <StartupObject />
@@ -11,6 +10,8 @@
     <Authors>Balazs Tihanyi</Authors>
     <Version>2.4</Version>
     <Copyright>Copyright © Georgi Baychev 2016-2018, Balazs Tihanyi 2006-2009</Copyright>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,7 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="TextCopy" Version="4.3.1" />
   </ItemGroup>
 

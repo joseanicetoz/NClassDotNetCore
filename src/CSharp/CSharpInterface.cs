@@ -16,154 +16,139 @@
 using NClass.Core;
 using System;
 using System.Text;
+using NClass.Core.Entities;
+using NClass.Core.Members;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal sealed class CSharpInterface : InterfaceType
 {
-    internal sealed class CSharpInterface : InterfaceType
+    public override AccessModifier AccessModifier
     {
-        internal CSharpInterface() : this("NewInterface")
+        get { return base.AccessModifier; }
+        set
         {
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        internal CSharpInterface(string name) : base(name)
-        {
-        }
-
-        public override AccessModifier AccessModifier
-        {
-            get
+            if (IsNested ||
+                value == AccessModifier.Default ||
+                value == AccessModifier.Internal ||
+                value == AccessModifier.Public)
             {
-                return base.AccessModifier;
-            }
-            set
-            {
-                if (IsNested ||
-                    value == AccessModifier.Default ||
-                    value == AccessModifier.Internal ||
-                    value == AccessModifier.Public)
-                {
-                    base.AccessModifier = value;
-                }
+                base.AccessModifier = value;
             }
         }
+    }
 
-        public override AccessModifier DefaultAccess
-        {
-            get { return AccessModifier.Internal; }
-        }
+    public override AccessModifier DefaultAccess
+    {
+        get { return AccessModifier.Internal; }
+    }
 
-        public override AccessModifier DefaultMemberAccess
-        {
-            get { return AccessModifier.Public; }
-        }
+    public override AccessModifier DefaultMemberAccess
+    {
+        get { return AccessModifier.Public; }
+    }
 
-        public override bool SupportsProperties
-        {
-            get { return true; }
-        }
+    public override bool SupportsProperties
+    {
+        get { return true; }
+    }
 
-        public override bool SupportsEvents
-        {
-            get { return true; }
-        }
+    public override bool SupportsEvents
+    {
+        get { return true; }
+    }
 
-        /// <exception cref="ArgumentException">
-        /// The <paramref name="value"/> is already a child member of the type.
-        /// </exception>
-        public override CompositeType NestingParent
+    /// <exception cref="ArgumentException">
+    /// The <paramref name="value"/> is already a child member of the type.
+    /// </exception>
+    public override CompositeType NestingParent
+    {
+        get { return base.NestingParent; }
+        protected set
         {
-            get
+            try
             {
-                return base.NestingParent;
+                RaiseChangedEvent = false;
+
+                base.NestingParent = value;
+                if (NestingParent == null && Access != AccessModifier.Public)
+                    AccessModifier = AccessModifier.Internal;
             }
-            protected set
+            finally
             {
-                try
-                {
-                    RaiseChangedEvent = false;
-
-                    base.NestingParent = value;
-                    if (NestingParent == null && Access != AccessModifier.Public)
-                        AccessModifier = AccessModifier.Internal;
-                }
-                finally
-                {
-                    RaiseChangedEvent = true;
-                }
+                RaiseChangedEvent = true;
             }
         }
+    }
 
-        public override Language Language
+    public override Language Language
+    {
+        get { return CSharpLanguage.Instance; }
+    }
+
+    internal CSharpInterface() : this("NewInterface")
+    {
+    }
+    internal CSharpInterface(string name) : base(name)
+    {
+    }
+
+    public override Method AddMethod()
+    {
+        Method method = new CSharpMethod(this);
+
+        AddOperation(method);
+        return method;
+    }
+
+    public override Property AddProperty()
+    {
+        Property property = new CSharpProperty(this);
+
+        AddOperation(property);
+        return property;
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    public override Event AddEvent()
+    {
+        Event newEvent = new CSharpEvent(this);
+
+        AddOperation(newEvent);
+        return newEvent;
+    }
+
+    public override string GetDeclaration()
+    {
+        StringBuilder builder = new StringBuilder(30);
+
+        if (AccessModifier != AccessModifier.Default)
         {
-            get { return CSharpLanguage.Instance; }
+            builder.Append(Language.GetAccessString(AccessModifier, true));
+            builder.Append(" ");
         }
+        builder.AppendFormat("interface {0}", Name);
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        public override Method AddMethod()
+        if (HasExplicitBase)
         {
-            Method method = new CSharpMethod(this);
-
-            AddOperation(method);
-            return method;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        public override Property AddProperty()
-        {
-            Property property = new CSharpProperty(this);
-
-            AddOperation(property);
-            return property;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        public override Event AddEvent()
-        {
-            Event newEvent = new CSharpEvent(this);
-
-            AddOperation(newEvent);
-            return newEvent;
-        }
-
-        public override string GetDeclaration()
-        {
-            StringBuilder builder = new StringBuilder(30);
-
-            if (AccessModifier != AccessModifier.Default)
+            builder.Append(" : ");
+            for (int i = 0; i < BaseList.Count; i++)
             {
-                builder.Append(Language.GetAccessString(AccessModifier, true));
-                builder.Append(" ");
+                builder.Append(BaseList[i].Name);
+                if (i < BaseList.Count - 1)
+                    builder.Append(", ");
             }
-            builder.AppendFormat("interface {0}", Name);
-
-            if (HasExplicitBase)
-            {
-                builder.Append(" : ");
-                for (int i = 0; i < BaseList.Count; i++)
-                {
-                    builder.Append(BaseList[i].Name);
-                    if (i < BaseList.Count - 1)
-                        builder.Append(", ");
-                }
-            }
-
-            return builder.ToString();
         }
 
-        public override InterfaceType Clone()
-        {
-            CSharpInterface newInterface = new CSharpInterface();
-            newInterface.CopyFrom(this);
-            return newInterface;
-        }
+        return builder.ToString();
+    }
+
+    public override InterfaceType Clone()
+    {
+        CSharpInterface newInterface = new CSharpInterface();
+        newInterface.CopyFrom(this);
+        return newInterface;
     }
 }

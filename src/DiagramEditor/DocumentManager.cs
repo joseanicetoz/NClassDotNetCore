@@ -15,259 +15,261 @@
 
 using System;
 using System.Collections.Generic;
+using NClass.DiagramEditor.EventsArgs;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public class DocumentManager
 {
-    public class DocumentManager
+    private readonly List<IDocument> documents = new List<IDocument>();
+    private IDocument activeDocument = null;
+    private readonly OrderedList<IDocument> documentHistory = new OrderedList<IDocument>();
+    private LinkedListNode<IDocument> switchingNode = null;
+
+    public event DocumentEventHandler ActiveDocumentChanged;
+    public event DocumentEventHandler DocumentAdded;
+    public event DocumentEventHandler DocumentRemoved;
+    public event DocumentMovedEventHandler DocumentMoved;
+
+    public IEnumerable<IDocument> Documents
     {
-        readonly List<IDocument> documents = new List<IDocument>();
-        IDocument activeDocument = null;
-        readonly OrderedList<IDocument> documentHistory = new OrderedList<IDocument>();
-        LinkedListNode<IDocument> switchingNode = null;
+        get { return documents; }
+        set => throw new NotImplementedException();
+    }
 
-        public event DocumentEventHandler ActiveDocumentChanged;
-        public event DocumentEventHandler DocumentAdded;
-        public event DocumentEventHandler DocumentRemoved;
-        public event DocumentMovedEventHandler DocumentMoved;
+    public IEnumerable<IDocument> DocumentHistory
+    {
+        get { return documentHistory; }
+        set => throw new NotImplementedException();
+    }
 
-        public IEnumerable<IDocument> Documents
+    public int DocumentCount
+    {
+        get { return documents.Count; }
+        set => throw new NotImplementedException();
+    }
+
+    public bool HasDocument
+    {
+        get { return (documents.Count > 0); }
+        set => throw new NotImplementedException();
+    }
+
+    public IDocument ActiveDocument
+    {
+        get { return activeDocument; }
+        set
         {
-            get { return documents; }
-        }
-
-        public IEnumerable<IDocument> DocumentHistory
-        {
-            get { return documentHistory; }
-        }
-
-        public int DocumentCount
-        {
-            get { return documents.Count; }
-        }
-
-        public bool HasDocument
-        {
-            get { return (documents.Count > 0); }
-        }
-
-        public IDocument ActiveDocument
-        {
-            get
+            if (activeDocument != value && documents.Contains(value))
             {
-                return activeDocument;
-            }
-            set
-            {
-                if (activeDocument != value && documents.Contains(value))
-                {
-                    IDocument oldDocument = activeDocument;
-                    if (!SwitchingTabs)
-                        documentHistory.ShiftToFirstPlace(value);
-                    activeDocument = value;
-                    OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
-                }
-            }
-        }
-
-        public bool SwitchingTabs
-        {
-            get { return (switchingNode != null); }
-        }
-
-        private void document_Closing(object sender, EventArgs e)
-        {
-            IDocument document = (IDocument)sender;
-            Close(document);
-        }
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="document"/> is null.
-        /// </exception>
-        public void AddOrActivate(IDocument document)
-        {
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
-
-            EndSwitching();
-
-            IDocument oldDocument = activeDocument;
-            if (documents.Contains(document))
-            {
-                if (activeDocument != document)
-                {
-                    activeDocument = document;
-                    documentHistory.ShiftToFirstPlace(document);
-                    OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
-                }
-            }
-            else
-            {
-                documents.Add(document);
-                activeDocument = document;
-                documentHistory.AddFirst(document);
-                document.Closing += new EventHandler(document_Closing);
-                OnDocumentAdded(new DocumentEventArgs(document));
+                IDocument oldDocument = activeDocument;
+                if (!SwitchingTabs)
+                    documentHistory.ShiftToFirstPlace(value);
+                activeDocument = value;
                 OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
             }
         }
+    }
 
-        public void MoveDocument(IDocument document, int places)
+    public bool SwitchingTabs
+    {
+        get { return (switchingNode != null); }
+        set => throw new NotImplementedException();
+    }
+
+    private void document_Closing(object sender, EventArgs e)
+    {
+        IDocument document = (IDocument)sender;
+        Close(document);
+    }
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="document"/> is null.
+    /// </exception>
+    public void AddOrActivate(IDocument document)
+    {
+        if (document == null)
+            throw new ArgumentNullException(nameof(document));
+
+        EndSwitching();
+
+        IDocument oldDocument = activeDocument;
+        if (documents.Contains(document))
         {
-            int index = documents.IndexOf(document);
-
-            if (index >= 0 && places != 0)
+            if (activeDocument != document)
             {
-                int position = index;
-                if (places > 0)
-                {
-                    while (position < index + places && position < DocumentCount - 1)
-                    {
-                        documents[position] = documents[position + 1];
-                        position++;
-                    }
-                }
-                else // places < 0
-                {
-                    while (position > index + places && position > 0)
-                    {
-                        documents[position] = documents[position - 1];
-                        position--;
-                    }
-                }
-
-                documents[position] = document;
-                OnDocumentMoved(new DocumentMovedEventArgs(document, index, position));
+                activeDocument = document;
+                documentHistory.ShiftToFirstPlace(document);
+                OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
             }
         }
-
-        public bool Close(IDocument document)
+        else
         {
-            EndSwitching();
+            documents.Add(document);
+            activeDocument = document;
+            documentHistory.AddFirst(document);
+            document.Closing += new EventHandler(document_Closing);
+            OnDocumentAdded(new DocumentEventArgs(document));
+            OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
+        }
+    }
 
-            if (documents.Remove(document))
+    public void MoveDocument(IDocument document, int places)
+    {
+        int index = documents.IndexOf(document);
+
+        if (index >= 0 && places != 0)
+        {
+            int position = index;
+            if (places > 0)
             {
-                documentHistory.Remove(document);
+                while (position < index + places && position < DocumentCount - 1)
+                {
+                    documents[position] = documents[position + 1];
+                    position++;
+                }
+            }
+            else // places < 0
+            {
+                while (position > index + places && position > 0)
+                {
+                    documents[position] = documents[position - 1];
+                    position--;
+                }
+            }
+
+            documents[position] = document;
+            OnDocumentMoved(new DocumentMovedEventArgs(document, index, position));
+        }
+    }
+
+    public bool Close(IDocument document)
+    {
+        EndSwitching();
+
+        if (documents.Remove(document))
+        {
+            documentHistory.Remove(document);
+            document.Closing -= new EventHandler(document_Closing);
+            OnDocumentRemoved(new DocumentEventArgs(document));
+            if (activeDocument == document)
+            {
+                IDocument oldDocument = activeDocument;
+                if (HasDocument)
+                    activeDocument = documentHistory.FirstValue;
+                else
+                    activeDocument = null;
+                OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void CloseAll()
+    {
+        EndSwitching();
+
+        if (HasDocument)
+        {
+            while (documents.Count > 0)
+            {
+                IDocument document = documents[documents.Count - 1];
+                documents.RemoveAt(documents.Count - 1);
                 document.Closing -= new EventHandler(document_Closing);
                 OnDocumentRemoved(new DocumentEventArgs(document));
-                if (activeDocument == document)
-                {
-                    IDocument oldDocument = activeDocument;
-                    if (HasDocument)
-                        activeDocument = documentHistory.FirstValue;
-                    else
-                        activeDocument = null;
-                    OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
-                }
-                return true;
             }
-            else
+
+            documentHistory.Clear();
+
+            if (activeDocument != null)
             {
-                return false;
+                IDocument oldDocument = activeDocument;
+                activeDocument = null;
+                OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
             }
         }
+    }
 
-        public void CloseAll()
+    public void CloseAllOthers(IDocument exception)
+    {
+        EndSwitching();
+
+        if (HasDocument && documents.Count >= 2)
         {
-            EndSwitching();
-
-            if (HasDocument)
+            while (documents.Count >= 2)
             {
-                while (documents.Count > 0)
+                IDocument document = documents[documents.Count - 1];
+                if (document != exception)
                 {
-                    IDocument document = documents[documents.Count - 1];
                     documents.RemoveAt(documents.Count - 1);
-                    document.Closing -= new EventHandler(document_Closing);
-                    OnDocumentRemoved(new DocumentEventArgs(document));
                 }
-
-                documentHistory.Clear();
-
-                if (activeDocument != null)
+                else
                 {
-                    IDocument oldDocument = activeDocument;
-                    activeDocument = null;
-                    OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
+                    document = documents[documents.Count - 2];
+                    documents.RemoveAt(documents.Count - 2);
                 }
+                document.Closing -= new EventHandler(document_Closing);
+                OnDocumentRemoved(new DocumentEventArgs(document));
             }
-        }
 
-        public void CloseAllOthers(IDocument exception)
-        {
-            EndSwitching();
+            documentHistory.Clear();
+            documentHistory.Add(exception);
 
-            if (HasDocument && documents.Count >= 2)
+            if (activeDocument != exception)
             {
-                while (documents.Count >= 2)
-                {
-                    IDocument document = documents[documents.Count - 1];
-                    if (document != exception)
-                    {
-                        documents.RemoveAt(documents.Count - 1);
-                    }
-                    else
-                    {
-                        document = documents[documents.Count - 2];
-                        documents.RemoveAt(documents.Count - 2);
-                    }
-                    document.Closing -= new EventHandler(document_Closing);
-                    OnDocumentRemoved(new DocumentEventArgs(document));
-                }
-
-                documentHistory.Clear();
-                documentHistory.Add(exception);
-
-                if (activeDocument != exception)
-                {
-                    IDocument oldDocument = activeDocument;
-                    activeDocument = exception;
-                    OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
-                }
+                IDocument oldDocument = activeDocument;
+                activeDocument = exception;
+                OnActiveDocumentChanged(new DocumentEventArgs(oldDocument));
             }
         }
+    }
 
-        public void SwitchDocument()
+    public void SwitchDocument()
+    {
+        if (DocumentCount >= 2)
         {
-            if (DocumentCount >= 2)
-            {
-                if (switchingNode == null)
-                    switchingNode = documentHistory.First;
+            if (switchingNode == null)
+                switchingNode = documentHistory.First;
 
-                switchingNode = switchingNode.Next;
-                if (switchingNode == null)
-                    switchingNode = documentHistory.First;
+            switchingNode = switchingNode.Next;
+            if (switchingNode == null)
+                switchingNode = documentHistory.First;
 
-                ActiveDocument = switchingNode.Value;
-            }
+            ActiveDocument = switchingNode.Value;
         }
+    }
 
-        public void EndSwitching()
+    public void EndSwitching()
+    {
+        if (SwitchingTabs)
         {
-            if (SwitchingTabs)
-            {
-                switchingNode = null;
-                if (HasDocument)
-                    documentHistory.ShiftToFirstPlace(ActiveDocument);
-            }
+            switchingNode = null;
+            if (HasDocument)
+                documentHistory.ShiftToFirstPlace(ActiveDocument);
         }
+    }
 
-        protected virtual void OnActiveDocumentChanged(DocumentEventArgs e)
-        {
-            ActiveDocumentChanged?.Invoke(this, e);
-        }
+    protected virtual void OnActiveDocumentChanged(DocumentEventArgs e)
+    {
+        ActiveDocumentChanged?.Invoke(this, e);
+    }
 
-        protected virtual void OnDocumentAdded(DocumentEventArgs e)
-        {
-            DocumentAdded?.Invoke(this, e);
-        }
+    protected virtual void OnDocumentAdded(DocumentEventArgs e)
+    {
+        DocumentAdded?.Invoke(this, e);
+    }
 
-        protected virtual void OnDocumentRemoved(DocumentEventArgs e)
-        {
-            DocumentRemoved?.Invoke(this, e);
-        }
+    protected virtual void OnDocumentRemoved(DocumentEventArgs e)
+    {
+        DocumentRemoved?.Invoke(this, e);
+    }
 
-        protected virtual void OnDocumentMoved(DocumentMovedEventArgs e)
-        {
-            DocumentMoved?.Invoke(this, e);
-        }
+    protected virtual void OnDocumentMoved(DocumentMovedEventArgs e)
+    {
+        DocumentMoved?.Invoke(this, e);
     }
 }

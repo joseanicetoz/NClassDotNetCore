@@ -18,74 +18,76 @@ using NClass.DiagramEditor.ClassDiagram.Shapes;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using NClass.Core.Entities;
+using NClass.Core.Relationships;
 
-namespace NClass.DiagramEditor.ClassDiagram.Connections
+namespace NClass.DiagramEditor.ClassDiagram.Connections;
+
+internal sealed class Generalization : Connection
 {
-    internal sealed class Generalization : Connection
+    private static readonly Pen linePen = new Pen(Color.Black);
+    private readonly GeneralizationRelationship generalization;
+
+    static Generalization()
     {
-        static readonly Pen linePen = new Pen(Color.Black);
-        readonly GeneralizationRelationship generalization;
+        linePen.MiterLimit = 2.0F;
+        linePen.LineJoin = LineJoin.MiterClipped;
+    }
 
-        static Generalization()
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="generalization"/> is null.-or-
+    /// <paramref name="startShape"/> is null.-or-
+    /// <paramref name="endShape"/> is null.
+    /// </exception>
+    public Generalization(GeneralizationRelationship generalization, Shape startShape, Shape endShape)
+        : base(generalization, startShape, endShape)
+    {
+        this.generalization = generalization;
+    }
+
+    internal GeneralizationRelationship GeneralizationRelationship
+    {
+        get { return generalization; }
+        set => throw new NotImplementedException();
+    }
+
+    protected internal override Relationship Relationship
+    {
+        get { return generalization; }
+    }
+
+    protected override Size EndCapSize
+    {
+        get { return Arrowhead.ClosedArrowSize; }
+    }
+
+    protected override int EndSelectionOffset
+    {
+        get { return Arrowhead.ClosedArrowHeight; }
+    }
+
+    protected override void DrawEndCap(IGraphics g, bool onScreen, Style style)
+    {
+        linePen.Color = style.RelationshipColor;
+        linePen.Width = style.RelationshipWidth;
+
+        g.FillPath(Brushes.White, Arrowhead.ClosedArrowPath);
+        g.DrawPath(linePen, Arrowhead.ClosedArrowPath);
+    }
+
+    protected override bool CloneRelationship(Diagram diagram, Shape first, Shape second)
+    {
+        CompositeType firstType = first.Entity as CompositeType;
+        CompositeType secondType = second.Entity as CompositeType;
+
+        if (firstType != null && secondType != null)
         {
-            linePen.MiterLimit = 2.0F;
-            linePen.LineJoin = LineJoin.MiterClipped;
+            GeneralizationRelationship clone = generalization.Clone(firstType, secondType);
+            return diagram.InsertGeneralization(clone);
         }
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="generalization"/> is null.-or-
-        /// <paramref name="startShape"/> is null.-or-
-        /// <paramref name="endShape"/> is null.
-        /// </exception>
-        public Generalization(GeneralizationRelationship generalization, Shape startShape, Shape endShape)
-            : base(generalization, startShape, endShape)
+        else
         {
-            this.generalization = generalization;
-        }
-
-        internal GeneralizationRelationship GeneralizationRelationship
-        {
-            get { return generalization; }
-        }
-
-        protected internal override Relationship Relationship
-        {
-            get { return generalization; }
-        }
-
-        protected override Size EndCapSize
-        {
-            get { return Arrowhead.ClosedArrowSize; }
-        }
-
-        protected override int EndSelectionOffset
-        {
-            get { return Arrowhead.ClosedArrowHeight; }
-        }
-
-        protected override void DrawEndCap(IGraphics g, bool onScreen, Style style)
-        {
-            linePen.Color = style.RelationshipColor;
-            linePen.Width = style.RelationshipWidth;
-
-            g.FillPath(Brushes.White, Arrowhead.ClosedArrowPath);
-            g.DrawPath(linePen, Arrowhead.ClosedArrowPath);
-        }
-
-        protected override bool CloneRelationship(Diagram diagram, Shape first, Shape second)
-        {
-            CompositeType firstType = first.Entity as CompositeType;
-            CompositeType secondType = second.Entity as CompositeType;
-
-            if (firstType != null && secondType != null)
-            {
-                GeneralizationRelationship clone = generalization.Clone(firstType, secondType);
-                return diagram.InsertGeneralization(clone);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

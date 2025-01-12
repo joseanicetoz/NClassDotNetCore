@@ -18,307 +18,258 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.Serialization;
+using NClass.Core.Entities;
+using NClass.Core.Members;
+using NClass.Core.Parameters;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public abstract class Language
 {
-    public abstract class Language
+    public abstract string Name { get; }
+
+    public abstract string AssemblyName { get; }
+
+    [XmlIgnore]
+    public abstract Dictionary<AccessModifier, string> ValidAccessModifiers { get; }
+
+    [XmlIgnore]
+    public abstract Dictionary<ClassModifier, string> ValidClassModifiers { get; }
+
+    [XmlIgnore]
+    public abstract Dictionary<FieldModifier, string> ValidFieldModifiers { get; }
+
+    [XmlIgnore]
+    public abstract Dictionary<OperationModifier, string> ValidOperationModifiers { get; }
+
+    public abstract bool SupportsAssemblyImport { get; }
+
+    public abstract bool SupportsInterfaces { get; }
+
+    public abstract bool SupportsStructures { get; }
+
+    public abstract bool SupportsEnums { get; }
+
+    public abstract bool SupportsDelegates { get; }
+
+    public abstract bool SupportsExplicitImplementation { get; }
+
+    public abstract bool ExplicitVirtualMethods { get; }
+
+    public abstract string DefaultFileExtension { get; }
+
+    protected abstract string[] ReservedNames { get; }
+
+    public abstract string[] TypeKeywords { get;  }
+
+    public bool IsForbiddenName(string name)
     {
-        public abstract string Name
-        {
-            get;
-        }
+        return (
+            Contains(ReservedNames, name) ||
+            Contains(TypeKeywords, name)
+        );
+    }
 
-        public abstract string AssemblyName
-        {
-            get;
-        }
+    public bool IsForbiddenTypeName(string name)
+    {
+        return Contains(ReservedNames, name);
+    }
 
-        [XmlIgnore]
-        public abstract Dictionary<AccessModifier, string> ValidAccessModifiers
+    [Obsolete("Use LanguageManager instead")]
+    public static Language GetLanguage(string languageName)
+    {
+        try
         {
-            get;
-        }
+            string languageString = languageName;
+            Assembly assembly = Assembly.Load(languageString);
 
-        [XmlIgnore]
-        public abstract Dictionary<ClassModifier, string> ValidClassModifiers
-        {
-            get;
-        }
-
-        [XmlIgnore]
-        public abstract Dictionary<FieldModifier, string> ValidFieldModifiers
-        {
-            get;
-        }
-
-        [XmlIgnore]
-        public abstract Dictionary<OperationModifier, string> ValidOperationModifiers
-        {
-            get;
-        }
-
-        public abstract bool SupportsAssemblyImport
-        {
-            get;
-        }
-
-        public abstract bool SupportsInterfaces
-        {
-            get;
-        }
-
-        public abstract bool SupportsStructures
-        {
-            get;
-        }
-
-        public abstract bool SupportsEnums
-        {
-            get;
-        }
-
-        public abstract bool SupportsDelegates
-        {
-            get;
-        }
-
-        public abstract bool SupportsExplicitImplementation
-        {
-            get;
-        }
-
-        public abstract bool ExplicitVirtualMethods
-        {
-            get;
-        }
-
-        public abstract string DefaultFileExtension
-        {
-            get;
-        }
-
-        protected abstract string[] ReservedNames
-        {
-            get;
-        }
-
-        protected abstract string[] TypeKeywords
-        {
-            get;
-        }
-
-        public bool IsForbiddenName(string name)
-        {
-            return (
-                Contains(ReservedNames, name) ||
-                Contains(TypeKeywords, name)
-            );
-        }
-
-        public bool IsForbiddenTypeName(string name)
-        {
-            return Contains(ReservedNames, name);
-        }
-
-        //TODO: a languageName ne az assembly neve legyen, hanem a Name property!
-        [Obsolete("Use LanguageManager instead")]
-        public static Language GetLanguage(string languageName)
-        {
-            try
+            foreach (Type type in assembly.GetTypes())
             {
-                string languageString = languageName;
-                Assembly assembly = Assembly.Load(languageString);
-
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (type.IsSubclassOf(typeof(Language)))
-                    {
-                        object languageInstance = type.InvokeMember("Instance",
-                            BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty,
-                            null, null, null);
-                        return (languageInstance as Language);
-                    }
-                }
-                return null;
+                if (!type.IsSubclassOf(typeof(Language))) continue;
+                
+                object languageInstance = type.InvokeMember("Instance",
+                    BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty,
+                    null, null, null);
+                return (languageInstance as Language);
             }
-            catch
-            {
-                return null;
-            }
+            return null;
         }
-
-        private static bool Contains(string[] values, string value)
+        catch
         {
-            if (values == null)
-                return false;
+            return null;
+        }
+    }
 
-            for (int i = 0; i < values.Length; i++)
-                if (values[i] == value)
-                    return true;
-
+    private static bool Contains(string[] values, string value)
+    {
+        if (values == null)
             return false;
-        }
 
-        /// <exception cref="ArgumentException">
-        /// The language does not support explicit interface implementation.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="operation"/> is null.-or-
-        /// <paramref name="newParent"/> is null.
-        /// </exception>
-        protected internal abstract Operation Implement(Operation operation,
-            CompositeType newParent, bool explicitly);
+        for (int i = 0; i < values.Length; i++)
+            if (values[i] == value)
+                return true;
 
-        /// <exception cref="ArgumentException">
-        /// <paramref name="operation"/> cannot be overridden.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="operation"/> is null.
-        /// </exception>
-        protected internal abstract Operation Override(Operation operation, CompositeType newParent);
+        return false;
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        public virtual string GetValidName(string name, bool isGenericName)
+    /// <exception cref="ArgumentException">
+    /// The language does not support explicit interface implementation.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="operation"/> is null.-or-
+    /// <paramref name="newParent"/> is null.
+    /// </exception>
+    protected internal abstract Operation Implement(Operation operation,
+        CompositeType newParent, bool explicitly);
+
+    /// <exception cref="ArgumentException">
+    /// <paramref name="operation"/> cannot be overridden.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="operation"/> is null.
+    /// </exception>
+    protected internal abstract Operation Override(Operation operation, CompositeType newParent);
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    public virtual string GetValidName(string name, bool isGenericName)
+    {
+        if (IsForbiddenName(name))
+            throw new BadSyntaxException(Strings.ErrorForbiddenName);
+
+        return name;
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    public virtual string GetValidTypeName(string name)
+    {
+        if (IsForbiddenTypeName(name))
+            throw new BadSyntaxException(Strings.ErrorForbiddenTypeName);
+
+        return name;
+    }
+
+    public virtual ClassModifier TryParseClassModifier(string value)
+    {
+        try
         {
-            if (IsForbiddenName(name))
-                throw new BadSyntaxException(Strings.ErrorForbiddenName);
-
-            return name;
+            return (ClassModifier)Enum.Parse(
+                typeof(ClassModifier), value, true);
         }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        public virtual string GetValidTypeName(string name)
+        catch
         {
-            if (IsForbiddenTypeName(name))
-                throw new BadSyntaxException(Strings.ErrorForbiddenTypeName);
-
-            return name;
+            return ClassModifier.None;
         }
+    }
 
-        public virtual ClassModifier TryParseClassModifier(string value)
+    public virtual AccessModifier TryParseAccessModifier(string value)
+    {
+        try
         {
-            try
-            {
-                return (ClassModifier)Enum.Parse(
-                    typeof(ClassModifier), value, true);
-            }
-            catch
-            {
-                return ClassModifier.None;
-            }
-        }
-
-        public virtual AccessModifier TryParseAccessModifier(string value)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(value))
-                    return AccessModifier.Default;
-                else
-                    return (AccessModifier)Enum.Parse(typeof(AccessModifier), value, true);
-            }
-            catch
-            {
+            if (string.IsNullOrEmpty(value))
                 return AccessModifier.Default;
-            }
+            return (AccessModifier)Enum.Parse(typeof(AccessModifier), value, true);
         }
-
-        public virtual OperationModifier TryParseOperationModifier(string value)
+        catch
         {
-            try
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    return OperationModifier.None;
-                }
-                else
-                {
-                    return (OperationModifier)Enum.Parse(
-                        typeof(OperationModifier), value, true);
-                }
-            }
-            catch
+            return AccessModifier.Default;
+        }
+    }
+
+    public virtual OperationModifier TryParseOperationModifier(string value)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(value))
             {
                 return OperationModifier.None;
             }
+            else
+            {
+                return (OperationModifier)Enum.Parse(
+                    typeof(OperationModifier), value, true);
+            }
         }
-
-        public abstract bool IsValidModifier(FieldModifier modifier);
-
-        public abstract bool IsValidModifier(OperationModifier modifier);
-
-        public abstract bool IsValidModifier(AccessModifier modifier);
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="operation"/> contains invalid modifier combinations.
-        /// </exception>
-        protected internal abstract void ValidateOperation(Operation operation);
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="field"/> contains invalid modifier combinations.
-        /// </exception>
-        protected internal abstract void ValidateField(Field field);
-
-        protected internal abstract ClassType CreateClass();
-
-        /// <exception cref="InvalidOperationException">
-        /// The language does not support structures.
-        /// </exception>
-        protected internal abstract StructureType CreateStructure();
-
-        /// <exception cref="InvalidOperationException">
-        /// The language does not support interfaces.
-        /// </exception>
-        protected internal abstract InterfaceType CreateInterface();
-
-        /// <exception cref="InvalidOperationException">
-        /// The language does not support enums.
-        /// </exception>
-        protected internal abstract EnumType CreateEnum();
-
-        /// <exception cref="InvalidOperationException">
-        /// The language does not support delegates.
-        /// </exception>
-        protected internal abstract DelegateType CreateDelegate();
-
-        protected internal abstract ArgumentList CreateParameterCollection();
-
-
-        public abstract string GetAccessString(AccessModifier access, bool forCode);
-
-        public abstract string GetFieldModifierString(FieldModifier modifier, bool forCode);
-
-        public abstract string GetOperationModifierString(OperationModifier modifier, bool forCode);
-
-        public abstract string GetClassModifierString(ClassModifier modifier, bool forCode);
-
-        public string GetAccessString(AccessModifier access)
+        catch
         {
-            return GetAccessString(access, false);
+            return OperationModifier.None;
         }
+    }
 
-        public string GetFieldModifierString(FieldModifier modifier)
-        {
-            return GetFieldModifierString(modifier, false);
-        }
+    public abstract bool IsValidModifier(FieldModifier modifier);
 
-        public string GetOperationModifierString(OperationModifier modifier)
-        {
-            return GetOperationModifierString(modifier, false);
-        }
+    public abstract bool IsValidModifier(OperationModifier modifier);
 
-        public string GetClassModifierString(ClassModifier modifier)
-        {
-            return GetClassModifierString(modifier, false);
-        }
+    public abstract bool IsValidModifier(AccessModifier modifier);
 
-        public override string ToString()
-        {
-            return Name;
-        }
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="operation"/> contains invalid modifier combinations.
+    /// </exception>
+    protected internal abstract void ValidateOperation(Operation operation);
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="field"/> contains invalid modifier combinations.
+    /// </exception>
+    protected internal abstract void ValidateField(Field field);
+
+    protected internal abstract ClassType CreateClass();
+
+    /// <exception cref="InvalidOperationException">
+    /// The language does not support structures.
+    /// </exception>
+    protected internal abstract StructureType CreateStructure();
+
+    /// <exception cref="InvalidOperationException">
+    /// The language does not support interfaces.
+    /// </exception>
+    protected internal abstract InterfaceType CreateInterface();
+
+    /// <exception cref="InvalidOperationException">
+    /// The language does not support enums.
+    /// </exception>
+    protected internal abstract EnumType CreateEnum();
+
+    /// <exception cref="InvalidOperationException">
+    /// The language does not support delegates.
+    /// </exception>
+    protected internal abstract DelegateType CreateDelegate();
+
+    protected internal abstract ArgumentList CreateParameterCollection();
+
+
+    public abstract string GetAccessString(AccessModifier access, bool forCode);
+
+    public abstract string GetFieldModifierString(FieldModifier modifier, bool forCode);
+
+    public abstract string GetOperationModifierString(OperationModifier modifier, bool forCode);
+
+    public abstract string GetClassModifierString(ClassModifier modifier, bool forCode);
+
+    public string GetAccessString(AccessModifier access)
+    {
+        return GetAccessString(access, false);
+    }
+
+    public string GetFieldModifierString(FieldModifier modifier)
+    {
+        return GetFieldModifierString(modifier, false);
+    }
+
+    public string GetOperationModifierString(OperationModifier modifier)
+    {
+        return GetOperationModifierString(modifier, false);
+    }
+
+    public string GetClassModifierString(ClassModifier modifier)
+    {
+        return GetClassModifierString(modifier, false);
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

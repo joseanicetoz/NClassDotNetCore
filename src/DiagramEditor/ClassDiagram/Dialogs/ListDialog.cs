@@ -18,227 +18,226 @@ using NClass.Translations;
 using System;
 using System.Windows.Forms;
 
-namespace NClass.DiagramEditor.ClassDiagram.Dialogs
+namespace NClass.DiagramEditor.ClassDiagram.Dialogs;
+
+public abstract partial class ListDialog : Form
 {
-    public abstract partial class ListDialog : Form
+    private bool changed = false;
+
+    public ListDialog()
     {
-        bool changed = false;
+        InitializeComponent();
+        lstItems.SmallImageList = Icons.IconList;
+        toolStrip1.Renderer = ToolStripSimplifiedRenderer.Default;
+    }
 
-        public ListDialog()
+    public bool Changed
+    {
+        get { return changed; }
+        private set { changed = value; }
+    }
+
+    protected abstract void FillList();
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="text"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ReservedNameException">
+    /// The <paramref name="text"/> contains a reserved name.
+    /// </exception>
+    protected abstract void AddToList(string text);
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="text"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ReservedNameException">
+    /// The <paramref name="text"/> contains a reserved name.
+    /// </exception>
+    protected abstract void Modify(ListViewItem item, string text);
+
+    protected virtual void MoveUpItem(ListViewItem item)
+    {
+        if (item != null)
         {
-            InitializeComponent();
-            lstItems.SmallImageList = Icons.IconList;
-            toolStrip1.Renderer = ToolStripSimplifiedRenderer.Default;
-        }
+            int index = item.Index;
 
-        public bool Changed
-        {
-            get { return changed; }
-            private set { changed = value; }
-        }
-
-        protected abstract void FillList();
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="text"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The <paramref name="text"/> contains a reserved name.
-        /// </exception>
-        protected abstract void AddToList(string text);
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="text"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The <paramref name="text"/> contains a reserved name.
-        /// </exception>
-        protected abstract void Modify(ListViewItem item, string text);
-
-        protected virtual void MoveUpItem(ListViewItem item)
-        {
-            if (item != null)
+            if (index > 0)
             {
-                int index = item.Index;
+                ListViewItem item2 = lstItems.Items[index - 1];
 
-                if (index > 0)
-                {
-                    ListViewItem item2 = lstItems.Items[index - 1];
-
-                    SwapListItems(item, item2);
-                    item2.Focused = true;
-                    item2.Selected = true;
-                    Changed = true;
-                }
-            }
-        }
-
-        protected virtual void MoveDownItem(ListViewItem item)
-        {
-            if (item != null)
-            {
-                int index = item.Index;
-
-                if (index < lstItems.Items.Count - 1)
-                {
-                    ListViewItem item2 = lstItems.Items[index + 1];
-
-                    SwapListItems(item, item2);
-                    item2.Focused = true;
-                    item2.Selected = true;
-                    Changed = true;
-                }
-            }
-        }
-
-        protected virtual void Remove(ListViewItem item)
-        {
-            lstItems.Items.Remove(item);
-            Changed = true;
-        }
-
-        private void SwapListItems(ListViewItem item1, ListViewItem item2)
-        {
-            string text = item1.Text;
-            item1.Text = item2.Text;
-            item2.Text = text;
-
-            object tag = item1.Tag;
-            item1.Tag = item2.Tag;
-            item2.Tag = tag;
-
-            Changed = true;
-        }
-
-        private void Accept()
-        {
-            try
-            {
-                if (lstItems.SelectedItems.Count == 0)
-                    AddToList(txtItem.Text);
-                else
-                    Modify(lstItems.SelectedItems[0], txtItem.Text);
-
-                ClearInput();
+                SwapListItems(item, item2);
+                item2.Focused = true;
+                item2.Selected = true;
                 Changed = true;
-                txtItem.Focus();
             }
-            catch (BadSyntaxException ex)
+        }
+    }
+
+    protected virtual void MoveDownItem(ListViewItem item)
+    {
+        if (item != null)
+        {
+            int index = item.Index;
+
+            if (index < lstItems.Items.Count - 1)
             {
-                errorProvider.SetError(txtItem, ex.Message);
+                ListViewItem item2 = lstItems.Items[index + 1];
+
+                SwapListItems(item, item2);
+                item2.Focused = true;
+                item2.Selected = true;
+                Changed = true;
             }
         }
+    }
 
-        private void ItemSelected()
-        {
-            toolMoveUp.Enabled = true;
-            toolMoveDown.Enabled = true;
-            toolDelete.Enabled = true;
-            btnAccept.Text = Strings.ButtonModify;
-            lblItemCaption.Text = Strings.ModifyItem;
-            txtItem.Text = lstItems.SelectedItems[0].Text;
-        }
+    protected virtual void Remove(ListViewItem item)
+    {
+        lstItems.Items.Remove(item);
+        Changed = true;
+    }
 
-        private void ClearInput()
-        {
-            toolMoveUp.Enabled = false;
-            toolMoveDown.Enabled = false;
-            toolDelete.Enabled = false;
-            btnAccept.Text = Strings.ButtonAddItem;
-            lblItemCaption.Text = Strings.AddNewItem;
-            txtItem.Text = null;
-            errorProvider.SetError(txtItem, null);
-            if (lstItems.SelectedItems.Count > 0)
-                lstItems.SelectedItems[0].Selected = false;
-        }
+    private void SwapListItems(ListViewItem item1, ListViewItem item2)
+    {
+        string text = item1.Text;
+        item1.Text = item2.Text;
+        item2.Text = text;
 
-        private void DeleteSelectedItem()
-        {
-            if (lstItems.SelectedItems.Count > 0)
-            {
-                int index = lstItems.SelectedItems[0].Index;
+        object tag = item1.Tag;
+        item1.Tag = item2.Tag;
+        item2.Tag = tag;
 
-                Remove(lstItems.SelectedItems[0]);
+        Changed = true;
+    }
 
-                int count = lstItems.Items.Count;
-                if (count > 0)
-                {
-                    if (index >= count)
-                        index = count - 1;
-                    lstItems.Items[index].Selected = true;
-                }
-                else
-                {
-                    txtItem.Focus();
-                }
-            }
-        }
-
-        private void UpdateTexts()
-        {
-            toolMoveUp.Text = Strings.MoveUp;
-            toolMoveDown.Text = Strings.MoveDown;
-            toolDelete.Text = Strings.Delete;
-            lstItems.Columns[0].Text = Strings.Item;
-            btnClose.Text = Strings.ButtonClose;
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            UpdateTexts();
-            ClearInput();
-            txtItem.Select();
-        }
-
-        private void txtItem_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-                Accept();
-            else if (e.KeyCode == Keys.Escape)
-                ClearInput();
-        }
-
-        private void btnAccept_Click(object sender, EventArgs e)
-        {
-            Accept();
-        }
-
-        private void lstItems_ItemSelectionChanged(object sender,
-            ListViewItemSelectionChangedEventArgs e)
+    private void Accept()
+    {
+        try
         {
             if (lstItems.SelectedItems.Count == 0)
-                ClearInput();
+                AddToList(txtItem.Text);
             else
-                ItemSelected();
-        }
+                Modify(lstItems.SelectedItems[0], txtItem.Text);
 
-        private void lstItems_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-                DeleteSelectedItem();
+            ClearInput();
+            Changed = true;
+            txtItem.Focus();
         }
-
-        private void toolMoveUp_Click(object sender, EventArgs e)
+        catch (BadSyntaxException ex)
         {
-            if (lstItems.SelectedItems.Count > 0)
-                MoveUpItem(lstItems.SelectedItems[0]);
+            errorProvider.SetError(txtItem, ex.Message);
         }
+    }
 
-        private void toolMoveDown_Click(object sender, EventArgs e)
+    private void ItemSelected()
+    {
+        toolMoveUp.Enabled = true;
+        toolMoveDown.Enabled = true;
+        toolDelete.Enabled = true;
+        btnAccept.Text = Strings.ButtonModify;
+        lblItemCaption.Text = Strings.ModifyItem;
+        txtItem.Text = lstItems.SelectedItems[0].Text;
+    }
+
+    private void ClearInput()
+    {
+        toolMoveUp.Enabled = false;
+        toolMoveDown.Enabled = false;
+        toolDelete.Enabled = false;
+        btnAccept.Text = Strings.ButtonAddItem;
+        lblItemCaption.Text = Strings.AddNewItem;
+        txtItem.Text = null;
+        errorProvider.SetError(txtItem, null);
+        if (lstItems.SelectedItems.Count > 0)
+            lstItems.SelectedItems[0].Selected = false;
+    }
+
+    private void DeleteSelectedItem()
+    {
+        if (lstItems.SelectedItems.Count > 0)
         {
-            if (lstItems.SelectedItems.Count > 0)
-                MoveDownItem(lstItems.SelectedItems[0]);
+            int index = lstItems.SelectedItems[0].Index;
+
+            Remove(lstItems.SelectedItems[0]);
+
+            int count = lstItems.Items.Count;
+            if (count > 0)
+            {
+                if (index >= count)
+                    index = count - 1;
+                lstItems.Items[index].Selected = true;
+            }
+            else
+            {
+                txtItem.Focus();
+            }
         }
+    }
 
-        private void toolDelete_Click(object sender, EventArgs e)
-        {
+    private void UpdateTexts()
+    {
+        toolMoveUp.Text = Strings.MoveUp;
+        toolMoveDown.Text = Strings.MoveDown;
+        toolDelete.Text = Strings.Delete;
+        lstItems.Columns[0].Text = Strings.Item;
+        btnClose.Text = Strings.ButtonClose;
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+        UpdateTexts();
+        ClearInput();
+        txtItem.Select();
+    }
+
+    private void txtItem_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter)
+            Accept();
+        else if (e.KeyCode == Keys.Escape)
+            ClearInput();
+    }
+
+    private void btnAccept_Click(object sender, EventArgs e)
+    {
+        Accept();
+    }
+
+    private void lstItems_ItemSelectionChanged(object sender,
+        ListViewItemSelectionChangedEventArgs e)
+    {
+        if (lstItems.SelectedItems.Count == 0)
+            ClearInput();
+        else
+            ItemSelected();
+    }
+
+    private void lstItems_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Delete)
             DeleteSelectedItem();
-        }
+    }
 
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+    private void toolMoveUp_Click(object sender, EventArgs e)
+    {
+        if (lstItems.SelectedItems.Count > 0)
+            MoveUpItem(lstItems.SelectedItems[0]);
+    }
+
+    private void toolMoveDown_Click(object sender, EventArgs e)
+    {
+        if (lstItems.SelectedItems.Count > 0)
+            MoveDownItem(lstItems.SelectedItems[0]);
+    }
+
+    private void toolDelete_Click(object sender, EventArgs e)
+    {
+        DeleteSelectedItem();
+    }
+
+    private void btnClose_Click(object sender, EventArgs e)
+    {
+        this.Close();
     }
 }

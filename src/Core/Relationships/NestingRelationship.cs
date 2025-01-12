@@ -13,68 +13,52 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Translations;
 using System;
+using NClass.Core.Entities;
+using NClass.Translations;
 
-namespace NClass.Core
+namespace NClass.Core.Relationships;
+
+public sealed class NestingRelationship : TypeRelationship
 {
-    public sealed class NestingRelationship : TypeRelationship
+    public override RelationshipType RelationshipType { get;  set; } = RelationshipType.Nesting;
+    private CompositeType ParentType
     {
-        /// <exception cref="RelationshipException">
-        /// Cannot create nesting relationship.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parentClass"/> is null.-or-
-        /// <paramref name="innerClass"/> is null.
-        /// </exception>
-        internal NestingRelationship(CompositeType parentType, TypeBase innerType)
-            : base(parentType, innerType)
-        {
-            Attach();
-        }
+        get { return (CompositeType)First; }
+    }
 
-        public override RelationshipType RelationshipType
-        {
-            get { return RelationshipType.Nesting; }
-        }
+    private TypeBase InnerType
+    {
+        get { return (TypeBase)Second; }
+    }
 
-        private CompositeType ParentType
-        {
-            get { return (CompositeType)First; }
-        }
+    internal NestingRelationship(CompositeType parentType, TypeBase innerType) : base(parentType, innerType)
+    {
+        Attach();
+    }
 
-        private TypeBase InnerType
-        {
-            get { return (TypeBase)Second; }
-        }
+    public NestingRelationship Clone(CompositeType parentType, TypeBase innerType)
+    {
+        NestingRelationship nesting = new NestingRelationship(parentType, innerType);
+        nesting.CopyFrom(this);
+        return nesting;
+    }
 
-        public NestingRelationship Clone(CompositeType parentType, TypeBase innerType)
-        {
-            NestingRelationship nesting = new NestingRelationship(parentType, innerType);
-            nesting.CopyFrom(this);
-            return nesting;
-        }
+    protected override void OnAttaching(System.EventArgs e)
+    {
+        if (InnerType.IsNested)
+            throw new RelationshipException(Strings.ErrorInnerTypeAlreadyNested);
 
-        /// <exception cref="RelationshipException">
-        /// Cannot finalize relationship.
-        /// </exception>
-        protected override void OnAttaching(EventArgs e)
-        {
-            if (InnerType.IsNested)
-                throw new RelationshipException(Strings.ErrorInnerTypeAlreadyNested);
+        InnerType.NestingParent = ParentType;
+    }
 
-            InnerType.NestingParent = ParentType;
-        }
+    protected override void OnDetaching(System.EventArgs e)
+    {
+        InnerType.NestingParent = null;
+    }
 
-        protected override void OnDetaching(EventArgs e)
-        {
-            InnerType.NestingParent = null;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} (+)--> {2}",
-                Strings.Nesting, First.Name, Second.Name);
-        }
+    public override string ToString()
+    {
+        return $@"{Strings.Nesting}: {First.Name} (+)--> {Second.Name}";
     }
 }

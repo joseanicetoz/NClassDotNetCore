@@ -15,22 +15,21 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor.EventsArgs;
+
+[Obsolete("Already supported in .NET Core")]
+public class EventArgs<T> : EventArgs
 {
-    [Obsolete("Already supported in .NET Core")]
-    public class EventArgs<T> : EventArgs
+    private T value;
+
+    public T Value
     {
-        T value;
+        get { return this.value; }
+        set { this.value = value; }
+    }
 
-        public T Value
-        {
-            get { return this.value; }
-            set { this.value = value; }
-        }
-
-        public EventArgs(T value)
-        {
-            this.value = value;
-        }
+    public EventArgs(T value)
+    {
+        this.value = value;
     }
 }

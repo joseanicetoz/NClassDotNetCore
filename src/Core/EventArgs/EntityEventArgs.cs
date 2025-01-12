@@ -14,23 +14,23 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
+using NClass.Core.Entities;
 
-namespace NClass.Core
+namespace NClass.Core.EventArgs;
+
+public delegate void EntityEventHandler(object sender, EntityEventArgs e);
+
+public class EntityEventArgs : System.EventArgs
 {
-    public delegate void EntityEventHandler(object sender, EntityEventArgs e);
+    private readonly IEntity entity;
 
-    public class EntityEventArgs : EventArgs
+    public EntityEventArgs(IEntity entity)
     {
-        readonly IEntity entity;
+        this.entity = entity;
+    }
 
-        public EntityEventArgs(IEntity entity)
-        {
-            this.entity = entity;
-        }
-
-        public IEntity Entity
-        {
-            get { return entity; }
-        }
+    public IEntity Entity
+    {
+        get { return entity; }
     }
 }

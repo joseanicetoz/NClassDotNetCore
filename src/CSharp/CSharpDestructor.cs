@@ -16,133 +16,95 @@
 using NClass.Core;
 using NClass.Translations;
 using System;
+using NClass.Core.Entities;
+using NClass.Core.Members;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal sealed class CSharpDestructor : Destructor
 {
-    internal sealed class CSharpDestructor : Destructor
+    public override string Name
     {
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="parent"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        internal CSharpDestructor(CompositeType parent) : base(parent)
+        get { return "~" + GetNameWithoutGeneric(Parent.Name); }
+        set
         {
-            AccessModifier = AccessModifier.Default;
+            if (value != null && value != "~" + GetNameWithoutGeneric(Parent.Name))
+                throw new BadSyntaxException(Strings.ErrorDestructorName);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="value"/> does not fit to the syntax.
-        /// </exception>
-        public override string Name
+    public override AccessModifier AccessModifier
+    {
+        get { return base.AccessModifier; }
+        set
         {
-            get
-            {
-                return "~" + GetNameWithoutGeneric(Parent.Name);
-            }
-            set
-            {
-                if (value != null && value != "~" + GetNameWithoutGeneric(Parent.Name))
-                    throw new BadSyntaxException(Strings.ErrorDestructorName);
-            }
+            if (value != AccessModifier.Default)
+                throw new BadSyntaxException(Strings.ErrorCannotSetAccess);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set access visibility.
-        /// </exception>
-        public override AccessModifier AccessModifier
-        {
-            get
-            {
-                return base.AccessModifier;
-            }
-            set
-            {
-                if (value != AccessModifier.Default)
-                    throw new BadSyntaxException(Strings.ErrorCannotSetAccess);
-            }
-        }
+    public override AccessModifier DefaultAccess
+    {
+        get { return AccessModifier.Private; }
+    }
 
-        public override AccessModifier DefaultAccess
-        {
-            get
-            {
-                return AccessModifier.Private;
-            }
-        }
+    public override bool IsAccessModifiable
+    {
+        get { return false; }
+    }
 
-        public override bool IsAccessModifiable
+    public override bool IsVirtual
+    {
+        get { return base.IsVirtual; }
+        set
         {
-            get { return false; }
+            if (value)
+                throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set virtual modifier.
-        /// </exception>
-        public override bool IsVirtual
+    public override bool IsOverride
+    {
+        get { return base.IsOverride; }
+        set
         {
-            get
-            {
-                return base.IsVirtual;
-            }
-            set
-            {
-                if (value)
-                    throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
-            }
+            if (value)
+                throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set override modifier.
-        /// </exception>
-        public override bool IsOverride
+    public override bool IsSealed
+    {
+        get { return base.IsSealed; }
+        set
         {
-            get
-            {
-                return base.IsOverride;
-            }
-            set
-            {
-                if (value)
-                    throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
-            }
+            if (value)
+                throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set sealed modifier.
-        /// </exception>
-        public override bool IsSealed
-        {
-            get
-            {
-                return base.IsSealed;
-            }
-            set
-            {
-                if (value)
-                    throw new BadSyntaxException(Strings.ErrorCannotSetModifier);
-            }
-        }
+    public override Language Language
+    {
+        get { return CSharpLanguage.Instance; }
+    }
 
-        public override Language Language
-        {
-            get { return CSharpLanguage.Instance; }
-        }
+    internal CSharpDestructor(CompositeType parent) : base(parent)
+    {
+        AccessModifier = AccessModifier.Default;
+    }
 
-        public override void InitFromString(string declaration)
-        {
-            ValidName = "~" + Parent.Name;
-        }
+    public override void InitFromString(string declaration)
+    {
+        ValidName = "~" + Parent.Name;
+    }
 
-        public override string GetDeclaration()
-        {
-            return Name + "()";
-        }
+    public override string GetDeclaration()
+    {
+        return Name + "()";
+    }
 
-        public override Operation Clone(CompositeType newParent)
-        {
-            return new CSharpDestructor(newParent);
-        }
+    public override Operation Clone(CompositeType newParent)
+    {
+        return new CSharpDestructor(newParent);
     }
 }

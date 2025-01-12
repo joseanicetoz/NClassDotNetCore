@@ -15,88 +15,88 @@
 
 using System.Collections.Generic;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+internal sealed class Intersector<T>
 {
-    internal sealed class Intersector<T>
+    private class DomainElement
     {
-        private class DomainElement
+        private int count = 1;
+        private readonly T value;
+
+        public DomainElement(T value)
         {
-            int count = 1;
-            readonly T value;
+            this.value = value;
+        }
 
-            public DomainElement(T value)
+        public T Value
+        {
+            get { return value; }
+            set => throw new System.NotImplementedException();
+        }
+
+        public int Count
+        {
+            get { return count; }
+            set { count = value; }
+        }
+    }
+
+    private int setCount = 0;
+    private int domainIndex = 0;
+    private readonly List<DomainElement> domain = new List<DomainElement>();
+
+    public void ClearSets()
+    {
+        setCount = 0;
+        domainIndex = 0;
+        domain.Clear();
+    }
+
+    public void AddSet(IEnumerable<T> values)
+    {
+        foreach (T value in values)
+            AddToDomain(value);
+        setCount++;
+    }
+
+    private void AddToDomain(T value)
+    {
+        bool found = false;
+
+        for (int i = domainIndex; i < domain.Count && !found; i++)
+        {
+            if (EqualityComparer<T>.Default.Equals(domain[i].Value, value))
             {
-                this.value = value;
+                domain[i].Count++;
+                domainIndex = (i + 1) % domain.Count;
+                found = true;
             }
-
-            public T Value
+        }
+        for (int i = 0; i < domainIndex && !found; i++)
+        {
+            if (EqualityComparer<T>.Default.Equals(domain[i].Value, value))
             {
-                get { return value; }
-            }
-
-            public int Count
-            {
-                get { return count; }
-                set { count = value; }
+                domain[i].Count++;
+                domainIndex = (i + 1) % domain.Count;
+                found = true;
             }
         }
 
-        int setCount = 0;
-        int domainIndex = 0;
-        readonly List<DomainElement> domain = new List<DomainElement>();
-
-        public void ClearSets()
+        if (!found)
         {
-            setCount = 0;
+            DomainElement newElement = new DomainElement(value);
+            domain.Add(newElement);
             domainIndex = 0;
-            domain.Clear();
         }
+    }
 
-        public void AddSet(IEnumerable<T> values)
+    public IEnumerable<T> GetIntersection()
+    {
+        for (int i = 0; i < domain.Count; i++)
         {
-            foreach (T value in values)
-                AddToDomain(value);
-            setCount++;
-        }
-
-        private void AddToDomain(T value)
-        {
-            bool found = false;
-
-            for (int i = domainIndex; i < domain.Count && !found; i++)
-            {
-                if (EqualityComparer<T>.Default.Equals(domain[i].Value, value))
-                {
-                    domain[i].Count++;
-                    domainIndex = (i + 1) % domain.Count;
-                    found = true;
-                }
-            }
-            for (int i = 0; i < domainIndex && !found; i++)
-            {
-                if (EqualityComparer<T>.Default.Equals(domain[i].Value, value))
-                {
-                    domain[i].Count++;
-                    domainIndex = (i + 1) % domain.Count;
-                    found = true;
-                }
-            }
-
-            if (!found)
-            {
-                DomainElement newElement = new DomainElement(value);
-                domain.Add(newElement);
-                domainIndex = 0;
-            }
-        }
-
-        public IEnumerable<T> GetIntersection()
-        {
-            for (int i = 0; i < domain.Count; i++)
-            {
-                if (domain[i].Count == setCount)
-                    yield return domain[i].Value;
-            }
+            if (domain[i].Count == setCount)
+                yield return domain[i].Value;
         }
     }
 }

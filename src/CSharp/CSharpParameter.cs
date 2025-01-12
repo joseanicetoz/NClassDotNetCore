@@ -14,101 +14,92 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
+using NClass.Core.Parameters;
 using NClass.Translations;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal sealed class CSharpParameter : Parameter
 {
-    internal sealed class CSharpParameter : Parameter
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> or <paramref name="type"/> 
+    /// does not fit to the syntax.
+    /// </exception>
+    internal CSharpParameter(string name, string type, ParameterModifier modifier, string defaultValue)
+        : base(name, type, modifier, defaultValue)
     {
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> or <paramref name="type"/> 
-        /// does not fit to the syntax.
-        /// </exception>
-        internal CSharpParameter(string name, string type, ParameterModifier modifier, string defaultValue)
-            : base(name, type, modifier, defaultValue)
-        {
-        }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="value"/> does not fit to the syntax.
-        /// </exception>
-        public override string Type
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="value"/> does not fit to the syntax.
+    /// </exception>
+    public override string Type
+    {
+        get { return base.Type; }
+        protected set
         {
-            get
+            if (value == "void")
             {
-                return base.Type;
+                throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
             }
-            protected set
-            {
-                if (value == "void")
-                {
-                    throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-                }
-                base.Type = value;
-            }
+            base.Type = value;
         }
+    }
 
-        public override ParameterModifier Modifier
+    public override ParameterModifier Modifier
+    {
+        get { return base.Modifier; }
+        protected set
         {
-            get
+            if (value != ParameterModifier.In && DefaultValue != null)
             {
-                return base.Modifier;
+                throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
             }
-            protected set
-            {
-                if (value != ParameterModifier.In && DefaultValue != null)
-                {
-                    throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-                }
-                base.Modifier = value;
-            }
+            base.Modifier = value;
         }
+    }
 
-        public override string DefaultValue
+    public override string DefaultValue
+    {
+        get { return base.DefaultValue; }
+        protected set
         {
-            get
+            if (!string.IsNullOrWhiteSpace(value) && Modifier != ParameterModifier.In)
             {
-                return base.DefaultValue;
+                throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
             }
-            protected set
-            {
-                if (!string.IsNullOrWhiteSpace(value) && Modifier != ParameterModifier.In)
-                {
-                    throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-                }
-                base.DefaultValue = value;
-            }
+            base.DefaultValue = value;
         }
+    }
 
-        public override Language Language
-        {
-            get { return CSharpLanguage.Instance; }
-        }
+    public override Language Language
+    {
+        get { return CSharpLanguage.Instance; }
+    }
 
-        public override string GetDeclaration()
+    public override string GetDeclaration()
+    {
+        if (DefaultValue != null)
         {
-            if (DefaultValue != null)
-            {
-                return Type + " " + Name + " = " + DefaultValue;
-            }
-            else if (Modifier == ParameterModifier.In)
-            {
-                return Type + " " + Name;
-            }
-            else if (Modifier == ParameterModifier.Inout)
-            {
-                return string.Format("ref {0} {1}", Type, Name);
-            }
-            else
-            {
-                return string.Format("{0} {1} {2}",
-                    Modifier.ToString().ToLower(), Type, Name);
-            }
+            return Type + " " + Name + " = " + DefaultValue;
         }
+        else if (Modifier == ParameterModifier.In)
+        {
+            return Type + " " + Name;
+        }
+        else if (Modifier == ParameterModifier.Inout)
+        {
+            return string.Format("ref {0} {1}", Type, Name);
+        }
+        else
+        {
+            return string.Format("{0} {1} {2}",
+                Modifier.ToString().ToLower(), Type, Name);
+        }
+    }
 
-        public override Parameter Clone()
-        {
-            return new CSharpParameter(Name, Type, Modifier, DefaultValue);
-        }
+    public override Parameter Clone()
+    {
+        return new CSharpParameter(Name, Type, Modifier, DefaultValue);
     }
 }

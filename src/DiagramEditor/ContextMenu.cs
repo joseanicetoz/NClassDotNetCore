@@ -16,34 +16,32 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public abstract class ContextMenu
 {
-    public abstract class ContextMenu
+    internal static readonly ContextMenuStrip MenuStrip = new ContextMenuStrip();
+    private readonly List<ToolStripItem> menuItems = new List<ToolStripItem>();
+
+    public IEnumerable<ToolStripItem> GetMenuItems(IDocument document)
     {
-        internal static readonly ContextMenuStrip MenuStrip = new ContextMenuStrip();
-        readonly List<ToolStripItem> menuItems = new List<ToolStripItem>();
-
-        public IEnumerable<ToolStripItem> GetMenuItems(IDocument document)
-        {
-            ValidateMenuItems(document);
-            return menuItems;
-        }
-
-        protected abstract IDocument Document
-        {
-            get;
-        }
-
-        internal IEnumerable<ToolStripItem> MenuItems
-        {
-            get { return menuItems; }
-        }
-
-        protected List<ToolStripItem> MenuList
-        {
-            get { return menuItems; }
-        }
-
-        public abstract void ValidateMenuItems(IDocument document);
+        ValidateMenuItems(document);
+        return menuItems;
     }
+
+    protected abstract IDocument Document { get; set; }
+
+    internal IEnumerable<ToolStripItem> MenuItems
+    {
+        get { return menuItems; }
+        set => throw new System.NotImplementedException();
+    }
+
+    protected List<ToolStripItem> MenuList
+    {
+        get { return menuItems; }
+        set => throw new System.NotImplementedException();
+    }
+
+    public abstract void ValidateMenuItems(IDocument document);
 }

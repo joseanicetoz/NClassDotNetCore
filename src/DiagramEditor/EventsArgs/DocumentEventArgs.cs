@@ -15,22 +15,22 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor.EventsArgs;
+
+public delegate void DocumentEventHandler(object sender, DocumentEventArgs e);
+
+public class DocumentEventArgs : EventArgs
 {
-    public delegate void DocumentEventHandler(object sender, DocumentEventArgs e);
+    private readonly IDocument document;
 
-    public class DocumentEventArgs : EventArgs
+    public DocumentEventArgs(IDocument document)
     {
-        readonly IDocument document;
+        this.document = document;
+    }
 
-        public DocumentEventArgs(IDocument document)
-        {
-            this.document = document;
-        }
-
-        public IDocument Document
-        {
-            get { return document; }
-        }
+    public IDocument Document
+    {
+        get { return document; }
+        set => throw new NotImplementedException();
     }
 }

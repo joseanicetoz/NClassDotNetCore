@@ -17,107 +17,105 @@ using NClass.Core;
 using NClass.DiagramEditor;
 using NClass.Translations;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
-namespace NClass.GUI
+namespace NClass.GUI;
+
+internal static class CrashHandler
 {
-    internal static class CrashHandler
+    public static void CreateGlobalErrorHandler()
     {
-        public static void CreateGlobalErrorHandler()
-        {
 #if !DEBUG
 			AppDomain.CurrentDomain.UnhandledException += 
 				new UnhandledExceptionEventHandler(AppDomain_UnhandledException);
 #endif
-        }
+    }
 
-        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        if (e.IsTerminating)
         {
-            if (e.IsTerminating)
-            {
-                string crashDir = Path.Combine(Program.AppDataDirectory, "crash");
-                Directory.CreateDirectory(crashDir);
+            string crashDir = Path.Combine(Program.AppDataDirectory, "crash");
+            Directory.CreateDirectory(crashDir);
 
-                CreateBackups(crashDir);
-                Exception ex = (Exception)e.ExceptionObject;
-                CreateCrashLog(crashDir, ex);
+            CreateBackups(crashDir);
+            Exception ex = (Exception)e.ExceptionObject;
+            CreateCrashLog(crashDir, ex);
 
-                MessageBox.Show(
-                    Strings.ProgramTerminates, Strings.CriticalError,
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(
+                Strings.ProgramTerminates, Strings.CriticalError,
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                System.Diagnostics.Process.Start(crashDir);
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-                // Goodbye!
-            }
+            System.Diagnostics.Process.Start(crashDir);
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
+            // Goodbye!
         }
+    }
 
-        private static void CreateBackups(string directory)
+    private static void CreateBackups(string directory)
+    {
+        int untitledCount = 0;
+        foreach (Project project in Workspace.Default.Projects)
         {
-            int untitledCount = 0;
-            foreach (Project project in Workspace.Default.Projects)
-            {
-                if (project.IsDirty)
-                {
-                    try
-                    {
-                        string fileName = project.FileName;
-                        if (project.IsUntitled)
-                        {
-                            untitledCount++;
-                            fileName = project.Name + untitledCount + ".ncp";
-                        }
-                        string filePath = Path.Combine(directory, fileName);
-
-                        project.Save(filePath);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
-
-        private static void CreateCrashLog(string directory, Exception exception)
-        {
-            StreamWriter writer = null;
-
+            if (!project.IsDirty) continue;
             try
             {
-                string filePath = Path.Combine(directory, "crash.log");
-                writer = new StreamWriter(filePath);
-
-                writer.WriteLine(string.Format(
-                    Strings.SendLogFile, Properties.Resources.MailAddress));
-                writer.WriteLine();
-                writer.WriteLine("Version: {0}", Program.GetVersionString());
-                writer.WriteLine("Mono: {0}", MonoHelper.IsRunningOnMono ? "yes" : "no");
-                if (MonoHelper.IsRunningOnMono)
-                    writer.WriteLine("Mono version: {0}", MonoHelper.Version);
-                writer.WriteLine("OS: {0}", Environment.OSVersion.VersionString);
-
-                writer.WriteLine();
-                writer.WriteLine(exception.Message);
-                Exception innerException = exception.InnerException;
-                while (innerException != null)
+                string fileName = project.FileName;
+                if (project.IsUntitled)
                 {
-                    writer.WriteLine(innerException.Message);
-                    innerException = innerException.InnerException;
+                    untitledCount++;
+                    fileName = project.Name + untitledCount + ".ncp";
                 }
+                string filePath = Path.Combine(directory, fileName);
 
-                writer.WriteLine();
-                writer.WriteLine(exception.StackTrace);
+                project.Save(filePath);
             }
-            catch
+            catch(Exception ex)
             {
-                // Do nothing
+                Debug.WriteLine(ex.Message);
             }
-            finally
+        }
+    }
+
+    private static void CreateCrashLog(string directory, Exception exception)
+    {
+        StreamWriter writer = null;
+
+        try
+        {
+            string filePath = Path.Combine(directory, "crash.log");
+            writer = new StreamWriter(filePath);
+
+            writer.WriteLine(string.Format(
+                Strings.SendLogFile, Properties.Resources.MailAddress));
+            writer.WriteLine();
+            writer.WriteLine("Version: {0}", Program.GetVersionString());
+            writer.WriteLine("Mono: {0}", MonoHelper.IsRunningOnMono ? "yes" : "no");
+            if (MonoHelper.IsRunningOnMono)
+                writer.WriteLine("Mono version: {0}", MonoHelper.Version);
+            writer.WriteLine("OS: {0}", Environment.OSVersion.VersionString);
+
+            writer.WriteLine();
+            writer.WriteLine(exception.Message);
+            Exception innerException = exception.InnerException;
+            while (innerException != null)
             {
-                if (writer != null)
-                    writer.Close();
+                writer.WriteLine(innerException.Message);
+                innerException = innerException.InnerException;
             }
+
+            writer.WriteLine();
+            writer.WriteLine(exception.StackTrace);
+        }
+        catch(Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+        finally
+        {
+            writer?.Close();
         }
     }
 }

@@ -15,22 +15,21 @@
 
 using System;
 
-namespace NClass.DiagramEditor.ClassDiagram.Connections
+namespace NClass.DiagramEditor.ClassDiagram.Connections;
+
+public delegate void BendPointEventHandler(object sender, BendPointEventArgs e);
+
+public class BendPointEventArgs : EventArgs
 {
-    public delegate void BendPointEventHandler(object sender, BendPointEventArgs e);
+    private readonly BendPoint point;
 
-    public class BendPointEventArgs : EventArgs
+    public BendPointEventArgs(BendPoint point)
     {
-        readonly BendPoint point;
+        this.point = point;
+    }
 
-        public BendPointEventArgs(BendPoint point)
-        {
-            this.point = point;
-        }
-
-        public BendPoint BendPoint
-        {
-            get { return point; }
-        }
+    public BendPoint BendPoint
+    {
+        get { return point; }
     }
 }

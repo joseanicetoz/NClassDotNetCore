@@ -15,22 +15,21 @@
 
 using System;
 
-namespace NClass.Core
+namespace NClass.Core.EventArgs;
+
+public delegate void ProjectItemEventHandler(object sender, ProjectItemEventArgs e);
+
+public class ProjectItemEventArgs : System.EventArgs
 {
-    public delegate void ProjectItemEventHandler(object sender, ProjectItemEventArgs e);
+    private readonly IProjectItem projectItem;
 
-    public class ProjectItemEventArgs : EventArgs
+    public ProjectItemEventArgs(IProjectItem projectItem)
     {
-        readonly IProjectItem projectItem;
+        this.projectItem = projectItem;
+    }
 
-        public ProjectItemEventArgs(IProjectItem projectItem)
-        {
-            this.projectItem = projectItem;
-        }
-
-        public IProjectItem ProjectItem
-        {
-            get { return projectItem; }
-        }
+    public IProjectItem ProjectItem
+    {
+        get { return projectItem; }
     }
 }

@@ -13,18 +13,11 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.Core
-{
-    public interface IEntity : ISerializableElement, IModifiable
-    {
-        string Name
-        {
-            get;
-        }
+namespace NClass.Core.Entities;
 
-        EntityType EntityType
-        {
-            get;
-        }
-    }
+public interface IEntity : ISerializableElement, IModifiable
+{
+    string Name { get; set; }
+
+    EntityType EntityType { get; set; }
 }

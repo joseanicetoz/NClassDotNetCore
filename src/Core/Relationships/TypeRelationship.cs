@@ -14,35 +14,18 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
+using NClass.Core.Entities;
 
-namespace NClass.Core
+namespace NClass.Core.Relationships;
+
+public abstract class TypeRelationship : Relationship
 {
-    public abstract class TypeRelationship : Relationship
+    public sealed override IEntity First { get; set; }
+    public sealed override IEntity Second { get; set; }
+
+    protected TypeRelationship(TypeBase first, TypeBase second)
     {
-        TypeBase first;
-        TypeBase second;
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="first"/> is null.-or-
-        /// <paramref name="second"/> is null.
-        /// </exception>
-        protected TypeRelationship(TypeBase first, TypeBase second)
-        {
-            this.first = first ?? throw new ArgumentNullException("first");
-            this.second = second ?? throw new ArgumentNullException("second");
-        }
-
-        //TODO: inkább abstract property-kre hivatkozzon
-        public sealed override IEntity First
-        {
-            get { return first; }
-            protected set { first = (TypeBase)value; }
-        }
-
-        public sealed override IEntity Second
-        {
-            get { return second; }
-            protected set { second = (TypeBase)value; }
-        }
+        First = first ?? throw new ArgumentNullException(nameof(first));
+        Second = second ?? throw new ArgumentNullException(nameof(second));
     }
 }

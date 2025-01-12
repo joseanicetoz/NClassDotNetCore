@@ -19,155 +19,151 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 
-namespace NClass.Translations
+namespace NClass.Translations;
+
+public class UILanguage
 {
-    public class UILanguage
+    private static readonly List<UILanguage> availableCultures;
+
+    static UILanguage()
     {
-        static readonly List<UILanguage> availableCultures;
+        // Load localization resources
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        string resourceDir = Path.GetDirectoryName(assembly.Location);
 
-        static UILanguage()
+        // Search for localized cultures
+        try
         {
-            // Load localization resources
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string resourceDir = Path.GetDirectoryName(assembly.Location);
+            DirectoryInfo resource = new DirectoryInfo(resourceDir);
+            DirectoryInfo[] directories = resource.GetDirectories("*",
+                SearchOption.TopDirectoryOnly);
+            availableCultures = new List<UILanguage>(directories.Length + 2);
 
-            // Search for localized cultures
-            try
+            foreach (DirectoryInfo directory in directories)
             {
-                DirectoryInfo resource = new DirectoryInfo(resourceDir);
-                DirectoryInfo[] directories = resource.GetDirectories("*",
-                    SearchOption.TopDirectoryOnly);
-                availableCultures = new List<UILanguage>(directories.Length + 2);
-
-                foreach (DirectoryInfo directory in directories)
+                if (directory.Name != "Plugins" && directory.Name != "Templates")
                 {
-                    if (directory.Name != "Plugins" && directory.Name != "Templates")
-                    {
-                        string cultureName = directory.Name;
-                        UILanguage language = CreateUILanguage(cultureName);
-                        if (language != null)
-                            availableCultures.Add(language);
-                    }
+                    string cultureName = directory.Name;
+                    UILanguage language = CreateUILanguage(cultureName);
+                    if (language != null)
+                        availableCultures.Add(language);
                 }
             }
-            catch
-            {
-                availableCultures = new List<UILanguage>(2);
-            }
-
-            availableCultures.Add(CreateDefaultUILanguage());
-            availableCultures.Add(CreateUILanguage("en"));
-            availableCultures.Sort(delegate (UILanguage c1, UILanguage c2)
-            {
-                return c1.Name.CompareTo(c2.Name);
-            });
         }
-
-        readonly CultureInfo culture;
-        bool isDefault;
-
-        private UILanguage()
+        catch
         {
+            availableCultures = new List<UILanguage>(2);
         }
 
-        private UILanguage(CultureInfo culture)
+        availableCultures.Add(CreateDefaultUILanguage());
+        availableCultures.Add(CreateUILanguage("en"));
+        availableCultures.Sort(delegate (UILanguage c1, UILanguage c2)
         {
-            this.culture = culture;
-            this.isDefault = false;
-        }
+            return c1.Name.CompareTo(c2.Name);
+        });
+    }
 
-        public string Name
-        {
-            get
-            {
-                if (IsDefault)
-                    return "[Default]";
-                else
-                    return culture.EnglishName;
-            }
-        }
+    private readonly CultureInfo culture;
+    private bool isDefault;
 
-        public string ShortName
-        {
-            get
-            {
-                if (IsDefault)
-                    return "default";
-                else
-                    return culture.Name;
-            }
-        }
+    private UILanguage()
+    {
+    }
 
-        public CultureInfo Culture
-        {
-            get
-            {
-                if (IsDefault)
-                    return CultureInfo.CurrentUICulture;
-                else
-                    return culture;
-            }
-        }
+    private UILanguage(CultureInfo culture)
+    {
+        this.culture = culture;
+        this.isDefault = false;
+    }
 
-        public bool IsDefault
-        {
-            get { return isDefault; }
-        }
-
-        public static IEnumerable<UILanguage> AvalilableCultures
-        {
-            get { return availableCultures; }
-        }
-
-        public static UILanguage CreateDefaultUILanguage()
-        {
-            UILanguage language = new UILanguage
-            {
-                isDefault = true
-            };
-
-            return language;
-        }
-
-        public static UILanguage CreateUILanguage(string cultureName)
-        {
-            if (cultureName == "default")
-                return CreateDefaultUILanguage();
-
-            try
-            {
-                CultureInfo culture = new CultureInfo(cultureName);
-                return new UILanguage(culture);
-            }
-            catch (ArgumentException)
-            {
-                return null;
-            }
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is not UILanguage other)
-                return false;
-            else if (this.IsDefault && other.IsDefault)
-                return true;
-            else if (!this.IsDefault && !other.IsDefault)
-                return (this.culture.Equals(other.culture));
-            else
-                return false;
-        }
-
-        public override int GetHashCode()
+    public string Name
+    {
+        get
         {
             if (IsDefault)
-                return 0;
-            else
-                return culture.GetHashCode();
+                return "[Default]";
+            return culture.EnglishName;
         }
+    }
 
-        public override string ToString()
+    public string ShortName
+    {
+        get
         {
-            return Name;
+            if (IsDefault)
+                return "default";
+            return culture.Name;
         }
+    }
+
+    public CultureInfo Culture
+    {
+        get
+        {
+            if (IsDefault)
+                return CultureInfo.CurrentUICulture;
+            return culture;
+        }
+    }
+
+    public bool IsDefault
+    {
+        get { return isDefault; }
+        set { isDefault = value; }
+    }
+
+    public static IEnumerable<UILanguage> AvalilableCultures
+    {
+        get { return availableCultures; }
+    }
+
+    public static UILanguage CreateDefaultUILanguage()
+    {
+        UILanguage language = new UILanguage
+        {
+            isDefault = true
+        };
+
+        return language;
+    }
+
+    public static UILanguage CreateUILanguage(string cultureName)
+    {
+        if (cultureName == "default")
+            return CreateDefaultUILanguage();
+
+        try
+        {
+            CultureInfo culture = new CultureInfo(cultureName);
+            return new UILanguage(culture);
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is not UILanguage other)
+            return false;
+        else if (this.IsDefault && other.IsDefault)
+            return true;
+        else if (!this.IsDefault && !other.IsDefault)
+            return (this.culture.Equals(other.culture));
+        else
+            return false;
+    }
+
+    public override int GetHashCode()
+    {
+        if (IsDefault)
+            return 0;
+        return culture.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

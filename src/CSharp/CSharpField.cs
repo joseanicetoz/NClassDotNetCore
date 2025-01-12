@@ -18,195 +18,190 @@ using NClass.Translations;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using NClass.Core.Entities;
+using NClass.Core.Members;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal sealed class CSharpField : Field
 {
-    internal sealed class CSharpField : Field
+    private const string ModifiersPattern = @"((?<modifier>static|readonly|const|new|volatile)\s+)*";
+    private const string InitValuePattern = @"(?<initvalue>[^\s;](.*[^\s;])?)";
+
+    // [<access>] [<modifiers>] <type> <name> [= <initvalue>]
+    private const string FieldPattern =
+        @"^\s*" + CSharpLanguage.AccessPattern + ModifiersPattern +
+        @"(?<type>" + CSharpLanguage.GenericTypePattern2 + @")\s+" +
+        @"(?<name>" + CSharpLanguage.NamePattern + @")" +
+        @"(\s*=\s*" + InitValuePattern + ")?" + CSharpLanguage.DeclarationEnding;
+
+    private static readonly Regex fieldRegex = new Regex(FieldPattern, RegexOptions.ExplicitCapture);
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parent"/> is null.
+    /// </exception>
+    internal CSharpField(CompositeType parent) : this("newField", parent)
     {
-        const string ModifiersPattern = @"((?<modifier>static|readonly|const|new|volatile)\s+)*";
-        const string InitValuePattern = @"(?<initvalue>[^\s;](.*[^\s;])?)";
+    }
 
-        // [<access>] [<modifiers>] <type> <name> [= <initvalue>]
-        const string FieldPattern =
-            @"^\s*" + CSharpLanguage.AccessPattern + ModifiersPattern +
-            @"(?<type>" + CSharpLanguage.GenericTypePattern2 + @")\s+" +
-            @"(?<name>" + CSharpLanguage.NamePattern + @")" +
-            @"(\s*=\s*" + InitValuePattern + ")?" + CSharpLanguage.DeclarationEnding;
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// The language of <paramref name="parent"/> does not equal.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parent"/> is null.
+    /// </exception>
+    internal CSharpField(string name, CompositeType parent) : base(name, parent)
+    {
+        IsConstant = false;
+    }
 
-        static readonly Regex fieldRegex = new Regex(FieldPattern, RegexOptions.ExplicitCapture);
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        internal CSharpField(CompositeType parent) : this("newField", parent)
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="value"/> does not fit to the syntax.
+    /// </exception>
+    public override string Type
+    {
+        get { return base.Type; }
+        set
         {
+            if (value == "void")
+                throw new BadSyntaxException(string.Format(Strings.ErrorType, "void"));
+
+            base.Type = value;
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="parent"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        internal CSharpField(string name, CompositeType parent) : base(name, parent)
-        {
-            IsConstant = false;
-        }
+    protected override string DefaultType
+    {
+        get { return "int"; }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="value"/> does not fit to the syntax.
-        /// </exception>
-        public override string Type
+    /// <exception cref="BadSyntaxException">
+    /// <see cref="IsConst"/> is set to true while 
+    /// <see cref="Field.InitialValue"/> is empty.
+    /// </exception>
+    public override bool IsConstant
+    {
+        get { return base.IsConstant; }
+        set
         {
-            get
+            if (value && !HasInitialValue)
             {
-                return base.Type;
+                throw new BadSyntaxException(
+                    Strings.ErrorLackOfInitialization);
             }
-            set
+            base.IsConstant = value;
+        }
+    }
+
+    public override Language Language
+    {
+        get { return CSharpLanguage.Instance; }
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    public override void InitFromString(string declaration)
+    {
+        Match match = fieldRegex.Match(declaration);
+        RaiseChangedEvent = false;
+
+        try
+        {
+            if (match.Success)
             {
-                if (value == "void")
+                ClearModifiers();
+                Group nameGroup = match.Groups["name"];
+                Group typeGroup = match.Groups["type"];
+                Group accessGroup = match.Groups["access"];
+                Group modifierGroup = match.Groups["modifier"];
+                Group initGroup = match.Groups["initvalue"];
+
+                if (CSharpLanguage.Instance.IsForbiddenName(nameGroup.Value))
+                    throw new BadSyntaxException(Strings.ErrorInvalidName);
+                if (CSharpLanguage.Instance.IsForbiddenTypeName(typeGroup.Value))
+                    throw new BadSyntaxException(Strings.ErrorInvalidTypeName);
+                if (typeGroup.Value == "void")
                     throw new BadSyntaxException(string.Format(Strings.ErrorType, "void"));
 
-                base.Type = value;
-            }
-        }
+                ValidName = nameGroup.Value;
+                ValidType = typeGroup.Value;
+                AccessModifier = Language.TryParseAccessModifier(accessGroup.Value);
+                InitialValue = (initGroup.Success) ? initGroup.Value : null;
 
-        protected override string DefaultType
-        {
-            get { return "int"; }
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// <see cref="IsConst"/> is set to true while 
-        /// <see cref="Field.InitialValue"/> is empty.
-        /// </exception>
-        public override bool IsConstant
-        {
-            get
-            {
-                return base.IsConstant;
-            }
-            set
-            {
-                if (value && !HasInitialValue)
+                foreach (Capture modifierCapture in modifierGroup.Captures)
                 {
-                    throw new BadSyntaxException(
-                        Strings.ErrorLackOfInitialization);
-                }
-                base.IsConstant = value;
-            }
-        }
-
-        public override Language Language
-        {
-            get { return CSharpLanguage.Instance; }
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        public override void InitFromString(string declaration)
-        {
-            Match match = fieldRegex.Match(declaration);
-            RaiseChangedEvent = false;
-
-            try
-            {
-                if (match.Success)
-                {
-                    ClearModifiers();
-                    Group nameGroup = match.Groups["name"];
-                    Group typeGroup = match.Groups["type"];
-                    Group accessGroup = match.Groups["access"];
-                    Group modifierGroup = match.Groups["modifier"];
-                    Group initGroup = match.Groups["initvalue"];
-
-                    if (CSharpLanguage.Instance.IsForbiddenName(nameGroup.Value))
-                        throw new BadSyntaxException(Strings.ErrorInvalidName);
-                    if (CSharpLanguage.Instance.IsForbiddenTypeName(typeGroup.Value))
-                        throw new BadSyntaxException(Strings.ErrorInvalidTypeName);
-                    if (typeGroup.Value == "void")
-                        throw new BadSyntaxException(string.Format(Strings.ErrorType, "void"));
-
-                    ValidName = nameGroup.Value;
-                    ValidType = typeGroup.Value;
-                    AccessModifier = Language.TryParseAccessModifier(accessGroup.Value);
-                    InitialValue = (initGroup.Success) ? initGroup.Value : null;
-
-                    foreach (Capture modifierCapture in modifierGroup.Captures)
-                    {
-                        if (modifierCapture.Value == "static")
-                            IsStatic = true;
-                        if (modifierCapture.Value == "readonly")
-                            IsReadonly = true;
-                        if (modifierCapture.Value == "const")
-                            IsConstant = true;
-                        if (modifierCapture.Value == "new")
-                            IsHider = true;
-                        if (modifierCapture.Value == "volatile")
-                            IsVolatile = true;
-                    }
-                }
-                else
-                {
-                    throw new BadSyntaxException(Strings.ErrorInvalidDeclaration);
+                    if (modifierCapture.Value == "static")
+                        IsStatic = true;
+                    if (modifierCapture.Value == "readonly")
+                        IsReadonly = true;
+                    if (modifierCapture.Value == "const")
+                        IsConstant = true;
+                    if (modifierCapture.Value == "new")
+                        IsHider = true;
+                    if (modifierCapture.Value == "volatile")
+                        IsVolatile = true;
                 }
             }
-            finally
+            else
             {
-                RaiseChangedEvent = true;
+                throw new BadSyntaxException(Strings.ErrorInvalidDeclaration);
             }
         }
-
-        public override string GetDeclaration()
+        finally
         {
-            return GetDeclarationLine(true);
+            RaiseChangedEvent = true;
+        }
+    }
+
+    public override string GetDeclaration()
+    {
+        return GetDeclarationLine(true);
+    }
+
+    public string GetDeclarationLine(bool withSemicolon)
+    {
+        StringBuilder builder = new StringBuilder(50);
+
+        if (AccessModifier != AccessModifier.Default)
+        {
+            builder.Append(Language.GetAccessString(AccessModifier, true));
+            builder.Append(" ");
         }
 
-        public string GetDeclarationLine(bool withSemicolon)
-        {
-            StringBuilder builder = new StringBuilder(50);
+        if (IsHider)
+            builder.Append("new ");
+        if (IsConstant)
+            builder.Append("const ");
+        if (IsStatic)
+            builder.Append("static ");
+        if (IsReadonly)
+            builder.Append("readonly ");
+        if (IsVolatile)
+            builder.Append("volatile ");
 
-            if (AccessModifier != AccessModifier.Default)
-            {
-                builder.Append(Language.GetAccessString(AccessModifier, true));
-                builder.Append(" ");
-            }
+        builder.AppendFormat("{0} {1}", Type, Name);
+        if (HasInitialValue)
+            builder.AppendFormat(" = {0}", InitialValue);
 
-            if (IsHider)
-                builder.Append("new ");
-            if (IsConstant)
-                builder.Append("const ");
-            if (IsStatic)
-                builder.Append("static ");
-            if (IsReadonly)
-                builder.Append("readonly ");
-            if (IsVolatile)
-                builder.Append("volatile ");
+        if (withSemicolon)
+            builder.Append(";");
 
-            builder.AppendFormat("{0} {1}", Type, Name);
-            if (HasInitialValue)
-                builder.AppendFormat(" = {0}", InitialValue);
+        return builder.ToString();
+    }
 
-            if (withSemicolon)
-                builder.Append(";");
+    protected override Field Clone(CompositeType newParent)
+    {
+        CSharpField field = new CSharpField(newParent);
+        field.CopyFrom(this);
+        return field;
+    }
 
-            return builder.ToString();
-        }
-
-        protected override Field Clone(CompositeType newParent)
-        {
-            CSharpField field = new CSharpField(newParent);
-            field.CopyFrom(this);
-            return field;
-        }
-
-        public override string ToString()
-        {
-            return GetDeclarationLine(false);
-        }
+    public override string ToString()
+    {
+        return GetDeclarationLine(false);
     }
 }

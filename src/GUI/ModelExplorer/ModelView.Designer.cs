@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace NClass.GUI.ModelExplorer
 {
-	partial class ModelView
+	sealed partial class ModelView
 	{
 		/// <summary>
 		/// Required designer variable.

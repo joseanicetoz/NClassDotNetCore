@@ -13,30 +13,31 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
+namespace NClass.DiagramEditor.ClassDiagram.ContextMenus;
+
+public abstract class DiagramContextMenu : ContextMenu
 {
-    public abstract class DiagramContextMenu : ContextMenu
+    private Diagram diagram = null;
+
+    protected sealed override IDocument Document
     {
-        Diagram diagram = null;
+        get { return diagram; }
+        set => diagram = (Diagram)value;
+    }
 
-        protected sealed override IDocument Document
-        {
-            get { return diagram; }
-        }
+    protected Diagram Diagram
+    {
+        get { return diagram; }
+        set => diagram = value;
+    }
 
-        protected Diagram Diagram
-        {
-            get { return diagram; }
-        }
+    public sealed override void ValidateMenuItems(IDocument document)
+    {
+        ValidateMenuItems(document as Diagram);
+    }
 
-        public sealed override void ValidateMenuItems(IDocument document)
-        {
-            ValidateMenuItems(document as Diagram);
-        }
-
-        public virtual void ValidateMenuItems(Diagram diagram)
-        {
-            this.diagram = diagram;
-        }
+    public virtual void ValidateMenuItems(Diagram diagram)
+    {
+        this.diagram = diagram;
     }
 }

@@ -16,26 +16,21 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+[Serializable]
+public class BadSyntaxException : Exception
 {
-    public class BadSyntaxException : Exception
+    public BadSyntaxException(string message) : base(message)
     {
-        public BadSyntaxException()
-        {
-        }
+    }
 
-        public BadSyntaxException(string message) : base(message)
-        {
-        }
+    public BadSyntaxException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 
-        public BadSyntaxException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
-
-        protected BadSyntaxException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+    [Obsolete("Obsolete")]
+    protected BadSyntaxException(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
     }
 }

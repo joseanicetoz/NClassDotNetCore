@@ -13,30 +13,31 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor.EventsArgs;
+
+public delegate void DocumentMovedEventHandler(object sender, DocumentMovedEventArgs e);
+
+public class DocumentMovedEventArgs : DocumentEventArgs
 {
-    public delegate void DocumentMovedEventHandler(object sender, DocumentMovedEventArgs e);
+    private readonly int oldPostion;
+    private readonly int newPosition;
 
-    public class DocumentMovedEventArgs : DocumentEventArgs
+    public DocumentMovedEventArgs(IDocument document, int oldPostion, int newPosition)
+        : base(document)
     {
-        readonly int oldPostion;
-        readonly int newPosition;
+        this.oldPostion = oldPostion;
+        this.newPosition = newPosition;
+    }
 
-        public DocumentMovedEventArgs(IDocument document, int oldPostion, int newPosition)
-            : base(document)
-        {
-            this.oldPostion = oldPostion;
-            this.newPosition = newPosition;
-        }
+    public int OldPostion
+    {
+        get { return oldPostion; }
+        set => throw new System.NotImplementedException();
+    }
 
-        public int OldPostion
-        {
-            get { return oldPostion; }
-        }
-
-        public int NewPosition
-        {
-            get { return newPosition; }
-        }
+    public int NewPosition
+    {
+        get { return newPosition; }
+        set => throw new System.NotImplementedException();
     }
 }

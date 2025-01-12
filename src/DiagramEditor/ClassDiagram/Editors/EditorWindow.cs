@@ -13,19 +13,18 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.DiagramEditor.ClassDiagram.Editors
+namespace NClass.DiagramEditor.ClassDiagram.Editors;
+
+public abstract class EditorWindow : PopupWindow
 {
-    public abstract class EditorWindow : PopupWindow
+    internal abstract void Init(DiagramElement element);
+
+    internal abstract void Relocate(DiagramElement element);
+
+    public abstract void ValidateData();
+
+    public override void Closing()
     {
-        internal abstract void Init(DiagramElement element);
-
-        internal abstract void Relocate(DiagramElement element);
-
-        public abstract void ValidateData();
-
-        public override void Closing()
-        {
-            ValidateData();
-        }
+        ValidateData();
     }
 }

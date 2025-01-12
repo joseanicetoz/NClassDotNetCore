@@ -13,59 +13,46 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using System;
 using System.Text;
+using NClass.Core.Entities;
 
-namespace NClass.Core
+namespace NClass.Core.Members;
+
+public abstract class Method : Operation
 {
-    public abstract class Method : Operation
+    public override MemberType MemberType
     {
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="parent"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        protected Method(string name, CompositeType parent) : base(name, parent)
+        get { return MemberType.Method; }
+    }
+
+    public abstract bool IsOperator { get; }
+
+    protected Method(string name, CompositeType parent) : base(name, parent)
+    {
+    }
+    
+    public sealed override string GetUmlDescription(bool getType, bool getParameters,
+        bool getParameterNames, bool getInitValue)
+    {
+        StringBuilder builder = new StringBuilder(100);
+
+        builder.AppendFormat("{0}(", Name);
+
+        if (getParameters)
         {
-        }
-
-        public override MemberType MemberType
-        {
-            get { return MemberType.Method; }
-        }
-
-        public abstract bool IsOperator
-        {
-            get;
-        }
-
-        public sealed override string GetUmlDescription(bool getType, bool getParameters,
-            bool getParameterNames, bool getInitValue)
-        {
-            StringBuilder builder = new StringBuilder(100);
-
-            builder.AppendFormat("{0}(", Name);
-
-            if (getParameters)
+            for (int i = 0; i < ArgumentList.Count; i++)
             {
-                for (int i = 0; i < ArgumentList.Count; i++)
-                {
-                    builder.Append(ArgumentList[i].GetUmlDescription(getParameterNames));
-                    if (i < ArgumentList.Count - 1)
-                        builder.Append(", ");
-                }
+                builder.Append(ArgumentList[i].GetUmlDescription(getParameterNames));
+                if (i < ArgumentList.Count - 1)
+                    builder.Append(", ");
             }
-
-            if (getType && !string.IsNullOrEmpty(Type))
-                builder.AppendFormat(") : {0}", Type);
-            else
-                builder.Append(')');
-
-            return builder.ToString();
         }
+
+        if (getType && !string.IsNullOrEmpty(Type))
+            builder.AppendFormat(") : {0}", Type);
+        else
+            builder.Append(')');
+
+        return builder.ToString();
     }
 }

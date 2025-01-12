@@ -16,49 +16,50 @@
 using System;
 using System.Reflection;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public static class MonoHelper
 {
-    public static class MonoHelper
+    private static readonly bool isMono;
+    private static readonly string version;
+
+    static MonoHelper()
     {
-        static readonly bool isMono;
-        static readonly string version;
+        Type monoRuntime = Type.GetType("Mono.Runtime");
 
-        static MonoHelper()
+        if (monoRuntime != null)
         {
-            Type monoRuntime = Type.GetType("Mono.Runtime");
+            isMono = true;
+            MethodInfo method = monoRuntime.GetMethod("GetDisplayName",
+                BindingFlags.NonPublic | BindingFlags.Static);
 
-            if (monoRuntime != null)
-            {
-                isMono = true;
-                MethodInfo method = monoRuntime.GetMethod("GetDisplayName",
-                    BindingFlags.NonPublic | BindingFlags.Static);
-
-                if (method != null)
-                    version = method.Invoke(null, null) as string;
-                else
-                    version = "Unknown version";
-            }
+            if (method != null)
+                version = method.Invoke(null, null) as string;
             else
-            {
-                isMono = false;
-                version = string.Empty;
-            }
+                version = "Unknown version";
         }
-
-        public static bool IsRunningOnMono
+        else
         {
-            get { return isMono; }
+            isMono = false;
+            version = string.Empty;
         }
+    }
 
-        public static string Version
-        {
-            get { return version; }
-        }
+    public static bool IsRunningOnMono
+    {
+        get { return isMono; }
+        set => throw new NotImplementedException();
+    }
 
-        public static bool IsOlderVersionThan(string version)
-        {
-            version = "Mono " + version;
-            return (Version.CompareTo(version) < 0);
-        }
+    public static string Version
+    {
+        get { return version; }
+        set => throw new NotImplementedException();
+    }
+
+    public static bool IsOlderVersionThan(string version)
+    {
+        version = "Mono " + version;
+        return (Version.CompareTo(version) < 0);
     }
 }

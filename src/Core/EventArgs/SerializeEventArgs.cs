@@ -16,22 +16,21 @@
 using System;
 using System.Xml;
 
-namespace NClass.Core
+namespace NClass.Core.EventArgs;
+
+public delegate void SerializeEventHandler(object sender, SerializeEventArgs e);
+
+public class SerializeEventArgs : System.EventArgs
 {
-    public delegate void SerializeEventHandler(object sender, SerializeEventArgs e);
+    private readonly XmlElement node;
 
-    public class SerializeEventArgs : EventArgs
+    public SerializeEventArgs(XmlElement node)
     {
-        readonly XmlElement node;
+        this.node = node;
+    }
 
-        public SerializeEventArgs(XmlElement node)
-        {
-            this.node = node;
-        }
-
-        public XmlElement Node
-        {
-            get { return node; }
-        }
+    public XmlElement Node
+    {
+        get { return node; }
     }
 }

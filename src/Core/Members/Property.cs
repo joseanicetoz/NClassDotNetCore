@@ -13,148 +13,133 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Translations;
 using System;
+using NClass.Core.Entities;
+using NClass.Translations;
 
-namespace NClass.Core
+namespace NClass.Core.Members;
+
+public abstract class Property : Operation
 {
-    public abstract class Property : Operation
+    private bool isReadonly = false;
+    private bool isWriteonly = false;
+    private AccessModifier readAccess = AccessModifier.Default;
+    private AccessModifier writeAccess = AccessModifier.Default;
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// The language of <paramref name="parent"/> does not equal.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parent"/> is null.
+    /// </exception>
+    protected Property(string name, CompositeType parent) : base(name, parent)
     {
-        bool isReadonly = false;
-        bool isWriteonly = false;
-        AccessModifier readAccess = AccessModifier.Default;
-        AccessModifier writeAccess = AccessModifier.Default;
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="parent"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        protected Property(string name, CompositeType parent) : base(name, parent)
-        {
-        }
+    public sealed override MemberType MemberType
+    {
+        get { return MemberType.Property; }
+    }
 
-        public sealed override MemberType MemberType
-        {
-            get { return MemberType.Property; }
-        }
+    public override bool HasBody
+    {
+        get { return true; }
+    }
 
-        public override bool HasBody
-        {
-            get { return true; }
-        }
+    public bool HasImplementation
+    {
+        get { return (!IsAbstract && !(Parent is InterfaceType)); }
+    }
 
-        public bool HasImplementation
+    public bool IsReadonly
+    {
+        get { return isReadonly; }
+        set
         {
-            get
+            if (isReadonly != value)
             {
-                return (!IsAbstract && !(Parent is InterfaceType));
+                if (value)
+                    isWriteonly = false;
+                isReadonly = value;
+                Changed();
             }
         }
+    }
 
-        public bool IsReadonly
+    public bool IsWriteonly
+    {
+        get { return isWriteonly; }
+        set
         {
-            get
+            if (isWriteonly != value)
             {
-                return isReadonly;
-            }
-            set
-            {
-                if (isReadonly != value)
-                {
-                    if (value)
-                        isWriteonly = false;
-                    isReadonly = value;
-                    Changed();
-                }
+                if (value)
+                    isReadonly = false;
+                isWriteonly = value;
+                Changed();
             }
         }
+    }
 
-        public bool IsWriteonly
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set accessor modifier.
+    /// </exception>
+    public AccessModifier ReadAccess
+    {
+        get { return readAccess; }
+        protected set
         {
-            get
+            if (value == readAccess)
+                return;
+
+            if (value == AccessModifier.Default || (value != Access &&
+                                                    WriteAccess == AccessModifier.Default && !IsReadonly && !IsWriteonly))
             {
-                return isWriteonly;
+                readAccess = value;
+                Changed();
             }
-            set
+            else
             {
-                if (isWriteonly != value)
-                {
-                    if (value)
-                        isReadonly = false;
-                    isWriteonly = value;
-                    Changed();
-                }
+                throw new BadSyntaxException(Strings.ErrorAccessorModifier);
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set accessor modifier.
-        /// </exception>
-        public AccessModifier ReadAccess
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set accessor modifier.
+    /// </exception>
+    public AccessModifier WriteAccess
+    {
+        get { return writeAccess; }
+        protected set
         {
-            get
-            {
-                return readAccess;
-            }
-            protected set
-            {
-                if (value == readAccess)
-                    return;
+            if (value == writeAccess)
+                return;
 
-                if (value == AccessModifier.Default || (value != Access &&
-                    WriteAccess == AccessModifier.Default && !IsReadonly && !IsWriteonly))
-                {
-                    readAccess = value;
-                    Changed();
-                }
-                else
-                {
-                    throw new BadSyntaxException(Strings.ErrorAccessorModifier);
-                }
+            if (value == AccessModifier.Default || (value != Access &&
+                                                    ReadAccess == AccessModifier.Default && !IsReadonly && !IsWriteonly))
+            {
+                writeAccess = value;
+                Changed();
+            }
+            else
+            {
+                throw new BadSyntaxException(Strings.ErrorAccessorModifier);
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set accessor modifier.
-        /// </exception>
-        public AccessModifier WriteAccess
-        {
-            get
-            {
-                return writeAccess;
-            }
-            protected set
-            {
-                if (value == writeAccess)
-                    return;
+    protected override void CopyFrom(Member member)
+    {
+        base.CopyFrom(member);
 
-                if (value == AccessModifier.Default || (value != Access &&
-                    ReadAccess == AccessModifier.Default && !IsReadonly && !IsWriteonly))
-                {
-                    writeAccess = value;
-                    Changed();
-                }
-                else
-                {
-                    throw new BadSyntaxException(Strings.ErrorAccessorModifier);
-                }
-            }
-        }
-
-        protected override void CopyFrom(Member member)
-        {
-            base.CopyFrom(member);
-
-            Property property = (Property)member;
-            isReadonly = property.isReadonly;
-            isWriteonly = property.isWriteonly;
-            readAccess = property.readAccess;
-            writeAccess = property.writeAccess;
-        }
+        Property property = (Property)member;
+        isReadonly = property.isReadonly;
+        isWriteonly = property.isWriteonly;
+        readAccess = property.readAccess;
+        writeAccess = property.writeAccess;
     }
 }

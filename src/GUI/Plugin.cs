@@ -17,46 +17,39 @@ using NClass.DiagramEditor;
 using System;
 using System.Windows.Forms;
 
-namespace NClass.GUI
+namespace NClass.GUI;
+
+public abstract class Plugin
 {
-    public abstract class Plugin
+    private readonly NClassEnvironment environment;
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="environment"/> is null.
+    /// </exception>
+    protected Plugin(NClassEnvironment environment)
     {
-        readonly NClassEnvironment environment;
+        if (environment == null)
+            throw new ArgumentNullException("environment");
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="environment"/> is null.
-        /// </exception>
-        protected Plugin(NClassEnvironment environment)
-        {
-            if (environment == null)
-                throw new ArgumentNullException("environment");
-
-            this.environment = environment;
-        }
-
-        protected NClassEnvironment NClassEnvironment
-        {
-            get { return environment; }
-        }
-
-        protected Workspace Workspace
-        {
-            get { return environment.Workspace; }
-        }
-
-        protected DocumentManager DocumentManager
-        {
-            get { return environment.DocumentManager; }
-        }
-
-        public abstract bool IsAvailable
-        {
-            get;
-        }
-
-        public abstract ToolStripItem MenuItem
-        {
-            get;
-        }
+        this.environment = environment;
     }
+
+    protected NClassEnvironment NClassEnvironment
+    {
+        get { return environment; }
+    }
+
+    protected Workspace Workspace
+    {
+        get { return environment.Workspace; }
+    }
+
+    protected DocumentManager DocumentManager
+    {
+        get { return environment.DocumentManager; }
+    }
+
+    public abstract bool IsAvailable { get; }
+
+    public abstract ToolStripItem MenuItem { get; }
 }

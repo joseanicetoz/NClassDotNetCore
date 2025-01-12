@@ -16,27 +16,26 @@
 using NClass.DiagramEditor.ClassDiagram.Shapes;
 using System.Drawing;
 
-namespace NClass.DiagramEditor.ClassDiagram.Editors
+namespace NClass.DiagramEditor.ClassDiagram.Editors;
+
+public abstract class TypeEditor : FloatingEditor
 {
-    public abstract class TypeEditor : FloatingEditor
+    internal sealed override void Relocate(DiagramElement element)
     {
-        internal sealed override void Relocate(DiagramElement element)
-        {
-            Relocate((TypeShape)element);
-        }
+        Relocate((TypeShape)element);
+    }
 
-        internal void Relocate(TypeShape shape)
+    internal void Relocate(TypeShape shape)
+    {
+        Diagram diagram = shape.Diagram;
+        if (diagram != null)
         {
-            Diagram diagram = shape.Diagram;
-            if (diagram != null)
-            {
-                Point absolute = new Point(shape.Right, shape.Top);
-                Size relative = new Size(
-                    (int)(absolute.X * diagram.Zoom) - diagram.Offset.X + MarginSize,
-                    (int)(absolute.Y * diagram.Zoom) - diagram.Offset.Y);
+            Point absolute = new Point(shape.Right, shape.Top);
+            Size relative = new Size(
+                (int)(absolute.X * diagram.Zoom) - diagram.Offset.X + MarginSize,
+                (int)(absolute.Y * diagram.Zoom) - diagram.Offset.Y);
 
-                this.Location = ParentLocation + relative;
-            }
+            this.Location = ParentLocation + relative;
         }
     }
 }

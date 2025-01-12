@@ -13,55 +13,37 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using NClass.Translations;
 using System;
+using NClass.Core.Entities;
+using NClass.Translations;
 
-namespace NClass.Core
+namespace NClass.Core.Relationships;
+
+public sealed class CommentRelationship : Relationship
 {
-    public sealed class CommentRelationship : Relationship
+    private Comment comment;
+    private IEntity entity;
+
+    public override RelationshipType RelationshipType { get; set; } = RelationshipType.Comment;
+    public override IEntity First { get; set; }
+    public override IEntity Second { get; set; }
+
+    internal CommentRelationship(Comment comment, IEntity entity)
     {
-        Comment comment;
-        IEntity entity;
+        this.comment = comment ?? throw new ArgumentNullException(nameof(comment));
+        this.entity = entity ?? throw new ArgumentNullException(nameof(entity));
+        Attach();
+    }
+    
+    public CommentRelationship Clone(Comment comment, IEntity entity)
+    {
+        CommentRelationship relationship = new CommentRelationship(comment, entity);
+        relationship.CopyFrom(this);
+        return relationship;
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="comment"/> is null.-or-
-        /// <paramref name="entity"/> is null.
-        /// </exception>
-        internal CommentRelationship(Comment comment, IEntity entity)
-        {
-            this.comment = comment ?? throw new ArgumentNullException(nameof(comment));
-            this.entity = entity ?? throw new ArgumentNullException(nameof(entity));
-            Attach();
-        }
-
-        public override RelationshipType RelationshipType
-        {
-            get { return RelationshipType.Comment; }
-        }
-
-        public override IEntity First
-        {
-            get { return comment; }
-            protected set { comment = (Comment)value; }
-        }
-
-        public override IEntity Second
-        {
-            get { return entity; }
-            protected set { entity = value; }
-        }
-
-        public CommentRelationship Clone(Comment comment, IEntity entity)
-        {
-            CommentRelationship relationship = new CommentRelationship(comment, entity);
-            relationship.CopyFrom(this);
-            return relationship;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} --- {2}",
-                Strings.Comment, comment.ToString(), entity.Name);
-        }
+    public override string ToString()
+    {
+        return $@"{Strings.Comment}: {comment} --- {entity.Name}";
     }
 }

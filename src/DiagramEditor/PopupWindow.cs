@@ -16,55 +16,48 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public class PopupWindow : UserControl
 {
-    public class PopupWindow : UserControl
+    private const int ClientMargin = 20;
+
+    private Point parentLocation;
+
+    public new Point Location
     {
-        const int ClientMargin = 20;
-
-        Point parentLocation;
-
-        public new Point Location
+        get { return base.Location; }
+        set
         {
-            get
+            if (Parent != null)
             {
-                return base.Location;
-            }
-            set
-            {
-                if (Parent != null)
-                {
-                    Rectangle client = Parent.ClientRectangle;
+                Rectangle client = Parent.ClientRectangle;
 
-                    if (value.X < ClientMargin)
-                        value.X = ClientMargin;
-                    if (value.Y < ClientMargin)
-                        value.Y = ClientMargin;
-                    if (value.X + Width > client.Width - ClientMargin)
-                        value.X = client.Width - Width - ClientMargin;
-                    if (value.Y + Height > client.Height - ClientMargin)
-                        value.Y = client.Height - Height - ClientMargin;
-                }
-                base.Location = value;
+                if (value.X < ClientMargin)
+                    value.X = ClientMargin;
+                if (value.Y < ClientMargin)
+                    value.Y = ClientMargin;
+                if (value.X + Width > client.Width - ClientMargin)
+                    value.X = client.Width - Width - ClientMargin;
+                if (value.Y + Height > client.Height - ClientMargin)
+                    value.Y = client.Height - Height - ClientMargin;
             }
+            base.Location = value;
         }
+    }
 
-        internal Point ParentLocation
+    internal Point ParentLocation
+    {
+        get { return parentLocation; }
+        set
         {
-            get
-            {
-                return parentLocation;
-            }
-            set
-            {
-                Size offset = new Size(value.X - parentLocation.X, value.Y - parentLocation.Y);
-                parentLocation = value;
-                this.Location += offset;
-            }
+            Size offset = new Size(value.X - parentLocation.X, value.Y - parentLocation.Y);
+            parentLocation = value;
+            this.Location += offset;
         }
+    }
 
-        public virtual void Closing()
-        {
-        }
+    public virtual void Closing()
+    {
     }
 }

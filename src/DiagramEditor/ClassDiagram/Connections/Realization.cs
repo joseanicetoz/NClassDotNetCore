@@ -18,76 +18,77 @@ using NClass.DiagramEditor.ClassDiagram.Shapes;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using NClass.Core.Entities;
+using NClass.Core.Relationships;
 
-namespace NClass.DiagramEditor.ClassDiagram.Connections
+namespace NClass.DiagramEditor.ClassDiagram.Connections;
+
+internal sealed class Realization : Connection
 {
-    internal sealed class Realization : Connection
+    private static readonly Pen linePen = new Pen(Color.Black);
+    private readonly RealizationRelationship realization;
+
+    static Realization()
     {
-        static readonly Pen linePen = new Pen(Color.Black);
-        readonly RealizationRelationship realization;
+        linePen.MiterLimit = 2.0F;
+        linePen.LineJoin = LineJoin.MiterClipped;
+    }
 
-        static Realization()
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="realization"/> is null.-or-
+    /// <paramref name="startShape"/> is null.-or-
+    /// <paramref name="endShape"/> is null.
+    /// </exception>
+    public Realization(RealizationRelationship realization, Shape startShape, Shape endShape)
+        : base(realization, startShape, endShape)
+    {
+        this.realization = realization;
+    }
+
+    internal RealizationRelationship RealizationRelationship
+    {
+        get { return realization; }
+    }
+
+    protected internal override Relationship Relationship
+    {
+        get { return realization; }
+    }
+
+    protected override bool IsDashed
+    {
+        get { return true; }
+    }
+
+    protected override Size EndCapSize
+    {
+        get { return Arrowhead.ClosedArrowSize; }
+    }
+
+    protected override int EndSelectionOffset
+    {
+        get { return Arrowhead.ClosedArrowHeight; }
+    }
+
+    protected override void DrawEndCap(IGraphics g, bool onScreen, Style style)
+    {
+        linePen.Color = style.RelationshipColor;
+        linePen.Width = style.RelationshipWidth;
+
+        g.FillPath(Brushes.White, Arrowhead.ClosedArrowPath);
+        g.DrawPath(linePen, Arrowhead.ClosedArrowPath);
+    }
+
+    protected override bool CloneRelationship(Diagram diagram, Shape first, Shape second)
+    {
+        if (first.Entity is TypeBase firstType && second.Entity is InterfaceType secondType)
         {
-            linePen.MiterLimit = 2.0F;
-            linePen.LineJoin = LineJoin.MiterClipped;
+            RealizationRelationship clone = realization.Clone(firstType, secondType);
+            return diagram.InsertRealization(clone);
         }
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="realization"/> is null.-or-
-        /// <paramref name="startShape"/> is null.-or-
-        /// <paramref name="endShape"/> is null.
-        /// </exception>
-        public Realization(RealizationRelationship realization, Shape startShape, Shape endShape)
-            : base(realization, startShape, endShape)
+        else
         {
-            this.realization = realization;
-        }
-
-        internal RealizationRelationship RealizationRelationship
-        {
-            get { return realization; }
-        }
-
-        protected internal override Relationship Relationship
-        {
-            get { return realization; }
-        }
-
-        protected override bool IsDashed
-        {
-            get { return true; }
-        }
-
-        protected override Size EndCapSize
-        {
-            get { return Arrowhead.ClosedArrowSize; }
-        }
-
-        protected override int EndSelectionOffset
-        {
-            get { return Arrowhead.ClosedArrowHeight; }
-        }
-
-        protected override void DrawEndCap(IGraphics g, bool onScreen, Style style)
-        {
-            linePen.Color = style.RelationshipColor;
-            linePen.Width = style.RelationshipWidth;
-
-            g.FillPath(Brushes.White, Arrowhead.ClosedArrowPath);
-            g.DrawPath(linePen, Arrowhead.ClosedArrowPath);
-        }
-
-        protected override bool CloneRelationship(Diagram diagram, Shape first, Shape second)
-        {
-            if (first.Entity is TypeBase firstType && second.Entity is InterfaceType secondType)
-            {
-                RealizationRelationship clone = realization.Clone(firstType, secondType);
-                return diagram.InsertRealization(clone);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

@@ -13,52 +13,26 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-using System;
 using System.Collections.Generic;
+using NClass.Core.Members;
 
-namespace NClass.Core
+namespace NClass.Core.Entities;
+
+public interface IInterfaceImplementer
 {
-    public interface IInterfaceImplementer
-    {
-        IEnumerable<InterfaceType> Interfaces
-        {
-            get;
-        }
+    IEnumerable<InterfaceType> Interfaces { get; }
 
-        string Name
-        {
-            get;
-        }
+    string Name { get; set; }
 
-        Language Language
-        {
-            get;
-        }
+    Language Language { get; }
 
-        bool ImplementsInterface
-        {
-            get;
-        }
+    bool ImplementsInterface { get; }
 
-        Operation GetDefinedOperation(Operation operation);
+    Operation GetDefinedOperation(Operation operation);
 
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="operation"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="operation"/> is null.
-        /// </exception>
-        Operation Implement(Operation operation, bool isExplicit);
+    Operation Implement(Operation operation, bool isExplicit);
 
-        /// <exception cref="RelationshipException">
-        /// The language of <paramref name="interfaceType"/> does not equal.-or-
-        /// <paramref name="interfaceType"/> is earlier implemented interface.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="interfaceType"/> is null.
-        /// </exception>
-        void AddInterface(InterfaceType interfaceType);
+    void AddInterface(InterfaceType interfaceType);
 
-        void RemoveInterface(InterfaceType interfaceType);
-    }
+    void RemoveInterface(InterfaceType interfaceType);
 }

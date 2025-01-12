@@ -15,57 +15,28 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public static class Clipboard
 {
-    public static class Clipboard
+    public static IClipboardItem Item { get; set; }
+
+    public static bool IsEmpty
     {
-        public static IClipboardItem Item { get; set; }
+        get { return (Item == null); }
+        set => throw new NotImplementedException();
+    }
 
-        public static bool IsEmpty { get { return (Item == null); } }
+    public static void Clear()
+    {
+        Item = null;
+    }
 
-        public static void Clear()
+    public static void Paste(IDocument document)
+    {
+        if (document != null)
         {
-            Item = null;
+            Item?.Paste(document);
         }
-
-        public static void Paste(IDocument document)
-        {
-            if (document != null)
-            {
-                Item?.Paste(document);
-            }
-        }
-
-        //static IClipboardItem item = null;
-
-        //public static IClipboardItem Item
-        //{
-        //    get { return Clipboard.item; }
-        //    set 
-        //    { 
-        //        Clipboard.item = value;
-        //    }
-        //}
-
-        //public static bool IsEmpty
-        //{
-        //    get { return (item == null); }
-        //}
-
-        //public static void Clear()
-        //{
-        //    item = null;
-        //}
-
-        ///// <exception cref="ArgumentNullException">
-        ///// <paramref name="document"/> is null.
-        ///// </exception>
-        //public static void Paste(IDocument document)
-        //{
-        //    if (document == null)
-        //        throw new ArgumentNullException("document");
-
-        //    item.Paste(document);
-        //}
     }
 }

@@ -18,76 +18,76 @@ using NClass.DiagramEditor.ClassDiagram.Connections;
 using NClass.DiagramEditor.ClassDiagram.Shapes;
 using System.Collections.Generic;
 using System.Drawing;
+using NClass.Core.Entities;
 
-namespace NClass.DiagramEditor.ClassDiagram
+namespace NClass.DiagramEditor.ClassDiagram;
+
+internal class ElementContainer : IClipboardItem
 {
-    internal class ElementContainer : IClipboardItem
+    private const int BaseOffset = 20;
+    private readonly List<Shape> shapes = new List<Shape>();
+    private readonly List<Connection> connections = new List<Connection>();
+    private readonly Dictionary<Shape, Shape> pastedShapes = new Dictionary<Shape, Shape>();
+    private int currentOffset = 0;
+
+    public void AddShape(Shape shape)
     {
-        const int BaseOffset = 20;
-        readonly List<Shape> shapes = new List<Shape>();
-        readonly List<Connection> connections = new List<Connection>();
-        readonly Dictionary<Shape, Shape> pastedShapes = new Dictionary<Shape, Shape>();
-        int currentOffset = 0;
+        shapes.Add(shape);
+        pastedShapes.Add(shape, null);
+    }
 
-        public void AddShape(Shape shape)
+    public void AddConnection(Connection connection)
+    {
+        connections.Add(connection);
+    }
+
+    void IClipboardItem.Paste(IDocument document)
+    {
+        Diagram diagram = (Diagram)document;
+        if (diagram != null)
         {
-            shapes.Add(shape);
-            pastedShapes.Add(shape, null);
-        }
+            bool success = false;
 
-        public void AddConnection(Connection connection)
-        {
-            connections.Add(connection);
-        }
+            currentOffset += BaseOffset;
+            Size offset = new Size(
+                (int)((diagram.Offset.X + currentOffset) / diagram.Zoom),
+                (int)((diagram.Offset.Y + currentOffset) / diagram.Zoom));
 
-        void IClipboardItem.Paste(IDocument document)
-        {
-            Diagram diagram = (Diagram)document;
-            if (diagram != null)
-            {
-                bool success = false;
-
-                currentOffset += BaseOffset;
-                Size offset = new Size(
-                    (int)((diagram.Offset.X + currentOffset) / diagram.Zoom),
-                    (int)((diagram.Offset.Y + currentOffset) / diagram.Zoom));
-
-                foreach (Shape shape in shapes)
-                {
-                    Shape pasted = shape.Paste(diagram, offset);
-                    pastedShapes[shape] = pasted;
-                    success |= (pasted != null);
-                }
-                foreach (Connection connection in connections)
-                {
-                    Shape first = GetShape(connection.Relationship.First);
-                    Shape second = GetShape(connection.Relationship.Second);
-
-                    if (first != null && pastedShapes[first] != null &&
-                        second != null && pastedShapes[second] != null)
-                    {
-                        Connection pasted = connection.Paste(
-                            diagram, offset, pastedShapes[first], pastedShapes[second]);
-                        success |= (pasted != null);
-                    }
-                }
-
-                if (success)
-                {
-                    Clipboard.Clear();
-                }
-            }
-        }
-
-        //TODO: legyenek inkább hivatkozások a shape-ekhez
-        public Shape GetShape(IEntity entity)
-        {
             foreach (Shape shape in shapes)
             {
-                if (shape.Entity == entity)
-                    return shape;
+                Shape pasted = shape.Paste(diagram, offset);
+                pastedShapes[shape] = pasted;
+                success |= (pasted != null);
             }
-            return null;
+            foreach (Connection connection in connections)
+            {
+                Shape first = GetShape(connection.Relationship.First);
+                Shape second = GetShape(connection.Relationship.Second);
+
+                if (first != null && pastedShapes[first] != null &&
+                    second != null && pastedShapes[second] != null)
+                {
+                    Connection pasted = connection.Paste(
+                        diagram, offset, pastedShapes[first], pastedShapes[second]);
+                    success |= (pasted != null);
+                }
+            }
+
+            if (success)
+            {
+                Clipboard.Clear();
+            }
         }
+    }
+
+    //TODO: legyenek inkább hivatkozások a shape-ekhez
+    public Shape GetShape(IEntity entity)
+    {
+        foreach (Shape shape in shapes)
+        {
+            if (shape.Entity == entity)
+                return shape;
+        }
+        return null;
     }
 }

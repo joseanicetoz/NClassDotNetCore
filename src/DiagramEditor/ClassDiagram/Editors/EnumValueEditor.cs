@@ -17,122 +17,121 @@ using NClass.Core;
 using NClass.DiagramEditor.ClassDiagram.Shapes;
 using System.Drawing;
 
-namespace NClass.DiagramEditor.ClassDiagram.Editors
+namespace NClass.DiagramEditor.ClassDiagram.Editors;
+
+public partial class EnumValueEditor : ItemEditor
 {
-    public partial class EnumValueEditor : ItemEditor
+    private EnumShape shape = null;
+
+    internal override void Init(DiagramElement element)
     {
-        EnumShape shape = null;
+        shape = (EnumShape)element;
+        base.Init(element);
+    }
 
-        internal override void Init(DiagramElement element)
+    internal override void Relocate(DiagramElement element)
+    {
+        Relocate((EnumShape)element);
+    }
+
+    internal void Relocate(EnumShape shape)
+    {
+        Diagram diagram = shape.Diagram;
+        if (diagram != null)
         {
-            shape = (EnumShape)element;
-            base.Init(element);
+            Rectangle record = shape.GetMemberRectangle(shape.ActiveMemberIndex);
+
+            Point absolute = new Point(shape.Right, record.Top);
+            Size relative = new Size(
+                (int)(absolute.X * diagram.Zoom) - diagram.Offset.X + MarginSize,
+                (int)(absolute.Y * diagram.Zoom) - diagram.Offset.Y);
+            relative.Height -= (Height - (int)(record.Height * diagram.Zoom)) / 2;
+
+            this.Location = ParentLocation + relative;
         }
+    }
 
-        internal override void Relocate(DiagramElement element)
+    protected override void RefreshValues()
+    {
+        if (shape.ActiveValue != null)
         {
-            Relocate((EnumShape)element);
-        }
+            int cursorPosition = SelectionStart;
+            DeclarationText = shape.ActiveValue.ToString();
+            SelectionStart = cursorPosition;
 
-        internal void Relocate(EnumShape shape)
-        {
-            Diagram diagram = shape.Diagram;
-            if (diagram != null)
-            {
-                Rectangle record = shape.GetMemberRectangle(shape.ActiveMemberIndex);
-
-                Point absolute = new Point(shape.Right, record.Top);
-                Size relative = new Size(
-                    (int)(absolute.X * diagram.Zoom) - diagram.Offset.X + MarginSize,
-                    (int)(absolute.Y * diagram.Zoom) - diagram.Offset.Y);
-                relative.Height -= (Height - (int)(record.Height * diagram.Zoom)) / 2;
-
-                this.Location = ParentLocation + relative;
-            }
-        }
-
-        protected override void RefreshValues()
-        {
-            if (shape.ActiveValue != null)
-            {
-                int cursorPosition = SelectionStart;
-                DeclarationText = shape.ActiveValue.ToString();
-                SelectionStart = cursorPosition;
-
-                SetError(null);
-                NeedValidation = false;
-                RefreshMoveUpDownTools();
-            }
-        }
-
-        private void RefreshMoveUpDownTools()
-        {
-            int index = shape.ActiveMemberIndex;
-            int parameterCount = shape.EnumType.ValueCount;
-
-            toolMoveUp.Enabled = (index > 0);
-            toolMoveDown.Enabled = (index < parameterCount - 1);
-        }
-
-        protected override bool ValidateDeclarationLine()
-        {
-            if (NeedValidation && shape.ActiveValue != null)
-            {
-                try
-                {
-                    shape.EnumType.ModifyValue(shape.ActiveValue, DeclarationText);
-                    RefreshValues();
-                }
-                catch (BadSyntaxException ex)
-                {
-                    SetError(ex.Message);
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        protected override void HideEditor()
-        {
+            SetError(null);
             NeedValidation = false;
-            shape.HideEditor();
+            RefreshMoveUpDownTools();
         }
+    }
 
-        protected override void SelectPrevious()
+    private void RefreshMoveUpDownTools()
+    {
+        int index = shape.ActiveMemberIndex;
+        int parameterCount = shape.EnumType.ValueCount;
+
+        toolMoveUp.Enabled = (index > 0);
+        toolMoveDown.Enabled = (index < parameterCount - 1);
+    }
+
+    protected override bool ValidateDeclarationLine()
+    {
+        if (NeedValidation && shape.ActiveValue != null)
         {
-            if (ValidateDeclarationLine())
+            try
             {
-                shape.SelectPrevious();
+                shape.EnumType.ModifyValue(shape.ActiveValue, DeclarationText);
+                RefreshValues();
+            }
+            catch (BadSyntaxException ex)
+            {
+                SetError(ex.Message);
+                return false;
             }
         }
+        return true;
+    }
 
-        protected override void SelectNext()
-        {
-            if (ValidateDeclarationLine())
-            {
-                shape.SelectNext();
-            }
-        }
+    protected override void HideEditor()
+    {
+        NeedValidation = false;
+        shape.HideEditor();
+    }
 
-        protected override void MoveUp()
+    protected override void SelectPrevious()
+    {
+        if (ValidateDeclarationLine())
         {
-            if (ValidateDeclarationLine())
-            {
-                shape.MoveUp();
-            }
+            shape.SelectPrevious();
         }
+    }
 
-        protected override void MoveDown()
+    protected override void SelectNext()
+    {
+        if (ValidateDeclarationLine())
         {
-            if (ValidateDeclarationLine())
-            {
-                shape.MoveDown();
-            }
+            shape.SelectNext();
         }
+    }
 
-        protected override void Delete()
+    protected override void MoveUp()
+    {
+        if (ValidateDeclarationLine())
         {
-            shape.DeleteActiveValue();
+            shape.MoveUp();
         }
+    }
+
+    protected override void MoveDown()
+    {
+        if (ValidateDeclarationLine())
+        {
+            shape.MoveDown();
+        }
+    }
+
+    protected override void Delete()
+    {
+        shape.DeleteActiveValue();
     }
 }

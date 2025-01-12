@@ -14,34 +14,35 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using NClass.Core;
+using NClass.Core.Members;
 
-namespace NClass.Java
+namespace NClass.Java;
+
+internal sealed class JavaEnumValue : EnumValue
 {
-    internal sealed class JavaEnumValue : EnumValue
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    internal JavaEnumValue(string declaration) : base(declaration)
     {
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        internal JavaEnumValue(string declaration) : base(declaration)
-        {
-        }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        public override void InitFromString(string declaration)
-        {
-            Name = JavaLanguage.Instance.GetValidName(declaration, false);
-        }
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    public override void InitFromString(string declaration)
+    {
+        Name = JavaLanguage.Instance.GetValidName(declaration, false);
+    }
 
-        public override string GetDeclaration()
-        {
-            return Name.ToString();
-        }
+    public override string GetDeclaration()
+    {
+        return Name.ToString();
+    }
 
-        protected override EnumValue Clone()
-        {
-            return new JavaEnumValue(Name);
-        }
+    protected override EnumValue Clone()
+    {
+        return new JavaEnumValue(Name);
     }
 }
+

@@ -13,15 +13,14 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.Core
+namespace NClass.Core.Entities;
+
+public enum EntityType
 {
-    public enum EntityType
-    {
-        Class,
-        Structure,
-        Interface,
-        Enum,
-        Delegate,
-        Comment
-    }
+    Class,
+    Structure,
+    Interface,
+    Enum,
+    Delegate,
+    Comment
 }

@@ -15,314 +15,282 @@
 
 using System;
 using System.Text;
+using NClass.Core.Entities;
 
-namespace NClass.Core
+namespace NClass.Core.Members;
+
+public abstract class Field : Member
 {
-    public abstract class Field : Member
+    private FieldModifier modifier = FieldModifier.None;
+    private string initialValue = null;
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="name"/> does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// The language of <paramref name="parent"/> does not equal.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parent"/> is null.
+    /// </exception>
+    protected Field(string name, CompositeType parent) : base(name, parent)
     {
-        FieldModifier modifier = FieldModifier.None;
-        string initialValue = null;
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The language of <paramref name="parent"/> does not equal.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="parent"/> is null.
-        /// </exception>
-        protected Field(string name, CompositeType parent) : base(name, parent)
-        {
-        }
+    public sealed override MemberType MemberType
+    {
+        get { return MemberType.Field; }
+    }
 
-        public sealed override MemberType MemberType
-        {
-            get { return MemberType.Field; }
-        }
+    public override string Name
+    {
+        get { return base.Name; }
+        set { ValidName = Language.GetValidName(value, false); }
+    }
 
-        public override string Name
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set access visibility.
+    /// </exception>
+    public override AccessModifier AccessModifier
+    {
+        get { return base.AccessModifier; }
+        set
         {
-            get
+            if (value == AccessModifier)
+                return;
+
+            AccessModifier previousAccess = base.AccessModifier;
+
+            try
             {
-                return base.Name;
+                RaiseChangedEvent = false;
+
+                base.AccessModifier = value;
+                Language.ValidateField(this);
             }
-            set
+            catch
             {
-                ValidName = Language.GetValidName(value, false);
+                base.AccessModifier = previousAccess;
+                throw;
             }
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set access visibility.
-        /// </exception>
-        public override AccessModifier AccessModifier
-        {
-            get
+            finally
             {
-                return base.AccessModifier;
-            }
-            set
-            {
-                if (value == AccessModifier)
-                    return;
-
-                AccessModifier previousAccess = base.AccessModifier;
-
-                try
-                {
-                    RaiseChangedEvent = false;
-
-                    base.AccessModifier = value;
-                    Language.ValidateField(this);
-                }
-                catch
-                {
-                    base.AccessModifier = previousAccess;
-                    throw;
-                }
-                finally
-                {
-                    RaiseChangedEvent = true;
-                }
+                RaiseChangedEvent = true;
             }
         }
+    }
 
-        public FieldModifier Modifier
-        {
-            get { return modifier; }
-        }
+    public FieldModifier Modifier
+    {
+        get { return modifier; }
+        set => modifier = value;
+    }
 
-        public sealed override bool IsModifierless
+    public sealed override bool IsModifierless
+    {
+        get { return (modifier == FieldModifier.None); }
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set static modifier.
+    /// </exception>
+    public override bool IsStatic
+    {
+        get { return ((modifier & FieldModifier.Static) != 0); }
+        set
         {
-            get
+            if (value == IsStatic)
+                return;
+
+            FieldModifier previousModifier = modifier;
+
+            try
             {
-                return (modifier == FieldModifier.None);
+                if (value)
+                    modifier |= FieldModifier.Static;
+                else
+                    modifier &= ~FieldModifier.Static;
+                Language.ValidateField(this);
+                Changed();
             }
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set static modifier.
-        /// </exception>
-        public override bool IsStatic
-        {
-            get
+            catch
             {
-                return ((modifier & FieldModifier.Static) != 0);
-            }
-            set
-            {
-                if (value == IsStatic)
-                    return;
-
-                FieldModifier previousModifier = modifier;
-
-                try
-                {
-                    if (value)
-                        modifier |= FieldModifier.Static;
-                    else
-                        modifier &= ~FieldModifier.Static;
-                    Language.ValidateField(this);
-                    Changed();
-                }
-                catch
-                {
-                    modifier = previousModifier;
-                    throw;
-                }
+                modifier = previousModifier;
+                throw;
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set hider modifier.
-        /// </exception>
-        public override bool IsHider
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set hider modifier.
+    /// </exception>
+    public override bool IsHider
+    {
+        get { return ((modifier & FieldModifier.Hider) != 0); }
+        set
         {
-            get
+            if (value == IsHider)
+                return;
+
+            FieldModifier previousModifier = modifier;
+
+            try
             {
-                return ((modifier & FieldModifier.Hider) != 0);
+                if (value)
+                    modifier |= FieldModifier.Hider;
+                else
+                    modifier &= ~FieldModifier.Hider;
+                Language.ValidateField(this);
+                Changed();
             }
-            set
+            catch
             {
-                if (value == IsHider)
-                    return;
-
-                FieldModifier previousModifier = modifier;
-
-                try
-                {
-                    if (value)
-                        modifier |= FieldModifier.Hider;
-                    else
-                        modifier &= ~FieldModifier.Hider;
-                    Language.ValidateField(this);
-                    Changed();
-                }
-                catch
-                {
-                    modifier = previousModifier;
-                    throw;
-                }
+                modifier = previousModifier;
+                throw;
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set readonly modifier.
-        /// </exception>
-        public virtual bool IsReadonly
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set readonly modifier.
+    /// </exception>
+    public virtual bool IsReadonly
+    {
+        get { return ((modifier & FieldModifier.Readonly) != 0); }
+        set
         {
-            get
+            if (value == IsReadonly)
+                return;
+
+            FieldModifier previousModifier = modifier;
+
+            try
             {
-                return ((modifier & FieldModifier.Readonly) != 0);
+                if (value)
+                    modifier |= FieldModifier.Readonly;
+                else
+                    modifier &= ~FieldModifier.Readonly;
+                Language.ValidateField(this);
+                Changed();
             }
-            set
+            catch
             {
-                if (value == IsReadonly)
-                    return;
-
-                FieldModifier previousModifier = modifier;
-
-                try
-                {
-                    if (value)
-                        modifier |= FieldModifier.Readonly;
-                    else
-                        modifier &= ~FieldModifier.Readonly;
-                    Language.ValidateField(this);
-                    Changed();
-                }
-                catch
-                {
-                    modifier = previousModifier;
-                    throw;
-                }
+                modifier = previousModifier;
+                throw;
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set constant modifier.
-        /// </exception>
-        public virtual bool IsConstant
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set constant modifier.
+    /// </exception>
+    public virtual bool IsConstant
+    {
+        get { return ((modifier & FieldModifier.Constant) != 0); }
+        set
         {
-            get
+            if (value == IsConstant)
+                return;
+
+            FieldModifier previousModifier = modifier;
+
+            try
             {
-                return ((modifier & FieldModifier.Constant) != 0);
+                if (value)
+                    modifier |= FieldModifier.Constant;
+                else
+                    modifier &= ~FieldModifier.Constant;
+                Language.ValidateField(this);
+                Changed();
             }
-            set
+            catch
             {
-                if (value == IsConstant)
-                    return;
-
-                FieldModifier previousModifier = modifier;
-
-                try
-                {
-                    if (value)
-                        modifier |= FieldModifier.Constant;
-                    else
-                        modifier &= ~FieldModifier.Constant;
-                    Language.ValidateField(this);
-                    Changed();
-                }
-                catch
-                {
-                    modifier = previousModifier;
-                    throw;
-                }
+                modifier = previousModifier;
+                throw;
             }
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// Cannot set volatile modifier.
-        /// </exception>
-        public virtual bool IsVolatile
+    /// <exception cref="BadSyntaxException">
+    /// Cannot set volatile modifier.
+    /// </exception>
+    public virtual bool IsVolatile
+    {
+        get { return ((modifier & FieldModifier.Volatile) != 0); }
+        set
         {
-            get
+            if (value == IsVolatile)
+                return;
+
+            FieldModifier previousModifier = modifier;
+
+            try
             {
-                return ((modifier & FieldModifier.Volatile) != 0);
+                if (value)
+                    modifier |= FieldModifier.Volatile;
+                else
+                    modifier &= ~FieldModifier.Volatile;
+                Language.ValidateField(this);
+                Changed();
             }
-            set
+            catch
             {
-                if (value == IsVolatile)
-                    return;
-
-                FieldModifier previousModifier = modifier;
-
-                try
-                {
-                    if (value)
-                        modifier |= FieldModifier.Volatile;
-                    else
-                        modifier &= ~FieldModifier.Volatile;
-                    Language.ValidateField(this);
-                    Changed();
-                }
-                catch
-                {
-                    modifier = previousModifier;
-                    throw;
-                }
+                modifier = previousModifier;
+                throw;
             }
         }
+    }
 
-        public virtual string InitialValue
+    public virtual string InitialValue
+    {
+        get { return initialValue; }
+        set
         {
-            get
+            if (initialValue != value &&
+                (!string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(initialValue)))
             {
-                return initialValue;
-            }
-            set
-            {
-                if (initialValue != value &&
-                    (!string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(initialValue)))
-                {
-                    initialValue = value;
-                    Changed();
-                }
-            }
-        }
-
-        public bool HasInitialValue
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(InitialValue);
-            }
-        }
-
-        public virtual void ClearModifiers()
-        {
-            if (modifier != FieldModifier.None)
-            {
-                modifier = FieldModifier.None;
+                initialValue = value;
                 Changed();
             }
         }
-
-        public sealed override string GetUmlDescription(bool getType, bool getParameters,
-            bool getParameterNames, bool getInitValue)
-        {
-            StringBuilder builder = new StringBuilder(50);
-
-            builder.Append(Name);
-            if (getType)
-                builder.AppendFormat(": {0}", Type);
-            if (getInitValue && HasInitialValue)
-                builder.AppendFormat(" = {0}", InitialValue);
-
-            return builder.ToString();
-        }
-
-        protected override void CopyFrom(Member member)
-        {
-            base.CopyFrom(member);
-
-            Field field = (Field)member;
-            modifier = field.modifier;
-            initialValue = field.initialValue;
-        }
-
-        protected internal abstract Field Clone(CompositeType newParent);
     }
+
+    public bool HasInitialValue
+    {
+        get { return !string.IsNullOrEmpty(InitialValue); }
+    }
+
+    public virtual void ClearModifiers()
+    {
+        if (modifier != FieldModifier.None)
+        {
+            modifier = FieldModifier.None;
+            Changed();
+        }
+    }
+
+    public sealed override string GetUmlDescription(bool getType, bool getParameters,
+        bool getParameterNames, bool getInitValue)
+    {
+        StringBuilder builder = new StringBuilder(50);
+
+        builder.Append(Name);
+        if (getType)
+            builder.AppendFormat(": {0}", Type);
+        if (getInitValue && HasInitialValue)
+            builder.AppendFormat(" = {0}", InitialValue);
+
+        return builder.ToString();
+    }
+
+    protected override void CopyFrom(Member member)
+    {
+        base.CopyFrom(member);
+
+        Field field = (Field)member;
+        modifier = field.modifier;
+        initialValue = field.initialValue;
+    }
+
+    protected internal abstract Field Clone(CompositeType newParent);
 }

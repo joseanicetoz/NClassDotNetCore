@@ -16,124 +16,109 @@
 using NClass.Core;
 using System;
 using System.Text;
+using NClass.Core.Entities;
+using NClass.Core.Members;
 
-namespace NClass.Java
+namespace NClass.Java;
+
+internal sealed class JavaEnum : EnumType
 {
-    internal sealed class JavaEnum : EnumType
+    public override AccessModifier AccessModifier
     {
-        internal JavaEnum() : this("NewEnum")
+        get { return base.AccessModifier; }
+        set
         {
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="name"/> does not fit to the syntax.
-        /// </exception>
-        internal JavaEnum(string name) : base(name)
-        {
-        }
-
-        public override AccessModifier AccessModifier
-        {
-            get
+            if (IsNested ||
+                value == AccessModifier.Default ||
+                value == AccessModifier.Public)
             {
-                return base.AccessModifier;
-            }
-            set
-            {
-                if (IsNested ||
-                    value == AccessModifier.Default ||
-                    value == AccessModifier.Public)
-                {
-                    base.AccessModifier = value;
-                }
+                base.AccessModifier = value;
             }
         }
+    }
 
-        public override AccessModifier DefaultAccess
-        {
-            get { return AccessModifier.Internal; }
-        }
+    public override AccessModifier DefaultAccess
+    {
+        get { return AccessModifier.Internal; }
+    }
 
-        /// <exception cref="ArgumentException">
-        /// The <paramref name="value"/> is already a child member of the type.
-        /// </exception>
-        public override CompositeType NestingParent
+    /// <exception cref="ArgumentException">
+    /// The <paramref name="value"/> is already a child member of the type.
+    /// </exception>
+    public override CompositeType NestingParent
+    {
+        get { return base.NestingParent; }
+        protected set
         {
-            get
+            try
             {
-                return base.NestingParent;
+                RaiseChangedEvent = false;
+
+                base.NestingParent = value;
+                if (NestingParent == null && Access != AccessModifier.Public)
+                    AccessModifier = AccessModifier.Default;
             }
-            protected set
+            finally
             {
-                try
-                {
-                    RaiseChangedEvent = false;
-
-                    base.NestingParent = value;
-                    if (NestingParent == null && Access != AccessModifier.Public)
-                        AccessModifier = AccessModifier.Default;
-                }
-                finally
-                {
-                    RaiseChangedEvent = true;
-                }
+                RaiseChangedEvent = true;
             }
         }
+    }
 
-        public override Language Language
-        {
-            get { return JavaLanguage.Instance; }
-        }
+    public override Language Language
+    {
+        get { return JavaLanguage.Instance; }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The name does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The name is a reserved name.
-        /// </exception>
-        public override EnumValue AddValue(string declaration)
-        {
-            EnumValue value = new JavaEnumValue(declaration);
+    internal JavaEnum() : this("NewEnum")
+    {
+    }
+    internal JavaEnum(string name) : base(name)
+    {
+    }
 
-            AddValue(value);
+    public override EnumValue AddValue(string declaration)
+    {
+        EnumValue value = new JavaEnumValue(declaration);
+
+        AddValue(value);
+        return value;
+    }
+
+    /// <exception cref="BadSyntaxException">
+    /// The name does not fit to the syntax.
+    /// </exception>
+    /// <exception cref="ReservedNameException">
+    /// The name is a reserved name.
+    /// </exception>
+    public override EnumValue ModifyValue(EnumValue value, string declaration)
+    {
+        EnumValue newValue = new JavaEnumValue(declaration);
+
+        if (ChangeValue(value, newValue))
+            return newValue;
+        else
             return value;
-        }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The name does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The name is a reserved name.
-        /// </exception>
-        public override EnumValue ModifyValue(EnumValue value, string declaration)
+    public override string GetDeclaration()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        if (AccessModifier != AccessModifier.Default)
         {
-            EnumValue newValue = new JavaEnumValue(declaration);
-
-            if (ChangeValue(value, newValue))
-                return newValue;
-            else
-                return value;
+            builder.Append(Language.GetAccessString(AccessModifier, true));
+            builder.Append(" ");
         }
+        builder.AppendFormat("enum {0}", Name);
 
-        public override string GetDeclaration()
-        {
-            StringBuilder builder = new StringBuilder();
+        return builder.ToString();
+    }
 
-            if (AccessModifier != AccessModifier.Default)
-            {
-                builder.Append(Language.GetAccessString(AccessModifier, true));
-                builder.Append(" ");
-            }
-            builder.AppendFormat("enum {0}", Name);
-
-            return builder.ToString();
-        }
-
-        public override EnumType Clone()
-        {
-            JavaEnum newEnum = new JavaEnum();
-            newEnum.CopyFrom(this);
-            return newEnum;
-        }
+    public override EnumType Clone()
+    {
+        JavaEnum newEnum = new JavaEnum();
+        newEnum.CopyFrom(this);
+        return newEnum;
     }
 }

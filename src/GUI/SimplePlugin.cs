@@ -17,62 +17,52 @@ using NClass.Translations;
 using System;
 using System.Windows.Forms;
 
-namespace NClass.GUI
+namespace NClass.GUI;
+
+public abstract class SimplePlugin : Plugin
 {
-    public abstract class SimplePlugin : Plugin
+    private readonly ToolStripMenuItem menuItem;
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="environment"/> is null.
+    /// </exception>
+    protected SimplePlugin(NClassEnvironment environment) : base(environment)
     {
-        readonly ToolStripMenuItem menuItem;
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="environment"/> is null.
-        /// </exception>
-        protected SimplePlugin(NClassEnvironment environment) : base(environment)
+        menuItem = new ToolStripMenuItem
         {
-            menuItem = new ToolStripMenuItem
-            {
-                Text = MenuText,
-                ToolTipText = string.Format(Strings.PluginTooltip, Name, Author)
-            };
-            menuItem.Click += new EventHandler(menuItem_Click);
-        }
-
-        public override ToolStripItem MenuItem
-        {
-            get { return menuItem; }
-        }
-
-        private void menuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Launch();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, Strings.UnknownError,
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        #region Abstract members
-
-        public abstract string Name
-        {
-            get;
-        }
-
-        public abstract string Author
-        {
-            get;
-        }
-
-        public abstract string MenuText
-        {
-            get;
-        }
-
-        protected abstract void Launch();
-
-        #endregion
+            Text = MenuText,
+            ToolTipText = string.Format(Strings.PluginTooltip, Name, Author)
+        };
+        menuItem.Click += new EventHandler(menuItem_Click);
     }
+
+    public override ToolStripItem MenuItem
+    {
+        get { return menuItem; }
+    }
+
+    private void menuItem_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            Launch();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, Strings.UnknownError,
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    #region Abstract members
+
+    public abstract string Name { get; }
+
+    public abstract string Author { get; }
+
+    public abstract string MenuText { get; }
+
+    protected abstract void Launch();
+
+    #endregion
 }

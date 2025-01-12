@@ -15,75 +15,76 @@
 
 using System.Windows.Forms;
 
-namespace NClass.GUI.ModelExplorer
+namespace NClass.GUI.ModelExplorer;
+
+public abstract class ModelNode : TreeNode
 {
-    public abstract class ModelNode : TreeNode
+    private bool editingLabel = false;
+    private bool deleted = false;
+
+    protected ModelNode()
     {
-        bool editingLabel = false;
-        bool deleted = false;
+    }
 
-        protected ModelNode()
-        {
-        }
+    public ModelView ModelView
+    {
+        get { return this.TreeView as ModelView; }
+        set => throw new System.NotImplementedException();
+    }
 
-        public ModelView ModelView
-        {
-            get { return this.TreeView as ModelView; }
-        }
+    public bool EditingLabel
+    {
+        get { return editingLabel; }
+        set => editingLabel = value;
+    }
 
-        public bool EditingLabel
+    public virtual void BeforeDelete()
+    {
+        foreach (ModelNode node in Nodes)
         {
-            get { return editingLabel; }
+            node.BeforeDelete();
         }
+    }
 
-        public virtual void BeforeDelete()
+    public void Delete()
+    {
+        if (!deleted)
         {
-            foreach (ModelNode node in Nodes)
-            {
-                node.BeforeDelete();
-            }
+            BeforeDelete();
+            Remove();
+            deleted = true;
         }
+    }
 
-        public void Delete()
+    public void EditLabel()
+    {
+        if (!editingLabel)
         {
-            if (!deleted)
-            {
-                BeforeDelete();
-                Remove();
-                deleted = true;
-            }
+            editingLabel = true;
+            this.BeginEdit();
         }
+    }
 
-        public void EditLabel()
-        {
-            if (!editingLabel)
-            {
-                editingLabel = true;
-                this.BeginEdit();
-            }
-        }
+    internal void LabelEdited()
+    {
+        editingLabel = false;
+    }
 
-        internal void LabelEdited()
-        {
-            editingLabel = false;
-        }
+    public virtual void LabelModified(NodeLabelEditEventArgs e)
+    {
+    }
 
-        public virtual void LabelModified(NodeLabelEditEventArgs e)
-        {
-        }
+    public virtual void DoubleClick()
+    {
+    }
 
-        public virtual void DoubleClick()
-        {
-        }
+    public virtual void EnterPressed()
+    {
+    }
 
-        public virtual void EnterPressed()
-        {
-        }
-
-        protected internal virtual void AfterInitialized()
-        {
-            foreach (ModelNode node in Nodes)
-                node.AfterInitialized();
-        }
+    protected internal virtual void AfterInitialized()
+    {
+        foreach (ModelNode node in Nodes)
+            node.AfterInitialized();
     }
 }

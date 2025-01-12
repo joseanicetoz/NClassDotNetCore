@@ -13,15 +13,14 @@
 // this program; if not, write to the Free Software Foundation, Inc., 
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-namespace NClass.Core
+namespace NClass.Core.Members;
+
+public enum MemberType
 {
-    public enum MemberType
-    {
-        Field,
-        Method,
-        Constructor,
-        Destructor,
-        Property,
-        Event
-    }
+    Field,
+    Method,
+    Constructor,
+    Destructor,
+    Property,
+    Event
 }

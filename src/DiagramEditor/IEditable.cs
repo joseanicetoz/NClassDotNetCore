@@ -15,30 +15,29 @@
 
 using System;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public interface IEditable
 {
-    public interface IEditable
-    {
-        bool IsEmpty { get; }
+    bool IsEmpty { get; }
 
-        bool CanCutToClipboard { get; }
+    bool CanCutToClipboard { get; }
 
-        bool CanCopyToClipboard { get; }
+    bool CanCopyToClipboard { get; }
 
-        bool CanPasteFromClipboard { get; }
+    bool CanPasteFromClipboard { get; }
 
 
-        event EventHandler ClipboardAvailabilityChanged;
+    event EventHandler ClipboardAvailabilityChanged;
 
 
-        void Cut();
+    void Cut();
 
-        void Copy();
+    void Copy();
 
-        void Paste();
+    void Paste();
 
-        void SelectAll();
+    void SelectAll();
 
-        void DeleteSelectedElements();
-    }
+    void DeleteSelectedElements();
 }

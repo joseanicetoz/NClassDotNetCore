@@ -16,16 +16,15 @@
 using NClass.Core;
 using System.Windows.Forms;
 
-namespace NClass.GUI.ModelExplorer
+namespace NClass.GUI.ModelExplorer;
+
+public abstract class ProjectItemNode : ModelNode
 {
-    public abstract class ProjectItemNode : ModelNode
+    protected ProjectItemNode()
     {
-        protected ProjectItemNode()
-        {
-        }
-
-        public abstract IProjectItem ProjectItem { get; }
-
-        public abstract override void LabelModified(NodeLabelEditEventArgs e);
     }
+
+    public abstract IProjectItem ProjectItem { get; set; }
+
+    public abstract override void LabelModified(NodeLabelEditEventArgs e);
 }

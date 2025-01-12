@@ -16,219 +16,220 @@
 using NClass.Core;
 using System;
 using System.Collections.Specialized;
+using NClass.Core.Entities;
+using NClass.Core.Members;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+internal sealed class CSharpSourceFileGenerator : SourceFileGenerator
 {
-    internal sealed class CSharpSourceFileGenerator : SourceFileGenerator
+    /// <exception cref="NullReferenceException">
+    /// <paramref name="type"/> is null.
+    /// </exception>
+    public CSharpSourceFileGenerator(TypeBase type, string rootNamespace)
+        : base(type, rootNamespace)
     {
-        /// <exception cref="NullReferenceException">
-        /// <paramref name="type"/> is null.
-        /// </exception>
-        public CSharpSourceFileGenerator(TypeBase type, string rootNamespace)
-            : base(type, rootNamespace)
-        {
-        }
+    }
 
-        protected override string Extension
-        {
-            get { return ".cs"; }
-        }
+    protected override string Extension
+    {
+        get { return ".cs"; }
+    }
 
-        protected override void WriteFileContent()
-        {
-            WriteUsings();
-            OpenNamespace();
-            WriteType(Type);
-            CloseNamespace();
-        }
+    protected override void WriteFileContent()
+    {
+        WriteUsings();
+        OpenNamespace();
+        WriteType(Type);
+        CloseNamespace();
+    }
 
-        private void WriteUsings()
-        {
-            StringCollection importList = Settings.Default.CSharpImportList;
-            foreach (string usingElement in importList)
-                WriteLine("using " + usingElement + ";");
+    private void WriteUsings()
+    {
+        StringCollection importList = Settings.Default.CSharpImportList;
+        foreach (string usingElement in importList)
+            WriteLine("using " + usingElement + ";");
 
-            if (importList.Count > 0)
+        if (importList.Count > 0)
+            AddBlankLine();
+    }
+
+    private void OpenNamespace()
+    {
+        WriteLine("namespace " + RootNamespace);
+        WriteLine("{");
+        IndentLevel++;
+    }
+
+    private void CloseNamespace()
+    {
+        IndentLevel--;
+        WriteLine("}");
+    }
+
+    private void WriteType(TypeBase type)
+    {
+        if (type is CompositeType compositeType)
+            WriteCompositeType(compositeType);
+        else if (type is EnumType enumType)
+            WriteEnum(enumType);
+        else if (type is DelegateType delegateType)
+            WriteDelegate(delegateType);
+    }
+
+    private void WriteCompositeType(CompositeType type)
+    {
+        // Writing type declaration
+        WriteLine(type.GetDeclaration());
+        WriteLine("{");
+        IndentLevel++;
+
+        if (type is ClassType classType)
+        {
+            foreach (TypeBase nestedType in classType.NestedChilds)
+            {
+                WriteType(nestedType);
                 AddBlankLine();
-        }
-
-        private void OpenNamespace()
-        {
-            WriteLine("namespace " + RootNamespace);
-            WriteLine("{");
-            IndentLevel++;
-        }
-
-        private void CloseNamespace()
-        {
-            IndentLevel--;
-            WriteLine("}");
-        }
-
-        private void WriteType(TypeBase type)
-        {
-            if (type is CompositeType compositeType)
-                WriteCompositeType(compositeType);
-            else if (type is EnumType enumType)
-                WriteEnum(enumType);
-            else if (type is DelegateType delegateType)
-                WriteDelegate(delegateType);
-        }
-
-        private void WriteCompositeType(CompositeType type)
-        {
-            // Writing type declaration
-            WriteLine(type.GetDeclaration());
-            WriteLine("{");
-            IndentLevel++;
-
-            if (type is ClassType classType)
-            {
-                foreach (TypeBase nestedType in classType.NestedChilds)
-                {
-                    WriteType(nestedType);
-                    AddBlankLine();
-                }
-            }
-
-            if (type.SupportsFields)
-            {
-                foreach (Field field in type.Fields)
-                    WriteField(field);
-            }
-
-            bool needBlankLine = (type.FieldCount > 0 && type.OperationCount > 0);
-
-            foreach (Operation operation in type.Operations)
-            {
-                if (needBlankLine)
-                    AddBlankLine();
-                needBlankLine = true;
-
-                WriteOperation(operation);
-            }
-
-            // Writing closing bracket of the type block
-            IndentLevel--;
-            WriteLine("}");
-        }
-
-        private void WriteEnum(EnumType _enum)
-        {
-            // Writing type declaration
-            WriteLine(_enum.GetDeclaration());
-            WriteLine("{");
-            IndentLevel++;
-
-            int valuesRemained = _enum.ValueCount;
-            foreach (EnumValue value in _enum.Values)
-            {
-                if (--valuesRemained > 0)
-                    WriteLine(value.GetDeclaration() + ",");
-                else
-                    WriteLine(value.GetDeclaration());
-            }
-
-            // Writing closing bracket of the type block
-            IndentLevel--;
-            WriteLine("}");
-        }
-
-        private void WriteDelegate(DelegateType _delegate)
-        {
-            WriteLine(_delegate.GetDeclaration());
-        }
-
-        private void WriteField(Field field)
-        {
-            WriteLine(field.GetDeclaration());
-        }
-
-        private void WriteOperation(Operation operation)
-        {
-            WriteLine(operation.GetDeclaration());
-
-            if (operation is Property propertyType)
-            {
-                WriteProperty(propertyType);
-            }
-            else if (operation.HasBody)
-            {
-                if (operation is Event)
-                {
-                    WriteLine("{");
-                    IndentLevel++;
-                    WriteLine("add {  }");
-                    WriteLine("remove {  }");
-                    IndentLevel--;
-                    WriteLine("}");
-                }
-                else
-                {
-                    WriteLine("{");
-                    IndentLevel++;
-                    WriteNotImplementedString();
-                    IndentLevel--;
-                    WriteLine("}");
-                }
             }
         }
 
-        private void WriteProperty(Property property)
+        if (type.SupportsFields)
         {
-            WriteLine("{");
-            IndentLevel++;
-
-            if (!property.IsWriteonly)
-            {
-                if (property.HasImplementation)
-                {
-                    WriteLine("get");
-                    WriteLine("{");
-                    IndentLevel++;
-                    WriteNotImplementedString();
-                    IndentLevel--;
-                    WriteLine("}");
-                }
-                else
-                {
-                    WriteLine("get;");
-                }
-            }
-            if (!property.IsReadonly)
-            {
-                if (property.HasImplementation)
-                {
-                    WriteLine("set");
-                    WriteLine("{");
-                    IndentLevel++;
-                    WriteNotImplementedString();
-                    IndentLevel--;
-                    WriteLine("}");
-                }
-                else
-                {
-                    WriteLine("set;");
-                }
-            }
-
-            IndentLevel--;
-            WriteLine("}");
+            foreach (Field field in type.Fields)
+                WriteField(field);
         }
 
-        private void WriteNotImplementedString()
+        bool needBlankLine = (type.FieldCount > 0 && type.OperationCount > 0);
+
+        foreach (Operation operation in type.Operations)
         {
-            if (Settings.Default.UseNotImplementedExceptions)
+            if (needBlankLine)
+                AddBlankLine();
+            needBlankLine = true;
+
+            WriteOperation(operation);
+        }
+
+        // Writing closing bracket of the type block
+        IndentLevel--;
+        WriteLine("}");
+    }
+
+    private void WriteEnum(EnumType _enum)
+    {
+        // Writing type declaration
+        WriteLine(_enum.GetDeclaration());
+        WriteLine("{");
+        IndentLevel++;
+
+        int valuesRemained = _enum.ValueCount;
+        foreach (EnumValue value in _enum.Values)
+        {
+            if (--valuesRemained > 0)
+                WriteLine(value.GetDeclaration() + ",");
+            else
+                WriteLine(value.GetDeclaration());
+        }
+
+        // Writing closing bracket of the type block
+        IndentLevel--;
+        WriteLine("}");
+    }
+
+    private void WriteDelegate(DelegateType _delegate)
+    {
+        WriteLine(_delegate.GetDeclaration());
+    }
+
+    private void WriteField(Field field)
+    {
+        WriteLine(field.GetDeclaration());
+    }
+
+    private void WriteOperation(Operation operation)
+    {
+        WriteLine(operation.GetDeclaration());
+
+        if (operation is Property propertyType)
+        {
+            WriteProperty(propertyType);
+        }
+        else if (operation.HasBody)
+        {
+            if (operation is Event)
             {
-                if (Settings.Default.CSharpImportList.Contains("System"))
-                    WriteLine("throw new NotImplementedException();");
-                else
-                    WriteLine("throw new System.NotImplementedException();");
+                WriteLine("{");
+                IndentLevel++;
+                WriteLine("add {  }");
+                WriteLine("remove {  }");
+                IndentLevel--;
+                WriteLine("}");
             }
             else
             {
-                AddBlankLine(true);
+                WriteLine("{");
+                IndentLevel++;
+                WriteNotImplementedString();
+                IndentLevel--;
+                WriteLine("}");
             }
+        }
+    }
+
+    private void WriteProperty(Property property)
+    {
+        WriteLine("{");
+        IndentLevel++;
+
+        if (!property.IsWriteonly)
+        {
+            if (property.HasImplementation)
+            {
+                WriteLine("get");
+                WriteLine("{");
+                IndentLevel++;
+                WriteNotImplementedString();
+                IndentLevel--;
+                WriteLine("}");
+            }
+            else
+            {
+                WriteLine("get;");
+            }
+        }
+        if (!property.IsReadonly)
+        {
+            if (property.HasImplementation)
+            {
+                WriteLine("set");
+                WriteLine("{");
+                IndentLevel++;
+                WriteNotImplementedString();
+                IndentLevel--;
+                WriteLine("}");
+            }
+            else
+            {
+                WriteLine("set;");
+            }
+        }
+
+        IndentLevel--;
+        WriteLine("}");
+    }
+
+    private void WriteNotImplementedString()
+    {
+        if (Settings.Default.UseNotImplementedExceptions)
+        {
+            if (Settings.Default.CSharpImportList.Contains("System"))
+                WriteLine("throw new NotImplementedException();");
+            else
+                WriteLine("throw new System.NotImplementedException();");
+        }
+        else
+        {
+            AddBlankLine(true);
         }
     }
 }

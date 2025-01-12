@@ -16,82 +16,84 @@
 using NClass.Core;
 using NClass.Translations;
 using System.Text.RegularExpressions;
+using NClass.Core.Members;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal sealed class CSharpEnumValue : EnumValue
 {
-    internal sealed class CSharpEnumValue : EnumValue
+    // <name> [= value]
+    private const string EnumNamePattern = "(?<name>" + CSharpLanguage.NamePattern + ")";
+
+    private const string EnumItemPattern = @"^\s*" + EnumNamePattern +
+                                           @"(\s*=\s*(?<value>\d+))?\s*$";
+
+    private static readonly Regex enumItemRegex = new Regex(EnumItemPattern, RegexOptions.ExplicitCapture);
+
+    private int? initValue;
+
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    internal CSharpEnumValue(string declaration) : base(declaration)
     {
-        // <name> [= value]
-        const string EnumNamePattern = "(?<name>" + CSharpLanguage.NamePattern + ")";
-        const string EnumItemPattern = @"^\s*" + EnumNamePattern +
-            @"(\s*=\s*(?<value>\d+))?\s*$";
+    }
 
-        static readonly Regex enumItemRegex = new Regex(EnumItemPattern, RegexOptions.ExplicitCapture);
+    public int? InitValue
+    {
+        get { return initValue; }
+        set => initValue = value;
+    }
 
-        int? initValue;
+    /// <exception cref="BadSyntaxException">
+    /// The <paramref name="declaration"/> does not fit to the syntax.
+    /// </exception>
+    public override void InitFromString(string declaration)
+    {
+        Match match = enumItemRegex.Match(declaration);
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        internal CSharpEnumValue(string declaration) : base(declaration)
+        try
         {
-        }
+            RaiseChangedEvent = false;
 
-        public int? InitValue
-        {
-            get { return initValue; }
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        public override void InitFromString(string declaration)
-        {
-            Match match = enumItemRegex.Match(declaration);
-
-            try
+            if (match.Success)
             {
-                RaiseChangedEvent = false;
+                Group nameGroup = match.Groups["name"];
+                Group valueGroup = match.Groups["value"];
 
-                if (match.Success)
+                Name = nameGroup.Value;
+                if (valueGroup.Success)
                 {
-                    Group nameGroup = match.Groups["name"];
-                    Group valueGroup = match.Groups["value"];
-
-                    Name = nameGroup.Value;
-                    if (valueGroup.Success)
-                    {
-                        if (int.TryParse(valueGroup.Value, out int intValue))
-                            initValue = intValue;
-                        else
-                            initValue = null;
-                    }
+                    if (int.TryParse(valueGroup.Value, out int intValue))
+                        initValue = intValue;
                     else
-                    {
                         initValue = null;
-                    }
                 }
                 else
                 {
-                    throw new BadSyntaxException(Strings.ErrorInvalidDeclaration);
+                    initValue = null;
                 }
             }
-            finally
+            else
             {
-                RaiseChangedEvent = true;
+                throw new BadSyntaxException(Strings.ErrorInvalidDeclaration);
             }
         }
-
-        public override string GetDeclaration()
+        finally
         {
-            if (InitValue == null)
-                return Name;
-            return Name + " = " + InitValue;
+            RaiseChangedEvent = true;
         }
+    }
 
-        protected override EnumValue Clone()
-        {
-            return new CSharpEnumValue(GetDeclaration());
-        }
+    public override string GetDeclaration()
+    {
+        if (InitValue == null)
+            return Name;
+        return Name + " = " + InitValue;
+    }
+
+    protected override EnumValue Clone()
+    {
+        return new CSharpEnumValue(GetDeclaration());
     }
 }

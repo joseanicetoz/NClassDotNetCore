@@ -16,162 +16,150 @@
 using NClass.Core;
 using NClass.Translations;
 using System.Text.RegularExpressions;
+using NClass.Core.Parameters;
 
-namespace NClass.CSharp
+namespace NClass.CSharp;
+
+internal class CSharpArgumentList : ArgumentList
 {
-    internal class CSharpArgumentList : ArgumentList
+    // [<modifiers>] <type> <name> [,]
+    private const string ParameterPattern =
+        @"(?<modifier>out|ref|params)?(?(modifier)\s+|)" +
+        @"(?<type>" + CSharpLanguage.GenericTypePattern2 + @")\s+" +
+        @"(?<name>" + CSharpLanguage.NamePattern + @")" +
+        @"(\s*=\s*(?<defval>([^,""]+|""(\\""|[^""])*"")))?";
+
+    private const string ParameterStringPattern = @"^\s*(" + ParameterPattern + @"\s*(,\s*|$))*$";
+
+    private static readonly Regex parameterRegex =
+        new Regex(ParameterPattern, RegexOptions.ExplicitCapture);
+
+    private static readonly Regex singleParamterRegex =
+        new Regex("^" + ParameterPattern + "$", RegexOptions.ExplicitCapture);
+
+    private static readonly Regex parameterStringRegex =
+        new Regex(ParameterStringPattern, RegexOptions.ExplicitCapture);
+
+    internal CSharpArgumentList()
     {
-        // [<modifiers>] <type> <name> [,]
-        const string ParameterPattern =
-            @"(?<modifier>out|ref|params)?(?(modifier)\s+|)" +
-            @"(?<type>" + CSharpLanguage.GenericTypePattern2 + @")\s+" +
-            @"(?<name>" + CSharpLanguage.NamePattern + @")" +
-            @"(\s*=\s*(?<defval>([^,""]+|""(\\""|[^""])*"")))?";
-        const string ParameterStringPattern = @"^\s*(" + ParameterPattern + @"\s*(,\s*|$))*$";
+    }
 
-        static readonly Regex parameterRegex =
-            new Regex(ParameterPattern, RegexOptions.ExplicitCapture);
-        static readonly Regex singleParamterRegex =
-            new Regex("^" + ParameterPattern + "$", RegexOptions.ExplicitCapture);
-        static readonly Regex parameterStringRegex =
-            new Regex(ParameterStringPattern, RegexOptions.ExplicitCapture);
+    private CSharpArgumentList(int capacity) : base(capacity)
+    {
+    }
 
-        internal CSharpArgumentList()
+    public override Parameter Add(string declaration)
+    {
+        Match match = singleParamterRegex.Match(declaration);
+
+        if (match.Success)
         {
+            Group nameGroup = match.Groups["name"];
+            Group typeGroup = match.Groups["type"];
+            Group modifierGroup = match.Groups["modifier"];
+            Group defvalGroup = match.Groups["defval"];
+
+            if (IsReservedName(nameGroup.Value))
+                throw new ReservedNameException(nameGroup.Value);
+
+            Parameter parameter = new CSharpParameter(nameGroup.Value, typeGroup.Value,
+                ParseParameterModifier(modifierGroup.Value), defvalGroup.Value);
+            InnerList.Add(parameter);
+
+            return parameter;
         }
-
-        private CSharpArgumentList(int capacity) : base(capacity)
+        else
         {
+            throw new BadSyntaxException(
+                Strings.ErrorInvalidParameterDeclaration);
         }
+    }
 
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public override Parameter Add(string declaration)
+    public override Parameter ModifyParameter(Parameter parameter, string declaration)
+    {
+        Match match = singleParamterRegex.Match(declaration);
+        int index = InnerList.IndexOf(parameter);
+
+        if (index < 0)
+            return parameter;
+
+        if (match.Success)
         {
-            Match match = singleParamterRegex.Match(declaration);
+            Group nameGroup = match.Groups["name"];
+            Group typeGroup = match.Groups["type"];
+            Group modifierGroup = match.Groups["modifier"];
+            Group defvalGroup = match.Groups["defval"];
 
-            if (match.Success)
+            if (IsReservedName(nameGroup.Value, index))
+                throw new ReservedNameException(nameGroup.Value);
+
+            Parameter newParameter = new CSharpParameter(nameGroup.Value, typeGroup.Value,
+                ParseParameterModifier(modifierGroup.Value), defvalGroup.Value);
+            InnerList[index] = newParameter;
+            return newParameter;
+        }
+        else
+        {
+            throw new BadSyntaxException(
+                Strings.ErrorInvalidParameterDeclaration);
+        }
+    }
+
+    private ParameterModifier ParseParameterModifier(string modifierString)
+    {
+        switch (modifierString)
+        {
+            case "ref":
+                return ParameterModifier.Inout;
+
+            case "out":
+                return ParameterModifier.Out;
+
+            case "params":
+                return ParameterModifier.Params;
+
+            case "in":
+            default:
+                return ParameterModifier.In;
+        }
+    }
+
+    public override ArgumentList Clone()
+    {
+        CSharpArgumentList argumentList = new CSharpArgumentList(Capacity);
+        foreach (Parameter parameter in InnerList)
+        {
+            argumentList.InnerList.Add(parameter.Clone());
+        }
+        return argumentList;
+    }
+
+    public override void InitFromString(string declaration)
+    {
+        if (parameterStringRegex.IsMatch(declaration))
+        {
+            Clear();
+
+            bool optionalPart = false;
+            foreach (Match match in parameterRegex.Matches(declaration))
             {
                 Group nameGroup = match.Groups["name"];
                 Group typeGroup = match.Groups["type"];
                 Group modifierGroup = match.Groups["modifier"];
                 Group defvalGroup = match.Groups["defval"];
 
-                if (IsReservedName(nameGroup.Value))
-                    throw new ReservedNameException(nameGroup.Value);
+                if (defvalGroup.Success)
+                    optionalPart = true;
+                else if (optionalPart)
+                    throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
 
-                Parameter parameter = new CSharpParameter(nameGroup.Value, typeGroup.Value,
-                    ParseParameterModifier(modifierGroup.Value), defvalGroup.Value);
-                InnerList.Add(parameter);
-
-                return parameter;
-            }
-            else
-            {
-                throw new BadSyntaxException(
-                    Strings.ErrorInvalidParameterDeclaration);
+                InnerList.Add(new CSharpParameter(nameGroup.Value, typeGroup.Value,
+                    ParseParameterModifier(modifierGroup.Value), defvalGroup.Value));
             }
         }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        /// <exception cref="ReservedNameException">
-        /// The parameter name is already exists.
-        /// </exception>
-        public override Parameter ModifyParameter(Parameter parameter, string declaration)
+        else
         {
-            Match match = singleParamterRegex.Match(declaration);
-            int index = InnerList.IndexOf(parameter);
-
-            if (index < 0)
-                return parameter;
-
-            if (match.Success)
-            {
-                Group nameGroup = match.Groups["name"];
-                Group typeGroup = match.Groups["type"];
-                Group modifierGroup = match.Groups["modifier"];
-                Group defvalGroup = match.Groups["defval"];
-
-                if (IsReservedName(nameGroup.Value, index))
-                    throw new ReservedNameException(nameGroup.Value);
-
-                Parameter newParameter = new CSharpParameter(nameGroup.Value, typeGroup.Value,
-                    ParseParameterModifier(modifierGroup.Value), defvalGroup.Value);
-                InnerList[index] = newParameter;
-                return newParameter;
-            }
-            else
-            {
-                throw new BadSyntaxException(
-                    Strings.ErrorInvalidParameterDeclaration);
-            }
-        }
-
-        private ParameterModifier ParseParameterModifier(string modifierString)
-        {
-            switch (modifierString)
-            {
-                case "ref":
-                    return ParameterModifier.Inout;
-
-                case "out":
-                    return ParameterModifier.Out;
-
-                case "params":
-                    return ParameterModifier.Params;
-
-                case "in":
-                default:
-                    return ParameterModifier.In;
-            }
-        }
-
-        public override ArgumentList Clone()
-        {
-            CSharpArgumentList argumentList = new CSharpArgumentList(Capacity);
-            foreach (Parameter parameter in InnerList)
-            {
-                argumentList.InnerList.Add(parameter.Clone());
-            }
-            return argumentList;
-        }
-
-        /// <exception cref="BadSyntaxException">
-        /// The <paramref name="declaration"/> does not fit to the syntax.
-        /// </exception>
-        public override void InitFromString(string declaration)
-        {
-            if (parameterStringRegex.IsMatch(declaration))
-            {
-                Clear();
-
-                bool optionalPart = false;
-                foreach (Match match in parameterRegex.Matches(declaration))
-                {
-                    Group nameGroup = match.Groups["name"];
-                    Group typeGroup = match.Groups["type"];
-                    Group modifierGroup = match.Groups["modifier"];
-                    Group defvalGroup = match.Groups["defval"];
-
-                    if (defvalGroup.Success)
-                        optionalPart = true;
-                    else if (optionalPart)
-                        throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-
-                    InnerList.Add(new CSharpParameter(nameGroup.Value, typeGroup.Value,
-                        ParseParameterModifier(modifierGroup.Value), defvalGroup.Value));
-                }
-            }
-            else
-            {
-                throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
-            }
+            throw new BadSyntaxException(Strings.ErrorInvalidParameterDeclaration);
         }
     }
 }

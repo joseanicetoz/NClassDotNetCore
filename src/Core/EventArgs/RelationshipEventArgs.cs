@@ -14,23 +14,23 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
+using NClass.Core.Relationships;
 
-namespace NClass.Core
+namespace NClass.Core.EventArgs;
+
+public delegate void RelationshipEventHandler(object sender, RelationshipEventArgs e);
+
+public class RelationshipEventArgs : System.EventArgs
 {
-    public delegate void RelationshipEventHandler(object sender, RelationshipEventArgs e);
+    private readonly Relationship relationship;
 
-    public class RelationshipEventArgs : EventArgs
+    public RelationshipEventArgs(Relationship relationship)
     {
-        readonly Relationship relationship;
+        this.relationship = relationship;
+    }
 
-        public RelationshipEventArgs(Relationship relationship)
-        {
-            this.relationship = relationship;
-        }
-
-        public Relationship Relationship
-        {
-            get { return relationship; }
-        }
+    public Relationship Relationship
+    {
+        get { return relationship; }
     }
 }

@@ -16,41 +16,41 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace NClass.DiagramEditor
+namespace NClass.DiagramEditor;
+
+public abstract class DynamicMenu : IEnumerable<ToolStripMenuItem>
 {
-    public abstract class DynamicMenu : IEnumerable<ToolStripMenuItem>
+    private readonly int preferredIndex;
+
+    public DynamicMenu()
     {
-        readonly int preferredIndex;
-
-        public DynamicMenu()
-        {
-            this.preferredIndex = -1;
-        }
-
-        public DynamicMenu(int preferredIndex)
-        {
-            this.preferredIndex = preferredIndex;
-        }
-
-        public int PreferredIndex
-        {
-            get { return preferredIndex; }
-        }
-
-        public IEnumerator<ToolStripMenuItem> GetEnumerator()
-        {
-            return GetMenuItems().GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public abstract IEnumerable<ToolStripMenuItem> GetMenuItems();
-
-        public abstract ToolStrip GetToolStrip();
-
-        public abstract void SetReference(IDocument document);
+        this.preferredIndex = -1;
     }
+
+    public DynamicMenu(int preferredIndex)
+    {
+        this.preferredIndex = preferredIndex;
+    }
+
+    public int PreferredIndex
+    {
+        get { return preferredIndex; }
+        set => throw new System.NotImplementedException();
+    }
+
+    public IEnumerator<ToolStripMenuItem> GetEnumerator()
+    {
+        return GetMenuItems().GetEnumerator();
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public abstract IEnumerable<ToolStripMenuItem> GetMenuItems();
+
+    public abstract ToolStrip GetToolStrip();
+
+    public abstract void SetReference(IDocument document);
 }

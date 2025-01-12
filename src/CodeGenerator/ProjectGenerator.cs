@@ -17,103 +17,101 @@ using NClass.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NClass.Core.Entities;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+public abstract class ProjectGenerator
 {
-    public abstract class ProjectGenerator
+    private Model model;
+    private List<string> fileNames = new List<string>();
+
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="model"/> is null.
+    /// </exception>
+    protected ProjectGenerator(Model model)
     {
-        readonly Model model;
-        readonly List<string> fileNames = new List<string>();
+        this.model = model ?? throw new ArgumentNullException(nameof(model));
+    }
 
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="model"/> is null.
-        /// </exception>
-        protected ProjectGenerator(Model model)
+    public string ProjectName
+    {
+        get { return model.Name; }
+        set { model.Name = value; }
+    }
+
+    public abstract string RelativeProjectFileName { get; }
+
+    public Language ProjectLanguage
+    {
+        get { return model.Language; }
+        set { model.Language = value; }
+    }
+
+    protected Model Model
+    {
+        get { return model; }
+        set { model = value; }
+    }
+
+    protected string RootNamespace
+    {
+        get
         {
-            this.model = model ?? throw new ArgumentNullException(nameof(model));
+            string projectName = Model.Project.Name;
+            string modelName = Model.Name;
+
+            if (string.Equals(projectName, modelName, StringComparison.OrdinalIgnoreCase))
+                return modelName;
+            else
+                return projectName + "." + modelName;
         }
+    }
 
-        public string ProjectName
-        {
-            get { return model.Name; }
-        }
+    protected List<string> FileNames
+    {
+        get { return fileNames; }
+        set { fileNames = value; }
+    }
 
-        public abstract string RelativeProjectFileName
-        {
-            get;
-        }
+    internal bool Generate(string location)
+    {
+        bool success = true;
 
-        public Language ProjectLanguage
-        {
-            get { return model.Language; }
-        }
+        success &= GenerateSourceFiles(location);
+        success &= GenerateProjectFiles(location);
 
-        protected Model Model
-        {
-            get { return model; }
-        }
+        return success;
+    }
 
-        protected string RootNamespace
+    private bool GenerateSourceFiles(string location)
+    {
+        bool success = true;
+        location = Path.Combine(location, ProjectName);
+
+        fileNames.Clear();
+        foreach (IEntity entity in model.Entities)
         {
-            get
+            if (entity is TypeBase type && !type.IsNested)
             {
-                string projectName = Model.Project.Name;
-                string modelName = Model.Name;
+                SourceFileGenerator sourceFile = CreateSourceFileGenerator(type);
 
-                if (string.Equals(projectName, modelName, StringComparison.OrdinalIgnoreCase))
-                    return modelName;
-                else
-                    return projectName + "." + modelName;
-            }
-        }
-
-        protected List<string> FileNames
-        {
-            get { return fileNames; }
-        }
-
-        /// <exception cref="ArgumentException">
-        /// <paramref name="location"/> contains invalid path characters.
-        /// </exception>
-        internal bool Generate(string location)
-        {
-            bool success = true;
-
-            success &= GenerateSourceFiles(location);
-            success &= GenerateProjectFiles(location);
-
-            return success;
-        }
-
-        private bool GenerateSourceFiles(string location)
-        {
-            bool success = true;
-            location = Path.Combine(location, ProjectName);
-
-            fileNames.Clear();
-            foreach (IEntity entity in model.Entities)
-            {
-                if (entity is TypeBase type && !type.IsNested)
+                try
                 {
-                    SourceFileGenerator sourceFile = CreateSourceFileGenerator(type);
-
-                    try
-                    {
-                        string fileName = sourceFile.Generate(location);
-                        fileNames.Add(fileName);
-                    }
-                    catch (FileGenerationException)
-                    {
-                        success = false;
-                    }
+                    string fileName = sourceFile.Generate(location);
+                    fileNames.Add(fileName);
+                }
+                catch (FileGenerationException)
+                {
+                    success = false;
                 }
             }
-
-            return success;
         }
 
-        protected abstract SourceFileGenerator CreateSourceFileGenerator(TypeBase type);
-
-        protected abstract bool GenerateProjectFiles(string location);
+        return success;
     }
+
+    protected abstract SourceFileGenerator CreateSourceFileGenerator(TypeBase type);
+
+    protected abstract bool GenerateProjectFiles(string location);
 }

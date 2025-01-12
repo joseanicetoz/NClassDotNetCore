@@ -16,44 +16,36 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace NClass.CodeGenerator
+namespace NClass.CodeGenerator;
+
+[Serializable]
+public class FileGenerationException : Exception
 {
-    public class FileGenerationException : Exception
+    public FileGenerationException(string filePath) : base(@"Could not generate the file\n" + filePath)
     {
-        readonly string filePath;
-
-        public FileGenerationException(string filePath)
-            : base(@"Could not generate the file\n" + filePath)
-        {
-            this.filePath = filePath;
-        }
-
-        public FileGenerationException(string filePath, string message)
-            : base(message)
-        {
-            this.filePath = filePath;
-        }
-
-        public FileGenerationException(string filePath, Exception innerException)
-            : base(@"Could not generate the file\n" + filePath, innerException)
-        {
-            this.filePath = filePath;
-        }
-
-        public FileGenerationException(string filePath, string message, Exception innerException)
-            : base(message, innerException)
-        {
-            this.filePath = filePath;
-        }
-
-        protected FileGenerationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
-        public string FilePath
-        {
-            get { return filePath; }
-        }
+        this.FilePath = filePath;
     }
+
+    public FileGenerationException(string filePath, string message) : base(message)
+    {
+        this.FilePath = filePath;
+    }
+
+    public FileGenerationException(string filePath, Exception innerException) : base(@"Could not generate the file\n" + filePath, innerException)
+    {
+        this.FilePath = filePath;
+    }
+
+    public FileGenerationException(string filePath, string message, Exception innerException) : base(message, innerException)
+    {
+        this.FilePath = filePath;
+    }
+
+    /*
+    protected FileGenerationException(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
+    }
+    */
+
+    public string FilePath { get; set; }
 }

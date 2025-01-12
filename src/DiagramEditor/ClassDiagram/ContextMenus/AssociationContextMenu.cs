@@ -19,150 +19,151 @@ using NClass.DiagramEditor.Properties;
 using NClass.Translations;
 using System;
 using System.Windows.Forms;
+using NClass.Core.Relationships;
 
-namespace NClass.DiagramEditor.ClassDiagram.ContextMenus
+namespace NClass.DiagramEditor.ClassDiagram.ContextMenus;
+
+internal sealed class AssociationContextMenu : DiagramContextMenu
 {
-    internal sealed class AssociationContextMenu : DiagramContextMenu
+    private static readonly AssociationContextMenu _default = new AssociationContextMenu();
+
+    private ToolStripMenuItem mnuDirection, mnuUnidirectional, mnuBidirectional;
+    private ToolStripMenuItem mnuType, mnuAssociation, mnuComposition, mnuAggregation;
+    private ToolStripMenuItem mnuReverse;
+    private ToolStripMenuItem mnuEdit;
+
+    private AssociationContextMenu()
     {
-        static readonly AssociationContextMenu _default = new AssociationContextMenu();
+        InitMenuItems();
+    }
 
-        ToolStripMenuItem mnuDirection, mnuUnidirectional, mnuBidirectional;
-        ToolStripMenuItem mnuType, mnuAssociation, mnuComposition, mnuAggregation;
-        ToolStripMenuItem mnuReverse;
-        ToolStripMenuItem mnuEdit;
+    public static AssociationContextMenu Default
+    {
+        get { return _default; }
+        set => throw new NotImplementedException();
+    }
 
-        private AssociationContextMenu()
+    private void UpdateTexts()
+    {
+        mnuDirection.Text = Strings.MenuDirection;
+        mnuUnidirectional.Text = Strings.MenuUnidirectional;
+        mnuBidirectional.Text = Strings.MenuBidirectional;
+        mnuType.Text = Strings.MenuType;
+        mnuAssociation.Text = Strings.MenuAssociation;
+        mnuComposition.Text = Strings.MenuComposition;
+        mnuAggregation.Text = Strings.MenuAggregation;
+        mnuReverse.Text = Strings.MenuReverse;
+        mnuEdit.Text = Strings.MenuProperties;
+    }
+
+    public override void ValidateMenuItems(Diagram diagram)
+    {
+        base.ValidateMenuItems(diagram);
+        ConnectionContextMenu.Default.ValidateMenuItems(diagram);
+        mnuEdit.Enabled = (diagram.SelectedElementCount == 1);
+    }
+
+    private void InitMenuItems()
+    {
+        mnuUnidirectional = new ToolStripMenuItem(Strings.MenuUnidirectional,
+            Resources.Unidirectional, mnuUnidirectional_Click);
+        mnuBidirectional = new ToolStripMenuItem(Strings.MenuBidirectional,
+            Resources.Bidirectional, mnuBidirectional_Click);
+        mnuDirection = new ToolStripMenuItem(Strings.MenuDirection, null,
+            mnuUnidirectional,
+            mnuBidirectional
+        );
+
+        mnuAssociation = new ToolStripMenuItem(Strings.MenuAssociation,
+            Resources.Association, mnuAssociation_Click);
+        mnuComposition = new ToolStripMenuItem(Strings.MenuComposition,
+            Resources.Composition, mnuComposition_Click);
+        mnuAggregation = new ToolStripMenuItem(Strings.MenuAggregation,
+            Resources.Aggregation, mnuAggregation_Click);
+        mnuType = new ToolStripMenuItem(Strings.MenuType, null,
+            mnuAssociation,
+            mnuComposition,
+            mnuAggregation
+        );
+
+        mnuReverse = new ToolStripMenuItem(Strings.MenuReverse, null, mnuReverse_Click);
+        mnuEdit = new ToolStripMenuItem(Strings.MenuEditAssociation,
+            Resources.Property, mnuEdit_Click);
+
+        MenuList.AddRange(ConnectionContextMenu.Default.MenuItems);
+        MenuList.InsertRange(7, new ToolStripItem[] {
+            mnuDirection,
+            mnuType,
+            mnuReverse,
+            new ToolStripSeparator(),
+        });
+        MenuList.Add(mnuEdit);
+    }
+
+    private void mnuUnidirectional_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            InitMenuItems();
+            foreach (Association association in Diagram.GetSelectedConnections())
+                association.AssociationRelationship.Direction = Direction.Unidirectional;
         }
+    }
 
-        public static AssociationContextMenu Default
+    private void mnuBidirectional_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            get { return _default; }
+            foreach (Association association in Diagram.GetSelectedConnections())
+                association.AssociationRelationship.Direction = Direction.Bidirectional;
         }
+    }
 
-        private void UpdateTexts()
+    private void mnuAssociation_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            mnuDirection.Text = Strings.MenuDirection;
-            mnuUnidirectional.Text = Strings.MenuUnidirectional;
-            mnuBidirectional.Text = Strings.MenuBidirectional;
-            mnuType.Text = Strings.MenuType;
-            mnuAssociation.Text = Strings.MenuAssociation;
-            mnuComposition.Text = Strings.MenuComposition;
-            mnuAggregation.Text = Strings.MenuAggregation;
-            mnuReverse.Text = Strings.MenuReverse;
-            mnuEdit.Text = Strings.MenuProperties;
-        }
-
-        public override void ValidateMenuItems(Diagram diagram)
-        {
-            base.ValidateMenuItems(diagram);
-            ConnectionContextMenu.Default.ValidateMenuItems(diagram);
-            mnuEdit.Enabled = (diagram.SelectedElementCount == 1);
-        }
-
-        private void InitMenuItems()
-        {
-            mnuUnidirectional = new ToolStripMenuItem(Strings.MenuUnidirectional,
-                Resources.Unidirectional, mnuUnidirectional_Click);
-            mnuBidirectional = new ToolStripMenuItem(Strings.MenuBidirectional,
-                Resources.Bidirectional, mnuBidirectional_Click);
-            mnuDirection = new ToolStripMenuItem(Strings.MenuDirection, null,
-                mnuUnidirectional,
-                mnuBidirectional
-            );
-
-            mnuAssociation = new ToolStripMenuItem(Strings.MenuAssociation,
-                Resources.Association, mnuAssociation_Click);
-            mnuComposition = new ToolStripMenuItem(Strings.MenuComposition,
-                Resources.Composition, mnuComposition_Click);
-            mnuAggregation = new ToolStripMenuItem(Strings.MenuAggregation,
-                Resources.Aggregation, mnuAggregation_Click);
-            mnuType = new ToolStripMenuItem(Strings.MenuType, null,
-                mnuAssociation,
-                mnuComposition,
-                mnuAggregation
-            );
-
-            mnuReverse = new ToolStripMenuItem(Strings.MenuReverse, null, mnuReverse_Click);
-            mnuEdit = new ToolStripMenuItem(Strings.MenuEditAssociation,
-                Resources.Property, mnuEdit_Click);
-
-            MenuList.AddRange(ConnectionContextMenu.Default.MenuItems);
-            MenuList.InsertRange(7, new ToolStripItem[] {
-                mnuDirection,
-                mnuType,
-                mnuReverse,
-                new ToolStripSeparator(),
-            });
-            MenuList.Add(mnuEdit);
-        }
-
-        private void mnuUnidirectional_Click(object sender, EventArgs e)
-        {
-            if (Diagram != null)
+            foreach (Association association in Diagram.GetSelectedConnections())
             {
-                foreach (Association association in Diagram.GetSelectedConnections())
-                    association.AssociationRelationship.Direction = Direction.Unidirectional;
+                association.AssociationRelationship.AssociationType = AssociationType.Association;
             }
         }
+    }
 
-        private void mnuBidirectional_Click(object sender, EventArgs e)
+    private void mnuComposition_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            if (Diagram != null)
-            {
-                foreach (Association association in Diagram.GetSelectedConnections())
-                    association.AssociationRelationship.Direction = Direction.Bidirectional;
-            }
+            foreach (Association association in Diagram.GetSelectedConnections())
+                association.AssociationRelationship.AssociationType = AssociationType.Composition;
         }
+    }
 
-        private void mnuAssociation_Click(object sender, EventArgs e)
+    private void mnuAggregation_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            if (Diagram != null)
-            {
-                foreach (Association association in Diagram.GetSelectedConnections())
-                {
-                    association.AssociationRelationship.AssociationType = AssociationType.Association;
-                }
-            }
+            foreach (Association association in Diagram.GetSelectedConnections())
+                association.AssociationRelationship.AssociationType = AssociationType.Aggregation;
         }
+    }
 
-        private void mnuComposition_Click(object sender, EventArgs e)
+    private void mnuReverse_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            if (Diagram != null)
-            {
-                foreach (Association association in Diagram.GetSelectedConnections())
-                    association.AssociationRelationship.AssociationType = AssociationType.Composition;
-            }
+            Association association = Diagram.TopSelectedElement as Association;
+            if (association != null)
+                association.AssociationRelationship.Reverse();
         }
+    }
 
-        private void mnuAggregation_Click(object sender, EventArgs e)
+    private void mnuEdit_Click(object sender, EventArgs e)
+    {
+        if (Diagram != null)
         {
-            if (Diagram != null)
-            {
-                foreach (Association association in Diagram.GetSelectedConnections())
-                    association.AssociationRelationship.AssociationType = AssociationType.Aggregation;
-            }
-        }
-
-        private void mnuReverse_Click(object sender, EventArgs e)
-        {
-            if (Diagram != null)
-            {
-                Association association = Diagram.TopSelectedElement as Association;
-                if (association != null)
-                    association.AssociationRelationship.Reverse();
-            }
-        }
-
-        private void mnuEdit_Click(object sender, EventArgs e)
-        {
-            if (Diagram != null)
-            {
-                Association association = Diagram.TopSelectedElement as Association;
-                if (association != null)
-                    association.ShowEditDialog();
-            }
+            Association association = Diagram.TopSelectedElement as Association;
+            if (association != null)
+                association.ShowEditDialog();
         }
     }
 }

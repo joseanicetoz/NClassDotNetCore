@@ -16,33 +16,19 @@
 using System;
 using System.Xml;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+public interface IProjectItem : IModifiable
 {
-    public interface IProjectItem : IModifiable
-    {
-        event EventHandler Renamed;
-        event EventHandler Closing;
-
-        string Name { get; }
-
-        Project Project { get; set; }
-
-        bool IsUntitled { get; }
-
-
-        void Close();
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>+
-        void Serialize(XmlElement node);
-
-        /// <exception cref="InvalidDataException">
-        /// The serialized format is corrupt and could not be loaded.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>
-        void Deserialize(XmlElement node);
-    }
+    event EventHandler Renamed; 
+    event EventHandler Closing;
+    string Name { get; set; }
+    Project Project { get; set; }
+    bool IsUntitled { get; }
+    void Close();
+    [Obsolete]
+    void Serialize(XmlElement node);
+    [Obsolete]
+    void Deserialize(XmlElement node);
 }
+

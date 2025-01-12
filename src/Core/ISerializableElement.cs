@@ -15,28 +15,15 @@
 
 using System;
 using System.Xml;
+using NClass.Core.EventArgs;
 
-namespace NClass.Core
+namespace NClass.Core;
+
+[Obsolete]
+public interface ISerializableElement
 {
-    public interface ISerializableElement
-    {
-        event SerializeEventHandler Serializing;
-        event SerializeEventHandler Deserializing;
-
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>
-        void Serialize(XmlElement node);
-
-        /// <exception cref="BadSyntaxException">
-        /// An error occured while deserializing.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// The XML document is corrupt.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="node"/> is null.
-        /// </exception>
-        void Deserialize(XmlElement node);
-    }
+    event SerializeEventHandler Serializing;
+    event SerializeEventHandler Deserializing;
+    void Serialize(XmlElement node);
+    void Deserialize(XmlElement node);
 }
